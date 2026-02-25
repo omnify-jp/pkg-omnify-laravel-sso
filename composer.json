@@ -1,5 +1,5 @@
 {
-    "name": "omnifyjp/omnify-client-laravel-sso",
+    "name": "omnifyjp/pkg-omnify-laravel-sso",
     "description": "SSO Client Package for Laravel - Provides Role, Permission and RolePermission models with Omnify schema-driven development",
     "type": "composer-plugin",
     "license": "MIT",
