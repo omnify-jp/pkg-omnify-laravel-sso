@@ -1,0 +1,92 @@
+# ==============================================================================
+# RolePermission (ロール権限 / Quyền vai trò)
+# ==============================================================================
+#
+# Mục đích (Purpose):
+#   Pivot table liên kết Role với Permission.
+#   Định nghĩa những permissions nào thuộc về role nào.
+#
+# Cấu trúc bảng:
+#   | Column        | Type | Description                    |
+#   |---------------|------|--------------------------------|
+#   | role_id       | UUID | FK → roles                     |
+#   | permission_id | UUID | FK → permissions               |
+#   | created_at    | TS   | Timestamp tạo                  |
+#   | updated_at    | TS   | Timestamp cập nhật             |
+#
+# Table Design:
+#   ┌─────────────────────────────────────────────────────────────────────────┐
+#   │  PIVOT TABLE: role_permissions                                         │
+#   ├─────────────────────────────────────────────────────────────────────────┤
+#   │  - NO auto-increment ID (composite primary key)                        │
+#   │  - (role_id, permission_id) = UNIQUE constraint                        │
+#   │  - Simple pivot, no extra fields                                       │
+#   └─────────────────────────────────────────────────────────────────────────┘
+#
+# Example Data:
+#   ┌─────────────────────────────────────────────────────────────────────────┐
+#   │  Role "Admin" có những permissions:                                    │
+#   │  ├── users.view                                                        │
+#   │  ├── users.create                                                      │
+#   │  ├── users.update                                                      │
+#   │  ├── users.delete                                                      │
+#   │  └── reports.view                                                      │
+#   │                                                                         │
+#   │  Role "Staff" có những permissions:                                    │
+#   │  ├── users.view                                                        │
+#   │  └── reports.view                                                      │
+#   └─────────────────────────────────────────────────────────────────────────┘
+#
+# Relationships:
+#   RolePermission ──┬── Role (N:1)
+#                    └── Permission (N:1)
+#
+# vs TeamPermission:
+#   ┌─────────────────────────────────────────────────────────────────────────┐
+#   │  RolePermission:                                                        │
+#   │    - Gán permissions cho Role (template)                               │
+#   │    - User có Role → User có Permissions của Role                       │
+#   │                                                                         │
+#   │  TeamPermission:                                                        │
+#   │    - Gán permissions trực tiếp cho Team                                │
+#   │    - Bypass Role, dùng cho special cases                               │
+#   └─────────────────────────────────────────────────────────────────────────┘
+#
+# Business Rules:
+#   - NO auto-increment ID (id: false)
+#   - (role_id, permission_id) là composite UNIQUE
+#   - Không cần softDelete (hard delete khi unassign)
+#
+# ==============================================================================
+
+kind: object
+
+displayName:
+  ja: ロール権限
+  en: Role Permission
+  vi: Quyền vai trò
+
+options:
+  id: false
+  primaryKey: [role, permission]
+  timestamps: true
+properties:
+  # FK to Role
+  role:
+    type: Association
+    relation: ManyToOne
+    target: Role
+    displayName:
+      ja: ロール
+      en: Role
+      vi: Vai trò
+
+  # FK to Permission
+  permission:
+    type: Association
+    relation: ManyToOne
+    target: Permission
+    displayName:
+      ja: 権限
+      en: Permission
+      vi: Quyền hạn

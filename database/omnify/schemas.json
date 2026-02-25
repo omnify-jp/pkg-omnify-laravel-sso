@@ -1,0 +1,1294 @@
+{
+  "generatedAt": "2026-02-24T01:58:21Z",
+  "database": {
+    "driver": "mysql"
+  },
+  "connections": {
+    "default": "mysql"
+  },
+  "locale": {
+    "locales": [
+      "ja",
+      "en",
+      "vi"
+    ],
+    "defaultLocale": "ja",
+    "fallbackLocale": "en"
+  },
+  "customTypes": {
+    "compound": {},
+    "simple": {},
+    "enums": {}
+  },
+  "schemas": {
+    "Branch": {
+      "connection": "default",
+      "displayName": {
+        "en": "Branch",
+        "ja": "支店",
+        "vi": "Chi nhánh"
+      },
+      "kind": "object",
+      "name": "Branch",
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "softDelete": true,
+        "indexes": [
+          {
+            "columns": [
+              "console_organization_id"
+            ]
+          },
+          {
+            "columns": [
+              "console_organization_id",
+              "slug"
+            ],
+            "unique": true
+          },
+          {
+            "columns": [
+              "console_organization_id",
+              "is_active"
+            ]
+          },
+          {
+            "columns": [
+              "console_organization_id",
+              "is_headquarters"
+            ]
+          }
+        ]
+      },
+      "package": null,
+      "properties": {
+        "console_branch_id": {
+          "type": "Uuid",
+          "displayName": {
+            "en": "Console Branch ID",
+            "ja": "Console Branch ID",
+            "vi": "Console Branch ID"
+          },
+          "unique": true,
+          "description": {
+            "en": "Branch ID from Console",
+            "ja": "Console側の支店ID",
+            "vi": "ID chi nhánh từ Console"
+          }
+        },
+        "console_organization_id": {
+          "type": "Uuid",
+          "displayName": {
+            "en": "Console Organization ID",
+            "ja": "Console Organization ID",
+            "vi": "Console Organization ID"
+          },
+          "description": {
+            "en": "Organization ID from Console",
+            "ja": "Console側の組織ID",
+            "vi": "ID tổ chức từ Console"
+          }
+        },
+        "is_active": {
+          "type": "Boolean",
+          "displayName": {
+            "en": "Active",
+            "ja": "有効",
+            "vi": "Hoạt động"
+          },
+          "default": true
+        },
+        "is_headquarters": {
+          "type": "Boolean",
+          "displayName": {
+            "en": "Is Headquarters",
+            "ja": "本社",
+            "vi": "Là trụ sở chính"
+          },
+          "default": false,
+          "description": {
+            "en": "Whether this is the main headquarters of the organization",
+            "ja": "この支店が組織の本社かどうか",
+            "vi": "Chi nhánh này có phải là trụ sở chính không"
+          }
+        },
+        "name": {
+          "type": "String",
+          "displayName": {
+            "en": "Branch Name",
+            "ja": "支店名",
+            "vi": "Tên chi nhánh"
+          },
+          "length": 100
+        },
+        "slug": {
+          "type": "String",
+          "displayName": {
+            "en": "Slug",
+            "ja": "スラッグ",
+            "vi": "Slug"
+          },
+          "description": {
+            "en": "URL-friendly unique identifier",
+            "ja": "URL用のユニーク識別子",
+            "vi": "Định danh URL duy nhất"
+          },
+          "length": 100
+        }
+      },
+      "propertyOrder": [
+        "console_branch_id",
+        "console_organization_id",
+        "slug",
+        "name",
+        "is_headquarters",
+        "is_active"
+      ],
+      "tableName": "branches"
+    },
+    "Location": {
+      "connection": "default",
+      "displayName": {
+        "en": "Location",
+        "ja": "拠点",
+        "vi": "Địa điểm"
+      },
+      "kind": "object",
+      "name": "Location",
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "softDelete": true,
+        "indexes": [
+          {
+            "columns": [
+              "console_location_id"
+            ],
+            "unique": true
+          },
+          {
+            "columns": [
+              "console_branch_id",
+              "code"
+            ],
+            "unique": true
+          },
+          {
+            "columns": [
+              "console_organization_id",
+              "is_active"
+            ]
+          },
+          {
+            "columns": [
+              "console_branch_id",
+              "is_active"
+            ]
+          },
+          {
+            "columns": [
+              "console_organization_id",
+              "type"
+            ]
+          }
+        ]
+      },
+      "package": null,
+      "properties": {
+        "address": {
+          "type": "Text",
+          "displayName": {
+            "en": "Address",
+            "ja": "住所",
+            "vi": "Địa chỉ"
+          },
+          "nullable": true
+        },
+        "capacity": {
+          "type": "Int",
+          "displayName": {
+            "en": "Capacity",
+            "ja": "収容人数",
+            "vi": "Sức chứa"
+          },
+          "nullable": true
+        },
+        "city": {
+          "type": "String",
+          "displayName": {
+            "en": "City",
+            "ja": "市区町村",
+            "vi": "Thành phố"
+          },
+          "nullable": true,
+          "length": 100
+        },
+        "code": {
+          "type": "String",
+          "displayName": {
+            "en": "Location Code",
+            "ja": "拠点コード",
+            "vi": "Mã địa điểm"
+          },
+          "description": {
+            "en": "Unique code within branch (e.g., MAIN-OFFICE, WH-01)",
+            "vi": "Mã duy nhất trong chi nhánh (VD: MAIN-OFFICE, WH-01)"
+          },
+          "length": 30
+        },
+        "console_branch_id": {
+          "type": "Uuid",
+          "displayName": {
+            "en": "Console Branch ID",
+            "ja": "Console Branch ID",
+            "vi": "Console Branch ID"
+          }
+        },
+        "console_location_id": {
+          "type": "Uuid",
+          "displayName": {
+            "en": "Console Location ID",
+            "ja": "Console Location ID",
+            "vi": "Console Location ID"
+          },
+          "unique": true,
+          "description": {
+            "en": "Location ID from Console",
+            "vi": "ID địa điểm từ Console"
+          }
+        },
+        "console_organization_id": {
+          "type": "Uuid",
+          "displayName": {
+            "en": "Console Organization ID",
+            "ja": "Console Organization ID",
+            "vi": "Console Organization ID"
+          }
+        },
+        "country_code": {
+          "type": "String",
+          "displayName": {
+            "en": "Country Code",
+            "ja": "国コード",
+            "vi": "Mã quốc gia"
+          },
+          "nullable": true,
+          "length": 2
+        },
+        "description": {
+          "type": "Text",
+          "displayName": {
+            "en": "Description",
+            "ja": "説明",
+            "vi": "Mô tả"
+          },
+          "nullable": true
+        },
+        "email": {
+          "type": "Email",
+          "displayName": {
+            "en": "Email",
+            "ja": "メール",
+            "vi": "Email"
+          },
+          "nullable": true
+        },
+        "is_active": {
+          "type": "Boolean",
+          "displayName": {
+            "en": "Active",
+            "ja": "有効",
+            "vi": "Hoạt động"
+          },
+          "default": true
+        },
+        "latitude": {
+          "type": "Decimal",
+          "displayName": {
+            "en": "Latitude",
+            "ja": "緯度",
+            "vi": "Vĩ độ"
+          },
+          "nullable": true,
+          "precision": 10,
+          "scale": 7
+        },
+        "longitude": {
+          "type": "Decimal",
+          "displayName": {
+            "en": "Longitude",
+            "ja": "経度",
+            "vi": "Kinh độ"
+          },
+          "nullable": true,
+          "precision": 10,
+          "scale": 7
+        },
+        "metadata": {
+          "type": "Json",
+          "displayName": {
+            "en": "Metadata",
+            "ja": "メタデータ",
+            "vi": "Metadata"
+          },
+          "nullable": true
+        },
+        "name": {
+          "type": "String",
+          "displayName": {
+            "en": "Location Name",
+            "ja": "拠点名",
+            "vi": "Tên địa điểm"
+          },
+          "length": 150
+        },
+        "phone": {
+          "type": "String",
+          "displayName": {
+            "en": "Phone",
+            "ja": "電話番号",
+            "vi": "Số điện thoại"
+          },
+          "nullable": true,
+          "length": 20
+        },
+        "postal_code": {
+          "type": "String",
+          "displayName": {
+            "en": "Postal Code",
+            "ja": "郵便番号",
+            "vi": "Mã bưu chính"
+          },
+          "nullable": true,
+          "length": 20
+        },
+        "settings": {
+          "type": "Json",
+          "displayName": {
+            "en": "Settings",
+            "ja": "設定",
+            "vi": "Cài đặt"
+          },
+          "nullable": true
+        },
+        "sort_order": {
+          "type": "Int",
+          "displayName": {
+            "en": "Sort Order",
+            "ja": "並び順",
+            "vi": "Thứ tự sắp xếp"
+          },
+          "default": 0
+        },
+        "state_province": {
+          "type": "String",
+          "displayName": {
+            "en": "State/Province",
+            "ja": "都道府県",
+            "vi": "Tỉnh/Thành phố"
+          },
+          "nullable": true,
+          "length": 100
+        },
+        "timezone": {
+          "type": "String",
+          "displayName": {
+            "en": "Timezone",
+            "ja": "タイムゾーン",
+            "vi": "Múi giờ"
+          },
+          "nullable": true,
+          "description": {
+            "en": "IANA timezone (inherits from Branch if null)",
+            "vi": "Múi giờ IANA (null thì kế thừa từ chi nhánh)"
+          },
+          "length": 50
+        },
+        "type": {
+          "type": "Enum",
+          "displayName": {
+            "en": "Location Type",
+            "ja": "拠点タイプ",
+            "vi": "Loại địa điểm"
+          },
+          "default": "office",
+          "enum": [
+            "office",
+            "warehouse",
+            "factory",
+            "store",
+            "clinic",
+            "restaurant",
+            "other"
+          ]
+        }
+      },
+      "propertyOrder": [
+        "console_location_id",
+        "console_branch_id",
+        "console_organization_id",
+        "code",
+        "name",
+        "type",
+        "is_active",
+        "address",
+        "city",
+        "state_province",
+        "postal_code",
+        "country_code",
+        "latitude",
+        "longitude",
+        "phone",
+        "email",
+        "timezone",
+        "capacity",
+        "sort_order",
+        "description",
+        "settings",
+        "metadata"
+      ],
+      "tableName": "locations"
+    },
+    "Organization": {
+      "connection": "default",
+      "displayName": {
+        "en": "Organization",
+        "ja": "組織",
+        "vi": "Tổ chức"
+      },
+      "kind": "object",
+      "name": "Organization",
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "softDelete": true,
+        "indexes": [
+          {
+            "columns": [
+              "slug"
+            ],
+            "unique": true
+          }
+        ]
+      },
+      "package": null,
+      "properties": {
+        "console_organization_id": {
+          "type": "Uuid",
+          "displayName": {
+            "en": "Console Organization ID",
+            "ja": "Console Organization ID",
+            "vi": "Console Organization ID"
+          },
+          "unique": true,
+          "description": {
+            "en": "Organization ID from Console",
+            "ja": "Console側の組織ID",
+            "vi": "ID tổ chức từ Console"
+          }
+        },
+        "is_active": {
+          "type": "Boolean",
+          "displayName": {
+            "en": "Active",
+            "ja": "有効",
+            "vi": "Hoạt động"
+          },
+          "default": true
+        },
+        "name": {
+          "type": "String",
+          "displayName": {
+            "en": "Organization Name",
+            "ja": "組織名",
+            "vi": "Tên tổ chức"
+          },
+          "length": 100
+        },
+        "slug": {
+          "type": "String",
+          "displayName": {
+            "en": "Slug",
+            "ja": "スラッグ",
+            "vi": "Slug"
+          },
+          "description": {
+            "en": "URL-friendly unique identifier",
+            "ja": "URL用のユニーク識別子",
+            "vi": "Định danh URL duy nhất"
+          },
+          "length": 100
+        }
+      },
+      "propertyOrder": [
+        "console_organization_id",
+        "name",
+        "slug",
+        "is_active"
+      ],
+      "tableName": "organizations"
+    },
+    "PasswordResetToken": {
+      "connection": "default",
+      "displayName": {
+        "en": "Password Reset Token",
+        "ja": "パスワードリセットトークン",
+        "vi": "Token đặt lại mật khẩu"
+      },
+      "kind": "object",
+      "name": "PasswordResetToken",
+      "options": {
+        "id": false,
+        "timestamps": false,
+        "hidden": true
+      },
+      "package": null,
+      "properties": {
+        "created_at": {
+          "type": "Timestamp",
+          "displayName": {
+            "en": "Created At",
+            "ja": "作成日時",
+            "vi": "Ngày tạo"
+          },
+          "nullable": true
+        },
+        "email": {
+          "type": "String",
+          "displayName": {
+            "en": "Email",
+            "ja": "メールアドレス",
+            "vi": "Email"
+          },
+          "primary": true
+        },
+        "token": {
+          "type": "String",
+          "displayName": {
+            "en": "Token",
+            "ja": "トークン",
+            "vi": "Token"
+          }
+        }
+      },
+      "propertyOrder": [
+        "email",
+        "token",
+        "created_at"
+      ],
+      "tableName": "password_reset_tokens"
+    },
+    "Permission": {
+      "connection": "default",
+      "displayName": {
+        "en": "Permission",
+        "ja": "権限",
+        "vi": "Quyền hạn"
+      },
+      "kind": "object",
+      "name": "Permission",
+      "options": {
+        "id": "Uuid",
+        "timestamps": true
+      },
+      "package": null,
+      "properties": {
+        "group": {
+          "type": "String",
+          "displayName": {
+            "en": "Group",
+            "ja": "グループ",
+            "vi": "Nhóm"
+          },
+          "nullable": true,
+          "description": {
+            "en": "Group name for UI display",
+            "ja": "UI表示用のグループ名",
+            "vi": "Tên nhóm để hiển thị trên UI"
+          },
+          "length": 50
+        },
+        "name": {
+          "type": "String",
+          "displayName": {
+            "en": "Permission Name",
+            "ja": "権限名",
+            "vi": "Tên quyền"
+          },
+          "unique": true,
+          "description": {
+            "en": "Human-readable permission name",
+            "ja": "人間が読める権限名",
+            "vi": "Tên quyền dễ đọc"
+          },
+          "length": 100
+        },
+        "roles": {
+          "type": "Association",
+          "displayName": {
+            "en": "Roles",
+            "ja": "ロール",
+            "vi": "Vai trò"
+          },
+          "relation": "ManyToMany",
+          "target": "Role",
+          "mappedBy": "permissions",
+          "joinTable": "role_permissions"
+        },
+        "slug": {
+          "type": "String",
+          "displayName": {
+            "en": "Slug",
+            "ja": "スラッグ",
+            "vi": "Slug"
+          },
+          "unique": true,
+          "description": {
+            "en": "Identifier used in code (e.g., users.create)",
+            "ja": "コード内で使用する識別子（例：users.create）",
+            "vi": "Định danh dùng trong code (vd: users.create)"
+          },
+          "length": 100
+        }
+      },
+      "propertyOrder": [
+        "name",
+        "slug",
+        "group",
+        "roles"
+      ],
+      "tableName": "permissions"
+    },
+    "RefreshToken": {
+      "connection": "default",
+      "displayName": {
+        "en": "Refresh Token",
+        "ja": "リフレッシュトークン",
+        "vi": "Refresh Token"
+      },
+      "kind": "object",
+      "name": "RefreshToken",
+      "options": {
+        "id": null,
+        "timestamps": false,
+        "indexes": [
+          {
+            "columns": [
+              "token_hash"
+            ]
+          },
+          {
+            "columns": [
+              "user"
+            ]
+          },
+          {
+            "columns": [
+              "expires_at"
+            ]
+          }
+        ]
+      },
+      "package": null,
+      "properties": {
+        "created_at": {
+          "type": "Timestamp",
+          "displayName": {
+            "en": "Created At",
+            "ja": "作成日時",
+            "vi": "Tạo lúc"
+          },
+          "useCurrent": true
+        },
+        "expires_at": {
+          "type": "Timestamp",
+          "displayName": {
+            "en": "Expires At",
+            "ja": "有効期限",
+            "vi": "Hết hạn lúc"
+          }
+        },
+        "ip_address": {
+          "type": "String",
+          "displayName": {
+            "en": "IP Address",
+            "ja": "IPアドレス",
+            "vi": "Địa chỉ IP"
+          },
+          "nullable": true,
+          "length": 45
+        },
+        "revoked_at": {
+          "type": "Timestamp",
+          "displayName": {
+            "en": "Revoked At",
+            "ja": "取消日時",
+            "vi": "Thu hồi lúc"
+          },
+          "nullable": true
+        },
+        "token_hash": {
+          "type": "String",
+          "displayName": {
+            "en": "Token Hash",
+            "ja": "トークンハッシュ",
+            "vi": "Hash token"
+          },
+          "length": 64
+        },
+        "user": {
+          "type": "Association",
+          "displayName": {
+            "en": "User",
+            "ja": "ユーザー",
+            "vi": "Người dùng"
+          },
+          "relation": "ManyToOne",
+          "target": "User",
+          "onDelete": "CASCADE"
+        },
+        "user_agent": {
+          "type": "String",
+          "displayName": {
+            "en": "User Agent",
+            "ja": "ユーザーエージェント",
+            "vi": "User Agent"
+          },
+          "nullable": true,
+          "length": 500
+        }
+      },
+      "propertyOrder": [
+        "token_hash",
+        "expires_at",
+        "revoked_at",
+        "ip_address",
+        "user_agent",
+        "created_at",
+        "user"
+      ],
+      "tableName": "refresh_tokens"
+    },
+    "Role": {
+      "connection": "default",
+      "displayName": {
+        "en": "Role",
+        "ja": "ロール",
+        "vi": "Vai trò"
+      },
+      "kind": "object",
+      "name": "Role",
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "softDelete": true,
+        "indexes": [
+          {
+            "columns": [
+              "console_organization_id"
+            ]
+          },
+          {
+            "columns": [
+              "console_organization_id",
+              "name"
+            ],
+            "unique": true
+          },
+          {
+            "columns": [
+              "console_organization_id",
+              "slug"
+            ],
+            "unique": true
+          }
+        ]
+      },
+      "package": null,
+      "properties": {
+        "console_organization_id": {
+          "type": "String",
+          "displayName": {
+            "en": "Organization ID",
+            "ja": "組織ID",
+            "vi": "ID tổ chức"
+          },
+          "nullable": true,
+          "description": {
+            "en": "NULL means global role (system-wide)",
+            "ja": "NULLの場合はグローバルロール",
+            "vi": "NULL nghĩa là vai trò toàn hệ thống"
+          },
+          "length": 36
+        },
+        "description": {
+          "type": "Text",
+          "displayName": {
+            "en": "Description",
+            "ja": "説明",
+            "vi": "Mô tả"
+          },
+          "nullable": true
+        },
+        "level": {
+          "type": "Int",
+          "displayName": {
+            "en": "Level",
+            "ja": "レベル",
+            "vi": "Cấp độ"
+          },
+          "default": 0,
+          "description": {
+            "en": "Permission level (higher = more permissions)",
+            "ja": "権限レベル（高いほど権限が大きい）",
+            "vi": "Cấp độ quyền hạn (cao hơn = nhiều quyền hơn)"
+          }
+        },
+        "name": {
+          "type": "String",
+          "displayName": {
+            "en": "Role Name",
+            "ja": "ロール名",
+            "vi": "Tên vai trò"
+          },
+          "length": 100
+        },
+        "permissions": {
+          "type": "Association",
+          "displayName": {
+            "en": "Permissions",
+            "ja": "権限",
+            "vi": "Quyền hạn"
+          },
+          "relation": "ManyToMany",
+          "target": "Permission",
+          "owning": true,
+          "joinTable": "role_permissions"
+        },
+        "slug": {
+          "type": "String",
+          "displayName": {
+            "en": "Slug",
+            "ja": "スラッグ",
+            "vi": "Slug"
+          },
+          "description": {
+            "en": "Identifier used in URLs and code",
+            "ja": "URLやコード内で使用する識別子",
+            "vi": "Định danh dùng trong URL và code"
+          },
+          "length": 100
+        }
+      },
+      "propertyOrder": [
+        "console_organization_id",
+        "name",
+        "slug",
+        "description",
+        "level",
+        "permissions"
+      ],
+      "tableName": "roles"
+    },
+    "RolePermission": {
+      "connection": "default",
+      "displayName": {
+        "en": "Role Permission",
+        "ja": "ロール権限",
+        "vi": "Quyền vai trò"
+      },
+      "kind": "object",
+      "name": "RolePermission",
+      "options": {
+        "id": false,
+        "primaryKey": [
+          "role",
+          "permission"
+        ],
+        "timestamps": true
+      },
+      "package": null,
+      "properties": {
+        "permission": {
+          "type": "Association",
+          "displayName": {
+            "en": "Permission",
+            "ja": "権限",
+            "vi": "Quyền hạn"
+          },
+          "relation": "ManyToOne",
+          "target": "Permission"
+        },
+        "role": {
+          "type": "Association",
+          "displayName": {
+            "en": "Role",
+            "ja": "ロール",
+            "vi": "Vai trò"
+          },
+          "relation": "ManyToOne",
+          "target": "Role"
+        }
+      },
+      "propertyOrder": [
+        "role",
+        "permission"
+      ],
+      "tableName": "role_permissions"
+    },
+    "Team": {
+      "connection": "default",
+      "displayName": {
+        "en": "Team",
+        "ja": "チーム",
+        "vi": "Nhóm"
+      },
+      "kind": "object",
+      "name": "Team",
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "softDelete": true,
+        "indexes": [
+          {
+            "columns": [
+              "console_organization_id"
+            ]
+          }
+        ]
+      },
+      "package": null,
+      "properties": {
+        "console_organization_id": {
+          "type": "Uuid",
+          "displayName": {
+            "en": "Console Organization ID",
+            "ja": "Console Organization ID",
+            "vi": "Console Organization ID"
+          },
+          "description": {
+            "en": "Organization ID from Console",
+            "ja": "Console側の組織ID",
+            "vi": "ID tổ chức từ Console"
+          }
+        },
+        "console_team_id": {
+          "type": "Uuid",
+          "displayName": {
+            "en": "Console Team ID",
+            "ja": "Console Team ID",
+            "vi": "Console Team ID"
+          },
+          "unique": true,
+          "description": {
+            "en": "Team ID from Console",
+            "ja": "Console側のチームID",
+            "vi": "ID nhóm từ Console"
+          }
+        },
+        "name": {
+          "type": "String",
+          "displayName": {
+            "en": "Team Name",
+            "ja": "チーム名",
+            "vi": "Tên nhóm"
+          },
+          "length": 100
+        }
+      },
+      "propertyOrder": [
+        "console_team_id",
+        "console_organization_id",
+        "name"
+      ],
+      "tableName": "teams"
+    },
+    "TeamPermission": {
+      "connection": "default",
+      "displayName": {
+        "en": "Team Permission",
+        "ja": "チーム権限",
+        "vi": "Quyền nhóm"
+      },
+      "kind": "object",
+      "name": "TeamPermission",
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "softDelete": true,
+        "indexes": [
+          {
+            "columns": [
+              "console_organization_id",
+              "console_team_id"
+            ]
+          }
+        ]
+      },
+      "package": null,
+      "properties": {
+        "console_organization_id": {
+          "type": "Uuid",
+          "displayName": {
+            "en": "Console Organization ID",
+            "ja": "Console Organization ID",
+            "vi": "Console Organization ID"
+          },
+          "description": {
+            "en": "Organization ID from Console",
+            "ja": "Console側の組織ID",
+            "vi": "ID tổ chức từ Console"
+          }
+        },
+        "console_team_id": {
+          "type": "Uuid",
+          "displayName": {
+            "en": "Console Team ID",
+            "ja": "Console Team ID",
+            "vi": "Console Team ID"
+          },
+          "description": {
+            "en": "Team ID from Console",
+            "ja": "Console側のチームID",
+            "vi": "ID nhóm từ Console"
+          }
+        },
+        "permission": {
+          "type": "Association",
+          "displayName": {
+            "en": "Permission",
+            "ja": "権限",
+            "vi": "Quyền hạn"
+          },
+          "description": {
+            "en": "Permission directly granted to team",
+            "ja": "チームに直接付与する権限",
+            "vi": "Quyền được gán trực tiếp cho team"
+          },
+          "relation": "ManyToOne",
+          "target": "Permission"
+        }
+      },
+      "propertyOrder": [
+        "console_organization_id",
+        "console_team_id",
+        "permission"
+      ],
+      "tableName": "team_permissions"
+    },
+    "User": {
+      "connection": "default",
+      "displayName": {
+        "en": "User",
+        "ja": "ユーザー",
+        "vi": "Người dùng"
+      },
+      "kind": "object",
+      "name": "User",
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "softDelete": true,
+        "indexes": [
+          {
+            "columns": [
+              "console_organization_id"
+            ]
+          },
+          {
+            "columns": [
+              "email",
+              "console_organization_id"
+            ],
+            "unique": true
+          },
+          {
+            "columns": [
+              "console_user_id",
+              "console_organization_id"
+            ],
+            "unique": true
+          }
+        ],
+        "authenticatable": true
+      },
+      "package": null,
+      "properties": {
+        "console_access_token": {
+          "type": "Text",
+          "displayName": {
+            "en": "Console Access Token",
+            "ja": "Console Access Token",
+            "vi": "Console Access Token"
+          },
+          "nullable": true,
+          "description": {
+            "en": "Encrypted token for Console API access",
+            "ja": "Console APIアクセス用トークン（暗号化）",
+            "vi": "Token mã hóa để truy cập Console API"
+          }
+        },
+        "console_organization_id": {
+          "type": "Uuid",
+          "displayName": {
+            "en": "Organization ID",
+            "ja": "所属組織ID",
+            "vi": "ID Tổ chức"
+          },
+          "nullable": true,
+          "description": {
+            "en": "Primary organization ID the user belongs to (from Console SSO)",
+            "ja": "ユーザーが所属する主要組織のID（Console SSO側）",
+            "vi": "ID tổ chức chính mà người dùng thuộc về (từ Console SSO)"
+          }
+        },
+        "console_refresh_token": {
+          "type": "Text",
+          "displayName": {
+            "en": "Console Refresh Token",
+            "ja": "Console Refresh Token",
+            "vi": "Console Refresh Token"
+          },
+          "nullable": true,
+          "description": {
+            "en": "Encrypted refresh token for token renewal",
+            "ja": "トークン更新用リフレッシュトークン（暗号化）",
+            "vi": "Token làm mới mã hóa"
+          }
+        },
+        "console_token_expires_at": {
+          "type": "Timestamp",
+          "displayName": {
+            "en": "Console Token Expiry",
+            "ja": "Console Token有効期限",
+            "vi": "Hạn Token Console"
+          },
+          "nullable": true,
+          "description": {
+            "en": "Access token expiration time",
+            "ja": "アクセストークンの有効期限",
+            "vi": "Thời gian hết hạn của token truy cập"
+          }
+        },
+        "console_user_id": {
+          "type": "Uuid",
+          "displayName": {
+            "en": "Console User ID",
+            "ja": "Console User ID",
+            "vi": "Console User ID"
+          },
+          "nullable": true,
+          "description": {
+            "en": "User ID from Console SSO",
+            "ja": "Console側のユーザーID",
+            "vi": "ID người dùng từ Console SSO"
+          }
+        },
+        "email": {
+          "type": "String",
+          "displayName": {
+            "en": "Email",
+            "ja": "メールアドレス",
+            "vi": "Email"
+          },
+          "description": {
+            "en": "Unique within organization",
+            "ja": "組織内でユニーク",
+            "vi": "Duy nhất trong tổ chức"
+          }
+        },
+        "name": {
+          "type": "String",
+          "displayName": {
+            "en": "Name",
+            "ja": "名前",
+            "vi": "Tên"
+          }
+        },
+        "password": {
+          "type": "String",
+          "displayName": {
+            "en": "Password",
+            "ja": "パスワード",
+            "vi": "Mật khẩu"
+          },
+          "nullable": true,
+          "description": {
+            "en": "Used in standalone auth mode. Null when using Console SSO.",
+            "ja": "スタンドアローンモード用。Console SSOモードではnull。",
+            "vi": "Dùng ở chế độ standalone. Null khi dùng Console SSO."
+          },
+          "hidden": true
+        },
+        "remember_token": {
+          "type": "String",
+          "displayName": {
+            "en": "Remember Token",
+            "ja": "Remember Token",
+            "vi": "Remember Token"
+          },
+          "nullable": true,
+          "description": {
+            "en": "Browser remember-me token (standalone auth mode)",
+            "ja": "ブラウザ記憶トークン（スタンドアローンモード用）",
+            "vi": "Token ghi nhớ đăng nhập (standalone mode)"
+          },
+          "hidden": true,
+          "length": 100
+        },
+        "roles": {
+          "type": "Association",
+          "displayName": {
+            "en": "Roles",
+            "ja": "ロール",
+            "vi": "Vai trò"
+          },
+          "description": {
+            "en": "User's roles (multiple allowed, can be scoped to org/branch)",
+            "ja": "ユーザーのロール（複数可、スコープ指定可能）",
+            "vi": "Vai trò của người dùng (có thể nhiều, có thể giới hạn theo org/branch)"
+          },
+          "relation": "ManyToMany",
+          "target": "Role",
+          "owning": true,
+          "pivotFields": {
+            "console_branch_id": {
+              "type": "String",
+              "nullable": true,
+              "length": 36,
+              "displayName": {
+                "en": "Branch ID",
+                "ja": "ブランチID",
+                "vi": "ID chi nhánh"
+              }
+            },
+            "console_organization_id": {
+              "type": "String",
+              "nullable": true,
+              "length": 36,
+              "displayName": {
+                "en": "Organization ID",
+                "ja": "組織ID",
+                "vi": "ID tổ chức"
+              }
+            }
+          }
+        }
+      },
+      "propertyOrder": [
+        "name",
+        "email",
+        "password",
+        "remember_token",
+        "console_user_id",
+        "console_organization_id",
+        "console_access_token",
+        "console_refresh_token",
+        "console_token_expires_at",
+        "roles"
+      ],
+      "tableName": "users"
+    }
+  }
+}

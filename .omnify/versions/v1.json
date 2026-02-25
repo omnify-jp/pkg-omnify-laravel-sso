@@ -1,0 +1,513 @@
+{
+  "version": 1,
+  "timestamp": "2026-02-21T03:24:18Z",
+  "connections": {
+    "default": "mysql"
+  },
+  "changes": [
+    {
+      "action": "initial"
+    }
+  ],
+  "snapshot": {
+    "Branch": {
+      "name": "Branch",
+      "kind": "object",
+      "displayName": "Branch",
+      "properties": {
+        "console_branch_id": {
+          "type": "Uuid",
+          "displayName": "Console Branch ID",
+          "description": "Branch ID from Console",
+          "unique": true
+        },
+        "console_organization_id": {
+          "type": "Uuid",
+          "displayName": "Console Organization ID",
+          "description": "Organization ID from Console"
+        },
+        "is_active": {
+          "type": "Boolean",
+          "displayName": "Active",
+          "default": true
+        },
+        "is_headquarters": {
+          "type": "Boolean",
+          "displayName": "Is Headquarters",
+          "description": "Whether this is the main headquarters of the organization",
+          "default": false
+        },
+        "name": {
+          "type": "String",
+          "displayName": "Branch Name",
+          "length": 100
+        },
+        "slug": {
+          "type": "String",
+          "displayName": "Slug",
+          "description": "URL-friendly unique identifier",
+          "length": 100
+        }
+      },
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "softDelete": true,
+        "indexes": [
+          {
+            "columns": [
+              "console_organization_id"
+            ]
+          },
+          {
+            "columns": [
+              "console_organization_id",
+              "slug"
+            ],
+            "unique": true
+          },
+          {
+            "columns": [
+              "console_organization_id",
+              "is_active"
+            ]
+          },
+          {
+            "columns": [
+              "console_organization_id",
+              "is_headquarters"
+            ]
+          }
+        ]
+      }
+    },
+    "Organization": {
+      "name": "Organization",
+      "kind": "object",
+      "displayName": "Organization",
+      "properties": {
+        "console_organization_id": {
+          "type": "Uuid",
+          "displayName": "Console Organization ID",
+          "description": "Organization ID from Console",
+          "unique": true
+        },
+        "is_active": {
+          "type": "Boolean",
+          "displayName": "Active",
+          "default": true
+        },
+        "name": {
+          "type": "String",
+          "displayName": "Organization Name",
+          "length": 100
+        },
+        "slug": {
+          "type": "String",
+          "displayName": "Slug",
+          "description": "URL-friendly unique identifier",
+          "length": 100
+        }
+      },
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "softDelete": true,
+        "indexes": [
+          {
+            "columns": [
+              "slug"
+            ],
+            "unique": true
+          }
+        ]
+      }
+    },
+    "PasswordResetToken": {
+      "name": "PasswordResetToken",
+      "kind": "object",
+      "displayName": "Password Reset Token",
+      "properties": {
+        "created_at": {
+          "type": "Timestamp",
+          "displayName": "Created At",
+          "nullable": true
+        },
+        "email": {
+          "type": "String",
+          "displayName": "Email"
+        },
+        "token": {
+          "type": "String",
+          "displayName": "Token"
+        }
+      },
+      "options": {
+        "id": false,
+        "timestamps": false
+      }
+    },
+    "Permission": {
+      "name": "Permission",
+      "kind": "object",
+      "displayName": "Permission",
+      "properties": {
+        "group": {
+          "type": "String",
+          "displayName": "Group",
+          "description": "Group name for UI display",
+          "nullable": true,
+          "length": 50
+        },
+        "name": {
+          "type": "String",
+          "displayName": "Permission Name",
+          "description": "Human-readable permission name",
+          "unique": true,
+          "length": 100
+        },
+        "roles": {
+          "type": "Association",
+          "displayName": "Roles",
+          "relation": "ManyToMany",
+          "target": "Role",
+          "mappedBy": "permissions",
+          "joinTable": "role_permissions"
+        },
+        "slug": {
+          "type": "String",
+          "displayName": "Slug",
+          "description": "Identifier used in code (e.g., users.create)",
+          "unique": true,
+          "length": 100
+        }
+      },
+      "options": {
+        "id": "Uuid",
+        "timestamps": true
+      }
+    },
+    "RefreshToken": {
+      "name": "RefreshToken",
+      "kind": "object",
+      "displayName": "Refresh Token",
+      "properties": {
+        "created_at": {
+          "type": "Timestamp",
+          "displayName": "Created At"
+        },
+        "expires_at": {
+          "type": "Timestamp",
+          "displayName": "Expires At"
+        },
+        "ip_address": {
+          "type": "String",
+          "displayName": "IP Address",
+          "nullable": true,
+          "length": 45
+        },
+        "revoked_at": {
+          "type": "Timestamp",
+          "displayName": "Revoked At",
+          "nullable": true
+        },
+        "token_hash": {
+          "type": "String",
+          "displayName": "Token Hash",
+          "length": 64
+        },
+        "user": {
+          "type": "Association",
+          "displayName": "User",
+          "relation": "ManyToOne",
+          "target": "User",
+          "onDelete": "CASCADE"
+        },
+        "user_agent": {
+          "type": "String",
+          "displayName": "User Agent",
+          "nullable": true,
+          "length": 500
+        }
+      },
+      "options": {
+        "timestamps": false,
+        "indexes": [
+          {
+            "columns": [
+              "token_hash"
+            ]
+          },
+          {
+            "columns": [
+              "user"
+            ]
+          },
+          {
+            "columns": [
+              "expires_at"
+            ]
+          }
+        ]
+      }
+    },
+    "Role": {
+      "name": "Role",
+      "kind": "object",
+      "displayName": "Role",
+      "properties": {
+        "console_organization_id": {
+          "type": "String",
+          "displayName": "Organization ID",
+          "description": "NULL means global role (system-wide)",
+          "nullable": true,
+          "length": 36
+        },
+        "description": {
+          "type": "Text",
+          "displayName": "Description",
+          "nullable": true
+        },
+        "level": {
+          "type": "Int",
+          "displayName": "Level",
+          "description": "Permission level (higher = more permissions)",
+          "default": 0
+        },
+        "name": {
+          "type": "String",
+          "displayName": "Role Name",
+          "length": 100
+        },
+        "permissions": {
+          "type": "Association",
+          "displayName": "Permissions",
+          "relation": "ManyToMany",
+          "target": "Permission",
+          "joinTable": "role_permissions",
+          "owning": true
+        },
+        "slug": {
+          "type": "String",
+          "displayName": "Slug",
+          "description": "Identifier used in URLs and code",
+          "length": 100
+        }
+      },
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "softDelete": true,
+        "indexes": [
+          {
+            "columns": [
+              "console_organization_id"
+            ]
+          },
+          {
+            "columns": [
+              "console_organization_id",
+              "name"
+            ],
+            "unique": true
+          },
+          {
+            "columns": [
+              "console_organization_id",
+              "slug"
+            ],
+            "unique": true
+          }
+        ]
+      }
+    },
+    "RolePermission": {
+      "name": "RolePermission",
+      "kind": "object",
+      "displayName": "Role Permission",
+      "properties": {
+        "permission": {
+          "type": "Association",
+          "displayName": "Permission",
+          "relation": "ManyToOne",
+          "target": "Permission"
+        },
+        "role": {
+          "type": "Association",
+          "displayName": "Role",
+          "relation": "ManyToOne",
+          "target": "Role"
+        }
+      },
+      "options": {
+        "id": false,
+        "timestamps": true
+      }
+    },
+    "Team": {
+      "name": "Team",
+      "kind": "object",
+      "displayName": "Team",
+      "properties": {
+        "console_organization_id": {
+          "type": "Uuid",
+          "displayName": "Console Organization ID",
+          "description": "Organization ID from Console"
+        },
+        "console_team_id": {
+          "type": "Uuid",
+          "displayName": "Console Team ID",
+          "description": "Team ID from Console",
+          "unique": true
+        },
+        "name": {
+          "type": "String",
+          "displayName": "Team Name",
+          "length": 100
+        }
+      },
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "softDelete": true,
+        "indexes": [
+          {
+            "columns": [
+              "console_organization_id"
+            ]
+          }
+        ]
+      }
+    },
+    "TeamPermission": {
+      "name": "TeamPermission",
+      "kind": "object",
+      "displayName": "Team Permission",
+      "properties": {
+        "console_organization_id": {
+          "type": "Uuid",
+          "displayName": "Console Organization ID",
+          "description": "Organization ID from Console"
+        },
+        "console_team_id": {
+          "type": "Uuid",
+          "displayName": "Console Team ID",
+          "description": "Team ID from Console"
+        },
+        "permission": {
+          "type": "Association",
+          "displayName": "Permission",
+          "description": "Permission directly granted to team",
+          "relation": "ManyToOne",
+          "target": "Permission"
+        }
+      },
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "softDelete": true,
+        "indexes": [
+          {
+            "columns": [
+              "console_organization_id",
+              "console_team_id"
+            ]
+          }
+        ]
+      }
+    },
+    "User": {
+      "name": "User",
+      "kind": "object",
+      "displayName": "User",
+      "properties": {
+        "console_access_token": {
+          "type": "Text",
+          "displayName": "Console Access Token",
+          "description": "Encrypted token for Console API access",
+          "nullable": true
+        },
+        "console_organization_id": {
+          "type": "Uuid",
+          "displayName": "Organization ID",
+          "description": "Primary organization ID the user belongs to (from Console SSO)",
+          "nullable": true
+        },
+        "console_refresh_token": {
+          "type": "Text",
+          "displayName": "Console Refresh Token",
+          "description": "Encrypted refresh token for token renewal",
+          "nullable": true
+        },
+        "console_token_expires_at": {
+          "type": "Timestamp",
+          "displayName": "Console Token Expiry",
+          "description": "Access token expiration time",
+          "nullable": true
+        },
+        "console_user_id": {
+          "type": "Uuid",
+          "displayName": "Console User ID",
+          "description": "User ID from Console SSO",
+          "nullable": true
+        },
+        "email": {
+          "type": "String",
+          "displayName": "Email",
+          "description": "Unique within organization"
+        },
+        "name": {
+          "type": "String",
+          "displayName": "Name"
+        },
+        "roles": {
+          "type": "Association",
+          "displayName": "Roles",
+          "description": "User's roles (multiple allowed, can be scoped to org/branch)",
+          "relation": "ManyToMany",
+          "target": "Role",
+          "owning": true
+        }
+      },
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "softDelete": true,
+        "indexes": [
+          {
+            "columns": [
+              "console_organization_id"
+            ]
+          },
+          {
+            "columns": [
+              "email",
+              "console_organization_id"
+            ],
+            "unique": true
+          },
+          {
+            "columns": [
+              "console_user_id",
+              "console_organization_id"
+            ],
+            "unique": true
+          }
+        ]
+      }
+    }
+  },
+  "migrationTimestamps": {
+    "branches": "2026_02_21_122418",
+    "organizations": "2026_02_21_122419",
+    "password_reset_tokens": "2026_02_21_122420",
+    "permissions": "2026_02_21_122421",
+    "refresh_tokens": "2026_02_21_122423",
+    "role_permissions": "2026_02_21_122425",
+    "role_user": "2026_02_21_122428",
+    "roles": "2026_02_21_122424",
+    "team_permissions": "2026_02_21_122427",
+    "teams": "2026_02_21_122426",
+    "users": "2026_02_21_122422"
+  }
+}

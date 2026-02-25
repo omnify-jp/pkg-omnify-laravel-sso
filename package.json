@@ -1,0 +1,11 @@
+{
+  "name": "@omnify/client-laravel-sso",
+  "description": "SSO Client Package for Laravel with Omnify schema-driven development",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@omnifyjp/omnify": "^1.1.3",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}

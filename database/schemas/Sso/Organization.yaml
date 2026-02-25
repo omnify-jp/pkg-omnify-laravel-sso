@@ -1,0 +1,73 @@
+# ==============================================================================
+# Organization (組織 / Tổ chức)
+# ==============================================================================
+#
+# Mục đích (Purpose):
+#   Lưu thông tin tổ chức từ Console API về local database.
+#
+# Relationships:
+#   Organization ──┬── Branch (1:N)
+#                  ├── Team (1:N)
+#                  ├── User (1:N)
+#                  └── Role (1:N, scoped roles)
+#
+# ==============================================================================
+
+kind: object
+
+displayName:
+  ja: 組織
+  en: Organization
+  vi: Tổ chức
+
+options:
+  timestamps: true
+  softDelete: true
+  id: Uuid
+  indexes:
+    - columns: [slug]
+      unique: true
+
+properties:
+  # Console reference - Primary identifier from Console
+  console_organization_id:
+    type: Uuid
+    unique: true
+    displayName:
+      ja: Console Organization ID
+      en: Console Organization ID
+      vi: Console Organization ID
+    description:
+      ja: Console側の組織ID
+      en: Organization ID from Console
+      vi: ID tổ chức từ Console
+
+  # Basic info - Cached from Console
+  name:
+    type: String
+    length: 100
+    displayName:
+      ja: 組織名
+      en: Organization Name
+      vi: Tên tổ chức
+
+  slug:
+    type: String
+    length: 100
+    displayName:
+      ja: スラッグ
+      en: Slug
+      vi: Slug
+    description:
+      ja: URL用のユニーク識別子
+      en: URL-friendly unique identifier
+      vi: Định danh URL duy nhất
+
+  # Status
+  is_active:
+    type: Boolean
+    default: true
+    displayName:
+      ja: 有効
+      en: Active
+      vi: Hoạt động

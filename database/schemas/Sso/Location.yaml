@@ -1,0 +1,249 @@
+# ============================================================================
+# Location Schema - Physical Locations/Facilities (Console-synced)
+# ============================================================================
+#
+# PURPOSE:
+#   Location is a specific physical location within a Branch.
+#   DATA SOURCE: Synced from Console API (like Branch).
+#   One Branch can have multiple Locations for different purposes.
+#
+# HIERARCHY:
+#   Organization → Branch → Location
+#
+# SYNC PATTERN:
+#   Same as Branch — console_location_id is the primary Console reference.
+#   console_branch_id links to branches.console_branch_id (not FK).
+#   console_organization_id links to organizations.console_organization_id (not FK).
+#
+# LOCATION TYPES:
+#   office, warehouse, factory, store, clinic, restaurant, other
+#
+# UNIQUE CONSTRAINT:
+#   - [console_branch_id, code]: Code unique within Branch
+#
+# INDEXES:
+#   - [console_organization_id, is_active]
+#   - [console_branch_id, is_active]
+#   - [console_organization_id, type]
+# ============================================================================
+
+displayName:
+  en: Location
+  ja: 拠点
+  vi: Địa điểm
+kind: object
+
+options:
+  timestamps: true
+  softDelete: true
+  id: Uuid
+  indexes:
+    - columns: [console_location_id]
+      unique: true
+    - columns: [console_branch_id, code]
+      unique: true
+    - columns: [console_organization_id, is_active]
+    - columns: [console_branch_id, is_active]
+    - columns: [console_organization_id, type]
+
+properties:
+  # === Console References ===
+  console_location_id:
+    type: Uuid
+    unique: true
+    displayName:
+      en: Console Location ID
+      ja: Console Location ID
+      vi: Console Location ID
+    description:
+      en: Location ID from Console
+      vi: ID địa điểm từ Console
+
+  console_branch_id:
+    type: Uuid
+    displayName:
+      en: Console Branch ID
+      ja: Console Branch ID
+      vi: Console Branch ID
+
+  console_organization_id:
+    type: Uuid
+    displayName:
+      en: Console Organization ID
+      ja: Console Organization ID
+      vi: Console Organization ID
+
+  # === Core Fields ===
+  code:
+    type: String
+    length: 30
+    displayName:
+      en: Location Code
+      ja: 拠点コード
+      vi: Mã địa điểm
+    description:
+      en: "Unique code within branch (e.g., MAIN-OFFICE, WH-01)"
+      vi: "Mã duy nhất trong chi nhánh (VD: MAIN-OFFICE, WH-01)"
+
+  name:
+    type: String
+    length: 150
+    displayName:
+      en: Location Name
+      ja: 拠点名
+      vi: Tên địa điểm
+
+  type:
+    type: Enum
+    enum: [office, warehouse, factory, store, clinic, restaurant, other]
+    default: office
+    displayName:
+      en: Location Type
+      ja: 拠点タイプ
+      vi: Loại địa điểm
+
+  is_active:
+    type: Boolean
+    default: true
+    displayName:
+      en: Active
+      ja: 有効
+      vi: Hoạt động
+
+  # === Address Fields ===
+  address:
+    type: Text
+    nullable: true
+    displayName:
+      en: Address
+      ja: 住所
+      vi: Địa chỉ
+
+  city:
+    type: String
+    length: 100
+    nullable: true
+    displayName:
+      en: City
+      ja: 市区町村
+      vi: Thành phố
+
+  state_province:
+    type: String
+    length: 100
+    nullable: true
+    displayName:
+      en: State/Province
+      ja: 都道府県
+      vi: Tỉnh/Thành phố
+
+  postal_code:
+    type: String
+    length: 20
+    nullable: true
+    displayName:
+      en: Postal Code
+      ja: 郵便番号
+      vi: Mã bưu chính
+
+  country_code:
+    type: String
+    length: 2
+    nullable: true
+    displayName:
+      en: Country Code
+      ja: 国コード
+      vi: Mã quốc gia
+
+  # === GPS Coordinates ===
+  latitude:
+    type: Decimal
+    precision: 10
+    scale: 7
+    nullable: true
+    displayName:
+      en: Latitude
+      ja: 緯度
+      vi: Vĩ độ
+
+  longitude:
+    type: Decimal
+    precision: 10
+    scale: 7
+    nullable: true
+    displayName:
+      en: Longitude
+      ja: 経度
+      vi: Kinh độ
+
+  # === Contact Fields ===
+  phone:
+    type: String
+    length: 20
+    nullable: true
+    displayName:
+      en: Phone
+      ja: 電話番号
+      vi: Số điện thoại
+
+  email:
+    type: Email
+    nullable: true
+    displayName:
+      en: Email
+      ja: メール
+      vi: Email
+
+  # === Operational Fields ===
+  timezone:
+    type: String
+    length: 50
+    nullable: true
+    displayName:
+      en: Timezone
+      ja: タイムゾーン
+      vi: Múi giờ
+    description:
+      en: "IANA timezone (inherits from Branch if null)"
+      vi: "Múi giờ IANA (null thì kế thừa từ chi nhánh)"
+
+  capacity:
+    type: Int
+    nullable: true
+    displayName:
+      en: Capacity
+      ja: 収容人数
+      vi: Sức chứa
+
+  sort_order:
+    type: Int
+    default: 0
+    displayName:
+      en: Sort Order
+      ja: 並び順
+      vi: Thứ tự sắp xếp
+
+  description:
+    type: Text
+    nullable: true
+    displayName:
+      en: Description
+      ja: 説明
+      vi: Mô tả
+
+  # === Flexible Storage ===
+  settings:
+    type: Json
+    nullable: true
+    displayName:
+      en: Settings
+      ja: 設定
+      vi: Cài đặt
+
+  metadata:
+    type: Json
+    nullable: true
+    displayName:
+      en: Metadata
+      ja: メタデータ
+      vi: Metadata

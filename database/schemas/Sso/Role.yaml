@@ -1,0 +1,157 @@
+# ==============================================================================
+# Role (ロール / Vai trò)
+# ==============================================================================
+#
+# Mục đích (Purpose):
+#   Định nghĩa vai trò trong hệ thống RBAC (Role-Based Access Control).
+#   Roles có thể là global (toàn hệ thống) hoặc scoped (theo organization).
+#
+# Cấu trúc bảng:
+#   | Column         | Type         | Description                          |
+#   |----------------|--------------|--------------------------------------|
+#   | id             | UUID         | Primary key                          |
+#   | console_organization_id | UUID/NULL    | NULL = global, UUID = org-specific   |
+#   | name           | VARCHAR(100) | Tên role (unique trong scope)        |
+#   | slug           | VARCHAR(100) | Slug (unique trong scope)            |
+#   | description    | TEXT         | Mô tả chi tiết                       |
+#   | level          | INT          | Mức độ ưu tiên (cao = quyền hạn cao) |
+#
+# Role Types:
+#   ┌─────────────────────────────────────────────────────────────────────────┐
+#   │  Type          │  console_organization_id  │  Description                       │
+#   ├────────────────┼──────────────────┼────────────────────────────────────┤
+#   │  Global Role   │  NULL            │  System-wide, managed by platform  │
+#   │  Org Role      │  uuid-xxx        │  Organization-specific, custom     │
+#   └─────────────────────────────────────────────────────────────────────────┘
+#
+# Role Hierarchy (via level):
+#   ┌─────────────────────────────────────────────────────────────────────────┐
+#   │  Level  │  Role         │  Description                                 │
+#   ├─────────┼───────────────┼──────────────────────────────────────────────┤
+#   │  100    │  Super Admin  │  Platform admin, all permissions             │
+#   │  90     │  System       │  Background jobs, integrations               │
+#   │  50     │  Org Admin    │  Organization administrator                  │
+#   │  30     │  Manager      │  Department/team manager                     │
+#   │  10     │  Staff        │  Regular employee                            │
+#   └─────────────────────────────────────────────────────────────────────────┘
+#
+# Use Cases for level:
+#   1. Determine "highest role" when user has multiple roles
+#   2. Restrict actions (vd: Staff không thể assign Manager role)
+#   3. UI display ordering (higher level = more prominent)
+#
+# Relationships:
+#   Role ──┬── Permission (N:M, via role_permissions)
+#          └── User (N:M, via role_user)
+#
+# Default Roles (seeded):
+#   ┌─────────────────────────────────────────────────────────────────────────┐
+#   │  # Global roles (console_organization_id = NULL)                                │
+#   │  - Super Admin: Full system access                                     │
+#   │  - System: For automated processes                                     │
+#   │                                                                         │
+#   │  # Template for org roles (created per organization)                   │
+#   │  - Admin: Org-level administration                                     │
+#   │  - Manager: Team/department management                                 │
+#   │  - Staff: Basic employee access                                        │
+#   └─────────────────────────────────────────────────────────────────────────┘
+#
+# Business Rules:
+#   - (console_organization_id, name) là UNIQUE: Tên role unique trong scope
+#   - (console_organization_id, slug) là UNIQUE: Slug unique trong scope
+#   - level phải >= 0, thường dùng 10, 30, 50, 90, 100
+#   - softDelete: Giữ data cho audit trail
+#
+# Security Considerations:
+#   - Super Admin role không thể bị delete
+#   - User không thể assign role có level cao hơn mình
+#   - Global roles chỉ platform admin mới có thể modify
+#
+# ==============================================================================
+
+kind: object
+
+displayName:
+  ja: ロール
+  en: Role
+  vi: Vai trò
+
+options:
+  timestamps: true
+  softDelete: true
+  id: Uuid
+  indexes:
+    - columns: [console_organization_id]
+    - columns: [console_organization_id, name]
+      unique: true
+    - columns: [console_organization_id, slug]
+      unique: true
+
+properties:
+  # Organization scope - NULL = global role
+  console_organization_id:
+    type: String
+    length: 36
+    nullable: true
+    displayName:
+      ja: 組織ID
+      en: Organization ID
+      vi: ID tổ chức
+    description:
+      ja: NULLの場合はグローバルロール
+      en: NULL means global role (system-wide)
+      vi: NULL nghĩa là vai trò toàn hệ thống
+
+  # Basic info
+  name:
+    type: String
+    length: 100
+    displayName:
+      ja: ロール名
+      en: Role Name
+      vi: Tên vai trò
+
+  slug:
+    type: String
+    length: 100
+    displayName:
+      ja: スラッグ
+      en: Slug
+      vi: Slug
+    description:
+      ja: URLやコード内で使用する識別子
+      en: Identifier used in URLs and code
+      vi: Định danh dùng trong URL và code
+
+  description:
+    type: Text
+    nullable: true
+    displayName:
+      ja: 説明
+      en: Description
+      vi: Mô tả
+
+  # Hierarchy level - Higher = more permissions
+  level:
+    type: Int
+    default: 0
+    displayName:
+      ja: レベル
+      en: Level
+      vi: Cấp độ
+    description:
+      ja: 権限レベル（高いほど権限が大きい）
+      en: Permission level (higher = more permissions)
+      vi: Cấp độ quyền hạn (cao hơn = nhiều quyền hơn)
+
+  # Relationship: Role ↔ Permission (N:M)
+  permissions:
+    type: Association
+    relation: ManyToMany
+    target: Permission
+    joinTable: role_permissions
+    owning: true
+    displayName:
+      ja: 権限
+      en: Permissions
+      vi: Quyền hạn

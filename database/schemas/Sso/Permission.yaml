@@ -1,0 +1,155 @@
+# ==============================================================================
+# Permission (権限 / Quyền hạn)
+# ==============================================================================
+#
+# Mục đích (Purpose):
+#   Định nghĩa quyền hạn cụ thể trong hệ thống.
+#   Permissions là GLOBAL (không scoped theo organization).
+#
+# Cấu trúc bảng:
+#   | Column | Type         | Description                    |
+#   |--------|--------------|--------------------------------|
+#   | id     | UUID         | Primary key                    |
+#   | name   | VARCHAR(100) | Tên quyền (unique)             |
+#   | slug   | VARCHAR(100) | Slug identifier (unique)       |
+#   | group  | VARCHAR(50)  | Nhóm quyền (nullable)          |
+#
+# Naming Convention:
+#   ┌─────────────────────────────────────────────────────────────────────────┐
+#   │  Format: {resource}.{action}                                           │
+#   ├─────────────────────────────────────────────────────────────────────────┤
+#   │  Examples:                                                              │
+#   │    - users.view        → Xem danh sách users                           │
+#   │    - users.create      → Tạo user mới                                  │
+#   │    - users.update      → Cập nhật user                                 │
+#   │    - users.delete      → Xóa user                                      │
+#   │    - reports.view      → Xem báo cáo                                   │
+#   │    - reports.export    → Xuất báo cáo                                  │
+#   │    - settings.manage   → Quản lý cài đặt                               │
+#   └─────────────────────────────────────────────────────────────────────────┘
+#
+# Permission Groups:
+#   ┌─────────────────────────────────────────────────────────────────────────┐
+#   │  Group       │  Permissions                                            │
+#   ├──────────────┼─────────────────────────────────────────────────────────┤
+#   │  users       │  users.view, users.create, users.update, users.delete  │
+#   │  employees   │  employees.view, employees.create, employees.update    │
+#   │  reports     │  reports.view, reports.export                          │
+#   │  settings    │  settings.view, settings.manage                        │
+#   │  time        │  time.view, time.approve, time.edit                    │
+#   └─────────────────────────────────────────────────────────────────────────┘
+#
+# Relationships:
+#   Permission ──── Role (N:M, via role_permissions)
+#
+# Why Permissions are Global:
+#   - Permissions định nghĩa CÓ THỂ LÀM GÌ (what actions are possible)
+#   - Roles quyết định AI CÓ QUYỀN (who can do what)
+#   - Scoping xảy ra ở Role assignment, không phải Permission definition
+#
+# Permission Check Flow:
+#   ┌─────────────────────────────────────────────────────────────────────────┐
+#   │  User Request: "Can I delete this employee?"                           │
+#   │       │                                                                 │
+#   │       ▼                                                                 │
+#   │  1. Get User's Roles (scoped by current org/branch)                    │
+#   │       │                                                                 │
+#   │       ▼                                                                 │
+#   │  2. Get Permissions from those Roles                                   │
+#   │       │                                                                 │
+#   │       ▼                                                                 │
+#   │  3. Check if "employees.delete" exists in permission set               │
+#   │       │                                                                 │
+#   │  ┌────┴────┐                                                           │
+#   │  │ Found?  │                                                           │
+#   │  └────┬────┘                                                           │
+#   │  Yes  │  No                                                            │
+#   │   │   │                                                                │
+#   │   ▼   ▼                                                                │
+#   │  Allow  Deny                                                           │
+#   └─────────────────────────────────────────────────────────────────────────┘
+#
+# Business Rules:
+#   - name là UNIQUE globally
+#   - slug là UNIQUE globally (dùng trong code check)
+#   - group giúp UI group các permissions related
+#   - Không cần softDelete (permissions là system-defined)
+#
+# Example Code Usage:
+#   ```php
+#   // Check permission
+#   if ($user->hasPermission('employees.delete')) {
+#       $employee->delete();
+#   }
+#
+#   // Middleware
+#   Route::delete('/employees/{id}', ...)->middleware('permission:employees.delete');
+#   ```
+#
+# ==============================================================================
+
+kind: object
+
+displayName:
+  ja: 権限
+  en: Permission
+  vi: Quyền hạn
+
+options:
+  timestamps: true
+  id: Uuid
+
+properties:
+  # Permission name - Human readable
+  name:
+    type: String
+    length: 100
+    unique: true
+    displayName:
+      ja: 権限名
+      en: Permission Name
+      vi: Tên quyền
+    description:
+      ja: 人間が読める権限名
+      en: Human-readable permission name
+      vi: Tên quyền dễ đọc
+
+  # Slug - Used in code for permission checks
+  slug:
+    type: String
+    length: 100
+    unique: true
+    displayName:
+      ja: スラッグ
+      en: Slug
+      vi: Slug
+    description:
+      ja: "コード内で使用する識別子（例：users.create）"
+      en: "Identifier used in code (e.g., users.create)"
+      vi: "Định danh dùng trong code (vd: users.create)"
+
+  # Group - For UI grouping
+  group:
+    type: String
+    length: 50
+    nullable: true
+    displayName:
+      ja: グループ
+      en: Group
+      vi: Nhóm
+    description:
+      ja: UI表示用のグループ名
+      en: Group name for UI display
+      vi: Tên nhóm để hiển thị trên UI
+
+  # Relationship: Permission ↔ Role (N:M, inverse side)
+  roles:
+    type: Association
+    relation: ManyToMany
+    target: Role
+    joinTable: role_permissions
+    mappedBy: permissions
+    displayName:
+      ja: ロール
+      en: Roles
+      vi: Vai trò

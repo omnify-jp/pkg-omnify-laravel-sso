@@ -1,0 +1,499 @@
+{
+  "version": 2,
+  "updatedAt": "2026-01-31T02:19:01.936Z",
+  "driver": "mysql",
+  "schemas": {
+    "BranchCache": {
+      "name": "BranchCache",
+      "kind": "object",
+      "hash": "439a1985c90ffb773bc1d9de43087d073cef7a55b6828e6b6cab3cff17199164",
+      "relativePath": "Sso/BranchCache.yaml",
+      "modifiedAt": "2026-01-30T14:34:18.980Z",
+      "properties": {
+        "console_branch_id": {
+          "type": "Uuid",
+          "unique": true
+        },
+        "console_organization_id": {
+          "type": "Uuid"
+        },
+        "slug": {
+          "type": "String",
+          "length": 100
+        },
+        "name": {
+          "type": "String",
+          "length": 100
+        },
+        "is_headquarters": {
+          "type": "Boolean",
+          "default": false
+        },
+        "is_active": {
+          "type": "Boolean",
+          "default": true
+        }
+      },
+      "idType": "Uuid",
+      "timestamps": true,
+      "softDelete": true,
+      "indexes": [
+        {
+          "columns": [
+            "console_organization_id"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "console_organization_id",
+            "slug"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "console_organization_id",
+            "is_active"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "console_organization_id",
+            "is_headquarters"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    "OrganizationCache": {
+      "name": "OrganizationCache",
+      "kind": "object",
+      "hash": "f17074ab0d09e78f0312b8ee6e8b19166b1f5ad6b8f33f3fbd052b7404348c25",
+      "relativePath": "Sso/OrganizationCache.yaml",
+      "modifiedAt": "2026-01-30T14:19:06.707Z",
+      "properties": {
+        "console_organization_id": {
+          "type": "Uuid",
+          "unique": true
+        },
+        "name": {
+          "type": "String",
+          "length": 100
+        },
+        "slug": {
+          "type": "String",
+          "length": 100
+        },
+        "is_active": {
+          "type": "Boolean",
+          "default": true
+        }
+      },
+      "idType": "Uuid",
+      "timestamps": true,
+      "softDelete": true,
+      "indexes": [
+        {
+          "columns": [
+            "slug"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    "Permission": {
+      "name": "Permission",
+      "kind": "object",
+      "hash": "26f17f3276614f8777d6448a5e26a69e6e9c2f79d54f5ba938c996353b9a68bc",
+      "relativePath": "Sso/Permission.yaml",
+      "modifiedAt": "2026-01-31T01:33:38.555Z",
+      "properties": {
+        "name": {
+          "type": "String",
+          "unique": true,
+          "length": 100
+        },
+        "slug": {
+          "type": "String",
+          "unique": true,
+          "length": 100
+        },
+        "group": {
+          "type": "String",
+          "nullable": true,
+          "length": 50
+        },
+        "roles": {
+          "type": "Association",
+          "relation": "ManyToMany",
+          "target": "Role",
+          "mappedBy": "permissions",
+          "joinTable": "role_permissions"
+        }
+      },
+      "idType": "Uuid",
+      "timestamps": true
+    },
+    "Role": {
+      "name": "Role",
+      "kind": "object",
+      "hash": "cb475b0ce9a7b2bb1b6fd4e7b05a65c3ed808157439dfbdbe5b1108219dc930c",
+      "relativePath": "Sso/Role.yaml",
+      "modifiedAt": "2026-01-31T01:33:38.557Z",
+      "properties": {
+        "console_organization_id": {
+          "type": "String",
+          "nullable": true,
+          "length": 36
+        },
+        "name": {
+          "type": "String",
+          "length": 100
+        },
+        "slug": {
+          "type": "String",
+          "length": 100
+        },
+        "description": {
+          "type": "Text",
+          "nullable": true
+        },
+        "level": {
+          "type": "Int",
+          "default": 0
+        },
+        "permissions": {
+          "type": "Association",
+          "relation": "ManyToMany",
+          "target": "Permission",
+          "joinTable": "role_permissions"
+        }
+      },
+      "idType": "Uuid",
+      "timestamps": true,
+      "softDelete": true,
+      "indexes": [
+        {
+          "columns": [
+            "console_organization_id"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "console_organization_id",
+            "name"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "console_organization_id",
+            "slug"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    "RolePermission": {
+      "name": "RolePermission",
+      "kind": "object",
+      "hash": "3612d5985a35975511f239b3b966fd1a94afaaf7fbba3fc7de64f5335ded1f1c",
+      "relativePath": "Sso/RolePermission.yaml",
+      "modifiedAt": "2026-01-31T01:33:38.557Z",
+      "properties": {
+        "role": {
+          "type": "Association",
+          "relation": "ManyToOne",
+          "target": "Role"
+        },
+        "permission": {
+          "type": "Association",
+          "relation": "ManyToOne",
+          "target": "Permission"
+        }
+      },
+      "id": false,
+      "timestamps": true,
+      "uniqueConstraints": [
+        [
+          "role_id",
+          "permission_id"
+        ]
+      ]
+    },
+    "TeamCache": {
+      "name": "TeamCache",
+      "kind": "object",
+      "hash": "2bfcaffd25b5ee14fc7ee8ee2e6f018528adb12a2be4f8a24286faec713d22a0",
+      "relativePath": "Sso/TeamCache.yaml",
+      "modifiedAt": "2026-01-30T14:19:22.279Z",
+      "properties": {
+        "console_team_id": {
+          "type": "Uuid",
+          "unique": true
+        },
+        "console_organization_id": {
+          "type": "Uuid"
+        },
+        "name": {
+          "type": "String",
+          "length": 100
+        }
+      },
+      "idType": "Uuid",
+      "timestamps": true,
+      "softDelete": true,
+      "indexes": [
+        {
+          "columns": [
+            "console_organization_id"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    "TeamPermission": {
+      "name": "TeamPermission",
+      "kind": "object",
+      "hash": "30187feaa8bf4e8f085589a7d9902ad52db06254fd75ec1c48fe3805ccbf78d1",
+      "relativePath": "Sso/TeamPermission.yaml",
+      "modifiedAt": "2026-01-31T01:33:38.558Z",
+      "properties": {
+        "console_organization_id": {
+          "type": "Uuid"
+        },
+        "console_team_id": {
+          "type": "Uuid"
+        },
+        "permission": {
+          "type": "Association",
+          "relation": "ManyToOne",
+          "target": "Permission"
+        }
+      },
+      "idType": "Uuid",
+      "timestamps": true,
+      "softDelete": true,
+      "indexes": [
+        {
+          "columns": [
+            "console_organization_id",
+            "console_team_id"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    "UserCache": {
+      "name": "UserCache",
+      "kind": "object",
+      "hash": "0d23e619fd78721e011f780165edd7706ebcdf7bef9e8d26d24507a9e93abb78",
+      "relativePath": "Sso/UserCache.yaml",
+      "modifiedAt": "2026-01-31T01:33:38.559Z",
+      "properties": {
+        "name": {
+          "type": "String"
+        },
+        "email": {
+          "type": "String"
+        },
+        "console_user_id": {
+          "type": "Uuid",
+          "nullable": true
+        },
+        "console_organization_id": {
+          "type": "Uuid",
+          "nullable": true
+        },
+        "console_access_token": {
+          "type": "Text",
+          "nullable": true
+        },
+        "console_refresh_token": {
+          "type": "Text",
+          "nullable": true
+        },
+        "console_token_expires_at": {
+          "type": "Timestamp",
+          "nullable": true
+        },
+        "roles": {
+          "type": "Association",
+          "relation": "ManyToMany",
+          "target": "Role",
+          "joinTable": "role_user_cache",
+          "pivotFields": {
+            "console_organization_id": {
+              "type": "String",
+              "length": 36,
+              "nullable": true,
+              "displayName": {
+                "ja": "組織ID",
+                "en": "Organization ID",
+                "vi": "ID tổ chức"
+              },
+              "description": {
+                "ja": "nullの場合はシステム全体に適用（グローバルスコープ）",
+                "en": "null means system-wide assignment (global scope)",
+                "vi": "null nghĩa là áp dụng toàn hệ thống (phạm vi toàn cục)"
+              }
+            },
+            "console_branch_id": {
+              "type": "String",
+              "length": 36,
+              "nullable": true,
+              "displayName": {
+                "ja": "ブランチID",
+                "en": "Branch ID",
+                "vi": "ID chi nhánh"
+              },
+              "description": {
+                "ja": "nullの場合は組織全体に適用。指定した場合は該当ブランチのみ",
+                "en": "null means org-wide. When specified, applies only to that branch",
+                "vi": "null nghĩa là toàn tổ chức. Khi chỉ định, chỉ áp dụng cho chi nhánh đó"
+              }
+            }
+          }
+        }
+      },
+      "idType": "Uuid",
+      "timestamps": true,
+      "softDelete": true,
+      "indexes": [
+        {
+          "columns": [
+            "console_organization_id"
+          ],
+          "unique": false
+        },
+        {
+          "columns": [
+            "email",
+            "console_organization_id"
+          ],
+          "unique": true
+        },
+        {
+          "columns": [
+            "console_user_id",
+            "console_organization_id"
+          ],
+          "unique": true
+        }
+      ]
+    }
+  },
+  "migrations": [
+    {
+      "fileName": "2026_01_31_101445_create_branch_caches_table.php",
+      "timestamp": "2026_01_31_101445",
+      "tableName": "branch_caches",
+      "type": "create",
+      "generatedAt": "2026-01-31T01:14:45.875Z",
+      "schemas": [
+        "BranchCache"
+      ],
+      "checksum": "42210ce836443b65130c92697959fa94eba04190f6d6505b1efd7c023cbb4902",
+      "outputPath": "./database/migrations/omnify"
+    },
+    {
+      "fileName": "2026_01_31_101446_create_organization_caches_table.php",
+      "timestamp": "2026_01_31_101446",
+      "tableName": "organization_caches",
+      "type": "create",
+      "generatedAt": "2026-01-31T01:14:45.875Z",
+      "schemas": [
+        "OrganizationCache"
+      ],
+      "checksum": "17a0c133384ac2c94ecb84f41232bba37f26d95550cc2f2fe7b49d4f8cc0abfc",
+      "outputPath": "./database/migrations/omnify"
+    },
+    {
+      "fileName": "2026_01_31_101447_create_permissions_table.php",
+      "timestamp": "2026_01_31_101447",
+      "tableName": "permissions",
+      "type": "create",
+      "generatedAt": "2026-01-31T01:14:45.875Z",
+      "schemas": [
+        "Permission"
+      ],
+      "checksum": "201092595b59d0aa63521af15e58321c0bfca69ae8f6d256f45d3833863cc020",
+      "outputPath": "./database/migrations/omnify"
+    },
+    {
+      "fileName": "2026_01_31_101448_create_roles_table.php",
+      "timestamp": "2026_01_31_101448",
+      "tableName": "roles",
+      "type": "create",
+      "generatedAt": "2026-01-31T01:14:45.875Z",
+      "schemas": [
+        "Role"
+      ],
+      "checksum": "42116fc8bab11572d13c07b2615ee6ee4b1a47f98d42f3440ff833055db0d953",
+      "outputPath": "./database/migrations/omnify"
+    },
+    {
+      "fileName": "2026_01_31_101449_create_role_permissions_table.php",
+      "timestamp": "2026_01_31_101449",
+      "tableName": "role_permissions",
+      "type": "create",
+      "generatedAt": "2026-01-31T01:14:45.875Z",
+      "schemas": [
+        "RolePermission"
+      ],
+      "checksum": "3de1cfaf507c404695869319520810a9a04e0500fb08e8ff3eae1319ecfc52b9",
+      "outputPath": "./database/migrations/omnify"
+    },
+    {
+      "fileName": "2026_01_31_101450_create_team_caches_table.php",
+      "timestamp": "2026_01_31_101450",
+      "tableName": "team_caches",
+      "type": "create",
+      "generatedAt": "2026-01-31T01:14:45.875Z",
+      "schemas": [
+        "TeamCache"
+      ],
+      "checksum": "2bed8bb10fab63e79abe1679817be4c25525d74a7157fce2740c7dbc8af9ae8a",
+      "outputPath": "./database/migrations/omnify"
+    },
+    {
+      "fileName": "2026_01_31_101451_create_team_permissions_table.php",
+      "timestamp": "2026_01_31_101451",
+      "tableName": "team_permissions",
+      "type": "create",
+      "generatedAt": "2026-01-31T01:14:45.875Z",
+      "schemas": [
+        "TeamPermission"
+      ],
+      "checksum": "46222a770669815acf17f3d4cd51aa4d0a2b2feb554d16fc55fd89dcba17acc9",
+      "outputPath": "./database/migrations/omnify"
+    },
+    {
+      "fileName": "2026_01_31_101452_create_user_caches_table.php",
+      "timestamp": "2026_01_31_101452",
+      "tableName": "user_caches",
+      "type": "create",
+      "generatedAt": "2026-01-31T01:14:45.875Z",
+      "schemas": [
+        "UserCache"
+      ],
+      "checksum": "c0d2430b811961b7e0c8eb70473dc2502c96edfa067e69065e7877f595f4db68",
+      "outputPath": "./database/migrations/omnify"
+    },
+    {
+      "fileName": "2026_01_31_101453_create_role_user_cache_table.php",
+      "timestamp": "2026_01_31_101453",
+      "tableName": "role_user_cache",
+      "type": "create",
+      "generatedAt": "2026-01-31T01:14:45.875Z",
+      "schemas": [
+        "UserCache"
+      ],
+      "checksum": "7b370fec53e6194ef298640ffc7d2fa14796c1cb3da7ffaa109d6f4a6c022d1e",
+      "outputPath": "./database/migrations/omnify"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "omnify": {
+      "command": "omnify",
+      "args": [
+        "mcp"
+      ]
+    }
+  }
+}

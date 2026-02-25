@@ -1,0 +1,78 @@
+# RefreshToken schema
+# SSO refresh tokens for services
+
+displayName:
+  en: Refresh Token
+  ja: リフレッシュトークン
+  vi: Refresh Token
+kind: object
+
+options:
+  timestamps: false
+  indexes:
+    - columns: [token_hash]
+    - columns: [user]
+    - columns: [expires_at]
+
+properties:
+  token_hash:
+    type: String
+    length: 64
+    displayName:
+      en: Token Hash
+      ja: トークンハッシュ
+      vi: Hash token
+
+  expires_at:
+    type: Timestamp
+    displayName:
+      en: Expires At
+      ja: 有効期限
+      vi: Hết hạn lúc
+
+  revoked_at:
+    type: Timestamp
+    nullable: true
+    displayName:
+      en: Revoked At
+      ja: 取消日時
+      vi: Thu hồi lúc
+
+  ip_address:
+    type: String
+    length: 45
+    nullable: true
+    displayName:
+      en: IP Address
+      ja: IPアドレス
+      vi: Địa chỉ IP
+
+  user_agent:
+    type: String
+    length: 500
+    nullable: true
+    displayName:
+      en: User Agent
+      ja: ユーザーエージェント
+      vi: User Agent
+
+  created_at:
+    type: Timestamp
+    useCurrent: true
+    displayName:
+      en: Created At
+      ja: 作成日時
+      vi: Tạo lúc
+
+  # === Relations ===
+  user:
+    type: Association
+    relation: ManyToOne
+    target: User
+    onDelete: CASCADE
+    displayName:
+      en: User
+      ja: ユーザー
+      vi: Người dùng
+
+

@@ -1,0 +1,98 @@
+# ==============================================================================
+# Branch (支店 / Chi nhánh)
+# ==============================================================================
+#
+# Mục đích (Purpose):
+#   Lưu thông tin chi nhánh từ Console API.
+#   Mỗi Organization có thể có nhiều Branches (chi nhánh/văn phòng).
+#
+# Relationships:
+#   Branch ──── Organization (N:1, via console_organization_id)
+#
+# ==============================================================================
+
+kind: object
+
+displayName:
+  ja: 支店
+  en: Branch
+  vi: Chi nhánh
+
+options:
+  timestamps: true
+  softDelete: true
+  id: Uuid
+  indexes:
+    - columns: [console_organization_id]
+    - columns: [console_organization_id, slug]
+      unique: true
+    - columns: [console_organization_id, is_active]
+    - columns: [console_organization_id, is_headquarters]
+
+properties:
+  # Console reference - Primary identifier from Console
+  console_branch_id:
+    type: Uuid
+    unique: true
+    displayName:
+      ja: Console Branch ID
+      en: Console Branch ID
+      vi: Console Branch ID
+    description:
+      ja: Console側の支店ID
+      en: Branch ID from Console
+      vi: ID chi nhánh từ Console
+
+  # Organization reference
+  console_organization_id:
+    type: Uuid
+    displayName:
+      ja: Console Organization ID
+      en: Console Organization ID
+      vi: Console Organization ID
+    description:
+      ja: Console側の組織ID
+      en: Organization ID from Console
+      vi: ID tổ chức từ Console
+
+  # Basic info - Cached from Console
+  slug:
+    type: String
+    length: 100
+    displayName:
+      ja: スラッグ
+      en: Slug
+      vi: Slug
+    description:
+      ja: URL用のユニーク識別子
+      en: URL-friendly unique identifier
+      vi: Định danh URL duy nhất
+
+  name:
+    type: String
+    length: 100
+    displayName:
+      ja: 支店名
+      en: Branch Name
+      vi: Tên chi nhánh
+
+  # Flags
+  is_headquarters:
+    type: Boolean
+    default: false
+    displayName:
+      ja: 本社
+      en: Is Headquarters
+      vi: Là trụ sở chính
+    description:
+      ja: この支店が組織の本社かどうか
+      en: Whether this is the main headquarters of the organization
+      vi: Chi nhánh này có phải là trụ sở chính không
+
+  is_active:
+    type: Boolean
+    default: true
+    displayName:
+      ja: 有効
+      en: Active
+      vi: Hoạt động

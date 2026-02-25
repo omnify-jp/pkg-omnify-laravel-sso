@@ -1,0 +1,83 @@
+{
+    "name": "omnifyjp/omnify-client-laravel-sso",
+    "description": "SSO Client Package for Laravel - Provides Role, Permission and RolePermission models with Omnify schema-driven development",
+    "type": "composer-plugin",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "sso",
+        "authentication",
+        "authorization",
+        "roles",
+        "permissions",
+        "omnify",
+        "composer-plugin",
+        "auto-discovery"
+    ],
+    "authors": [
+        {
+            "name": "Omnify Team",
+            "email": "dev@omnify.jp"
+        }
+    ],
+    "homepage": "https://github.com/dxscom/package-omnify-laravel-sso",
+    "require": {
+        "php": "^8.2",
+        "composer-plugin-api": "^2.0",
+        "illuminate/support": "^11.0|^12.0",
+        "illuminate/database": "^11.0|^12.0"
+    },
+    "require-dev": {
+        "composer/composer": "^2.0",
+        "inertiajs/inertia-laravel": "^2.0",
+        "laravel/pint": "^1.0",
+        "laravel/sanctum": "^4.2",
+        "lcobucci/jwt": "^5.6",
+        "orchestra/testbench": "^9.0|^10.0",
+        "pestphp/pest": "^3.0",
+        "phpunit/phpunit": "^11.0",
+        "spatie/laravel-query-builder": "^6.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Omnify\\SsoClient\\": "app/",
+            "Omnify\\SsoClient\\Database\\Factories\\": "database/factories/"
+        },
+        "files": [
+            "app/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Omnify\\SsoClient\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "class": "Omnify\\SsoClient\\Composer\\OmnifyDiscoveryPlugin",
+        "omnify": {
+            "schemas": "database/schemas",
+            "namespace": "Sso",
+            "priority": 50,
+            "options": {
+                "generateMigrations": true,
+                "generateModels": true,
+                "modelNamespace": "Omnify\\SsoClient\\Models",
+                "migrationsPath": "database/migrations/omnify",
+                "factoriesPath": "database/factories"
+            }
+        },
+        "laravel": {
+            "providers": [
+                "Omnify\\SsoClient\\SsoClientServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

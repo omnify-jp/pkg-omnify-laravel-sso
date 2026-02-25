@@ -1,0 +1,59 @@
+<?php
+
+/**
+ * Team Update Request
+ *
+ * SAFE TO EDIT - This file is never overwritten by Omnify.
+ */
+
+namespace App\Http\Requests;
+
+use Illuminate\Http\Request;
+use App\Http\Requests\OmnifyBase\TeamUpdateRequestBase;
+
+class TeamUpdateRequest extends TeamUpdateRequestBase
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return array_merge($this->schemaRules(), [
+            // Custom rules here
+        ]);
+    }
+
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return array_merge($this->schemaAttributes(), [
+            // Custom attributes here
+        ]);
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            // Custom messages here
+        ];
+    }
+}

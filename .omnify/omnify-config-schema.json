@@ -1,0 +1,231 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://omnify.dev/schemas/omnify-config-schema.json",
+  "title": "Omnify Configuration",
+  "description": "Configuration file for Omnify (omnify.yaml)",
+  "type": "object",
+  "properties": {
+    "schemasDir": {
+      "type": "string",
+      "default": "./schemas",
+      "description": "Directory containing schema YAML files"
+    },
+    "additionalSchemaPaths": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/AdditionalSchemaPath"
+      },
+      "description": "Additional schema directories to load (e.g., from external packages)"
+    },
+    "lockFilePath": {
+      "type": "string",
+      "default": ".omnify/lock.json",
+      "description": "Path to the lock file for tracking migration state"
+    },
+    "connections": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/Connection"
+      },
+      "description": "Database connection configurations"
+    },
+    "default": {
+      "type": "string",
+      "default": "default",
+      "description": "Default connection name"
+    },
+    "locale": {
+      "$ref": "#/definitions/Locale",
+      "description": "Locale settings for multi-language support"
+    },
+    "compoundTypes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["japan"]
+      },
+      "description": "Built-in compound type packs to enable (e.g., 'japan' for JapaneseName, JapaneseAddress)"
+    },
+    "codegen": {
+      "$ref": "#/definitions/Codegen",
+      "description": "Code generation configuration (connection-independent, reads schemas.json)"
+    },
+    "verbose": {
+      "type": "boolean",
+      "default": false,
+      "description": "Enable verbose output during generation"
+    }
+  },
+  "definitions": {
+    "AdditionalSchemaPath": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Path to the additional schema directory"
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Namespace prefix for schemas in this directory"
+        }
+      }
+    },
+    "Connection": {
+      "type": "object",
+      "required": ["driver"],
+      "properties": {
+        "driver": {
+          "type": "string",
+          "enum": ["mysql", "pgsql", "postgres", "sqlite"],
+          "description": "Database driver"
+        },
+        "migrations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Migration"
+          },
+          "description": "Migration output configurations"
+        }
+      }
+    },
+    "Migration": {
+      "type": "object",
+      "required": ["type", "path"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["laravel", "sql"],
+          "description": "Migration output type"
+        },
+        "path": {
+          "type": "string",
+          "description": "Output directory for migration files"
+        },
+        "schemasPath": {
+          "type": "string",
+          "description": "Path for exported schemas JSON (laravel only)"
+        },
+        "dialect": {
+          "type": "string",
+          "enum": ["mysql", "postgresql", "sqlite"],
+          "description": "SQL dialect for generated migrations (sql only)"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "laravel" } }
+          },
+          "then": {
+            "properties": {
+              "schemasPath": { "type": "string" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "sql" } }
+          },
+          "then": {
+            "properties": {
+              "dialect": { "type": "string", "enum": ["mysql", "postgresql", "sqlite"] }
+            }
+          }
+        }
+      ]
+    },
+    "Codegen": {
+      "type": "object",
+      "properties": {
+        "typescript": {
+          "$ref": "#/definitions/CodegenTypeScript",
+          "description": "TypeScript codegen configuration"
+        },
+        "laravel": {
+          "$ref": "#/definitions/CodegenLaravel",
+          "description": "Laravel PHP codegen configuration"
+        }
+      }
+    },
+    "CodegenTypeScript": {
+      "type": "object",
+      "required": ["enable", "modelsPath"],
+      "properties": {
+        "enable": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable TypeScript codegen. Defaults to false."
+        },
+        "modelsPath": {
+          "type": "string",
+          "description": "Output directory for generated TypeScript model files"
+        }
+      }
+    },
+    "CodegenLaravel": {
+      "type": "object",
+      "required": ["enable"],
+      "properties": {
+        "enable": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable Laravel PHP codegen. Defaults to false."
+        },
+        "model": {
+          "$ref": "#/definitions/CodegenLaravelPath",
+          "description": "Model output configuration (default: app/Models/Omnify)"
+        },
+        "request": {
+          "$ref": "#/definitions/CodegenLaravelPath",
+          "description": "Request output configuration (default: app/Http/Requests)"
+        },
+        "resource": {
+          "$ref": "#/definitions/CodegenLaravelPath",
+          "description": "Resource output configuration (default: app/Http/Resources)"
+        },
+        "factory": {
+          "$ref": "#/definitions/CodegenLaravelPath",
+          "description": "Factory output configuration (default: database/factories)"
+        },
+        "provider": {
+          "$ref": "#/definitions/CodegenLaravelPath",
+          "description": "Provider output configuration (default: app/Providers)"
+        }
+      }
+    },
+    "CodegenLaravelPath": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Output directory path"
+        },
+        "namespace": {
+          "type": "string",
+          "description": "PHP namespace (default: derived from path)"
+        }
+      }
+    },
+    "Locale": {
+      "type": "object",
+      "properties": {
+        "locales": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of supported locale codes (e.g., ['ja', 'en', 'vi'])"
+        },
+        "defaultLocale": {
+          "type": "string",
+          "description": "Default locale code"
+        },
+        "fallbackLocale": {
+          "type": "string",
+          "description": "Fallback locale when translation is missing"
+        }
+      }
+    }
+  }
+}

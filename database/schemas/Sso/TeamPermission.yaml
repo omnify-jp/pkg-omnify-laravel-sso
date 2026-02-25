@@ -1,0 +1,143 @@
+# ==============================================================================
+# TeamPermission (チーム権限 / Quyền nhóm)
+# ==============================================================================
+#
+# Mục đích (Purpose):
+#   Gán permission trực tiếp cho Team (bypass Role).
+#   Cho phép flexible permission assignment cho các trường hợp đặc biệt.
+#
+# Cấu trúc bảng:
+#   | Column          | Type | Description                    |
+#   |-----------------|------|--------------------------------|
+#   | id              | UUID | Primary key                    |
+#   | console_organization_id  | UUID | ID tổ chức                     |
+#   | console_team_id | UUID | ID team                        |
+#   | permission_id   | UUID | FK → permissions               |
+#
+# Use Case:
+#   ┌─────────────────────────────────────────────────────────────────────────┐
+#   │  Scenario: Team "Sales HN" cần quyền đặc biệt không có trong Role      │
+#   ├─────────────────────────────────────────────────────────────────────────┤
+#   │  - Members có Role "Staff" → permissions từ Role                       │
+#   │  - Team "Sales HN" có TeamPermission → thêm permissions                │
+#   │                                                                         │
+#   │  Result: Members của "Sales HN" có:                                    │
+#   │    - Permissions từ Role "Staff" (via RolePermission)                  │
+#   │    - Permissions từ Team "Sales HN" (via TeamPermission)               │
+#   └─────────────────────────────────────────────────────────────────────────┘
+#
+# Example Data:
+#   ┌─────────────────────────────────────────────────────────────────────────┐
+#   │  Team "Sales HN" có quyền đặc biệt:                                    │
+#   │  ├── customers.export   (không có trong Role Staff)                    │
+#   │  └── reports.sales      (chỉ Sales team mới có)                        │
+#   │                                                                         │
+#   │  Team "Engineering" có quyền đặc biệt:                                 │
+#   │  ├── deployments.view                                                  │
+#   │  └── logs.view                                                         │
+#   └─────────────────────────────────────────────────────────────────────────┘
+#
+# Permission Check Flow (with TeamPermission):
+#   ┌─────────────────────────────────────────────────────────────────────────┐
+#   │  User Request → Check Permission                                        │
+#   │       │                                                                 │
+#   │       ├─── 1. Get User's Roles → Get RolePermissions                   │
+#   │       │                                                                 │
+#   │       ├─── 2. Get User's Teams → Get TeamPermissions                   │
+#   │       │                                                                 │
+#   │       └─── 3. Merge all permissions → Final permission set             │
+#   │                                                                         │
+#   │  if (permissionSet.includes(requestedPermission)) → Allow              │
+#   └─────────────────────────────────────────────────────────────────────────┘
+#
+# Relationships:
+#   TeamPermission ──── Permission (N:1)
+#
+# vs RolePermission:
+#   ┌─────────────────────────────────────────────────────────────────────────┐
+#   │  Aspect           │  RolePermission       │  TeamPermission             │
+#   ├───────────────────┼───────────────────────┼─────────────────────────────┤
+#   │  Scope            │  Via Role template    │  Direct to Team             │
+#   │  Use case         │  Standard permissions │  Special/exception cases    │
+#   │  Management       │  Admin manages Roles  │  Team lead can request      │
+#   │  Granularity      │  Role-level           │  Team-level                 │
+#   └─────────────────────────────────────────────────────────────────────────┘
+#
+# Business Rules:
+#   - console_organization_id + console_team_id + permission_id nên là UNIQUE
+#   - softDelete: Giữ history khi revoke permission
+#   - Indexed by (console_organization_id, console_team_id) cho query performance
+#
+# Code Example:
+#   ```php
+#   public function hasPermission(User $user, string $permission): bool
+#   {
+#       // 1. Check role-based permissions
+#       $hasRolePermission = $user->roles()
+#           ->whereHas('permissions', fn($q) => $q->where('slug', $permission))
+#           ->exists();
+#
+#       if ($hasRolePermission) return true;
+#
+#       // 2. Check team-based permissions
+#       $userTeams = $user->teams()->pluck('console_team_id');
+#       return TeamPermission::whereIn('console_team_id', $userTeams)
+#           ->whereHas('permission', fn($q) => $q->where('slug', $permission))
+#           ->exists();
+#   }
+#   ```
+#
+# ==============================================================================
+
+kind: object
+
+displayName:
+  ja: チーム権限
+  en: Team Permission
+  vi: Quyền nhóm
+
+options:
+  timestamps: true
+  softDelete: true
+  id: Uuid
+  indexes:
+    - columns: [console_organization_id, console_team_id]
+
+properties:
+  # Organization context
+  console_organization_id:
+    type: Uuid
+    displayName:
+      ja: Console Organization ID
+      en: Console Organization ID
+      vi: Console Organization ID
+    description:
+      ja: Console側の組織ID
+      en: Organization ID from Console
+      vi: ID tổ chức từ Console
+
+  # Team reference
+  console_team_id:
+    type: Uuid
+    displayName:
+      ja: Console Team ID
+      en: Console Team ID
+      vi: Console Team ID
+    description:
+      ja: Console側のチームID
+      en: Team ID from Console
+      vi: ID nhóm từ Console
+
+  # Permission being granted
+  permission:
+    type: Association
+    relation: ManyToOne
+    target: Permission
+    displayName:
+      ja: 権限
+      en: Permission
+      vi: Quyền hạn
+    description:
+      ja: チームに直接付与する権限
+      en: Permission directly granted to team
+      vi: Quyền được gán trực tiếp cho team

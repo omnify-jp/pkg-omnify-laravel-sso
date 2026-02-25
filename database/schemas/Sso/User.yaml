@@ -1,0 +1,183 @@
+# ==============================================================================
+# User (ユーザー / Người dùng)
+# ==============================================================================
+#
+# Mục đích (Purpose):
+#   Model chính cho authentication. Lưu thông tin user và SSO tokens.
+#
+# Relationships:
+#   User ──┬── Organization (N:1, via console_organization_id)
+#          └── Role (N:M, via pivot role_user)
+#
+# ==============================================================================
+
+kind: object
+
+displayName:
+  ja: ユーザー
+  en: User
+  vi: Người dùng
+
+options:
+  timestamps: true
+  softDelete: true
+  id: Uuid
+  authenticatable: true
+  indexes:
+    - columns: [console_organization_id]
+    - columns: [email, console_organization_id]
+      unique: true
+    - columns: [console_user_id, console_organization_id]
+      unique: true
+
+properties:
+  # Basic user info - Cached from Console
+  name:
+    type: String
+    displayName:
+      ja: 名前
+      en: Name
+      vi: Tên
+
+  email:
+    type: String
+    displayName:
+      ja: メールアドレス
+      en: Email
+      vi: Email
+    description:
+      ja: 組織内でユニーク
+      en: Unique within organization
+      vi: Duy nhất trong tổ chức
+
+  # Standalone auth - only used when omnify-auth.mode = 'standalone'
+  password:
+    type: String
+    nullable: true
+    hidden: true
+    displayName:
+      ja: パスワード
+      en: Password
+      vi: Mật khẩu
+    description:
+      ja: スタンドアローンモード用。Console SSOモードではnull。
+      en: Used in standalone auth mode. Null when using Console SSO.
+      vi: Dùng ở chế độ standalone. Null khi dùng Console SSO.
+
+  remember_token:
+    type: String
+    length: 100
+    nullable: true
+    hidden: true
+    displayName:
+      ja: Remember Token
+      en: Remember Token
+      vi: Remember Token
+    description:
+      ja: ブラウザ記憶トークン（スタンドアローンモード用）
+      en: Browser remember-me token (standalone auth mode)
+      vi: Token ghi nhớ đăng nhập (standalone mode)
+
+  # SSO fields - Console reference
+  console_user_id:
+    type: Uuid
+    nullable: true
+    displayName:
+      ja: Console User ID
+      en: Console User ID
+      vi: Console User ID
+    description:
+      ja: Console側のユーザーID
+      en: User ID from Console SSO
+      vi: ID người dùng từ Console SSO
+
+  console_organization_id:
+    type: Uuid
+    nullable: true
+    displayName:
+      ja: 所属組織ID
+      en: Organization ID
+      vi: ID Tổ chức
+    description:
+      ja: ユーザーが所属する主要組織のID（Console SSO側）
+      en: Primary organization ID the user belongs to (from Console SSO)
+      vi: ID tổ chức chính mà người dùng thuộc về (từ Console SSO)
+
+  # OAuth Tokens - ENCRYPTED in database
+  console_access_token:
+    type: Text
+    nullable: true
+    displayName:
+      ja: Console Access Token
+      en: Console Access Token
+      vi: Console Access Token
+    description:
+      ja: Console APIアクセス用トークン（暗号化）
+      en: Encrypted token for Console API access
+      vi: Token mã hóa để truy cập Console API
+
+  console_refresh_token:
+    type: Text
+    nullable: true
+    displayName:
+      ja: Console Refresh Token
+      en: Console Refresh Token
+      vi: Console Refresh Token
+    description:
+      ja: トークン更新用リフレッシュトークン（暗号化）
+      en: Encrypted refresh token for token renewal
+      vi: Token làm mới mã hóa
+
+  console_token_expires_at:
+    type: Timestamp
+    nullable: true
+    displayName:
+      ja: Console Token有効期限
+      en: Console Token Expiry
+      vi: Hạn Token Console
+    description:
+      ja: アクセストークンの有効期限
+      en: Access token expiration time
+      vi: Thời gian hết hạn của token truy cập
+
+  # Relationship: User ↔ Role (N:M with scoped pivot)
+  roles:
+    type: Association
+    relation: ManyToMany
+    target: Role
+    owning: true
+    displayName:
+      ja: ロール
+      en: Roles
+      vi: Vai trò
+    description:
+      ja: ユーザーのロール（複数可、スコープ指定可能）
+      en: User's roles (multiple allowed, can be scoped to org/branch)
+      vi: Vai trò của người dùng (có thể nhiều, có thể giới hạn theo org/branch)
+    # Pivot fields for scoped role assignments
+    # See docs/architecture/branch-permissions-design.md
+    pivotFields:
+      console_organization_id:
+        type: String
+        length: 36
+        nullable: true
+        displayName:
+          ja: 組織ID
+          en: Organization ID
+          vi: ID tổ chức
+        description:
+          ja: nullの場合はシステム全体に適用（グローバルスコープ）
+          en: null means system-wide assignment (global scope)
+          vi: null nghĩa là áp dụng toàn hệ thống (phạm vi toàn cục)
+      console_branch_id:
+        type: String
+        length: 36
+        nullable: true
+        displayName:
+          ja: ブランチID
+          en: Branch ID
+          vi: ID chi nhánh
+        description:
+          ja: nullの場合は組織全体に適用。指定した場合は該当ブランチのみ
+          en: null means org-wide. When specified, applies only to that branch
+          vi: null nghĩa là toàn tổ chức. Khi chỉ định, chỉ áp dụng cho chi nhánh đó
