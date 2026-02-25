@@ -20,7 +20,7 @@
             "email": "dev@omnify.jp"
         }
     ],
-    "homepage": "https://github.com/dxscom/package-omnify-laravel-sso",
+    "homepage": "https://github.com/omnify-jp/pkg-omnify-laravel-sso",
     "require": {
         "php": "^8.2",
         "composer-plugin-api": "^2.0",
