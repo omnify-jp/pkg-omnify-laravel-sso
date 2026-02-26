@@ -4,23 +4,7 @@
   "connections": {
     "default": "mysql"
   },
-  "changes": [
-    {
-      "action": "property_added",
-      "schema": "User",
-      "property": "two_factor_recovery_codes"
-    },
-    {
-      "action": "property_added",
-      "schema": "User",
-      "property": "google2fa_secret"
-    },
-    {
-      "action": "property_added",
-      "schema": "User",
-      "property": "two_factor_confirmed_at"
-    }
-  ],
+  "changes": [],
   "snapshot": {
     "Branch": {
       "name": "Branch",
