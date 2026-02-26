@@ -29,7 +29,7 @@ class BranchUpdateRequest extends BranchUpdateRequestBase
     public function rules(): array
     {
         return array_merge($this->schemaRules(), [
-            // Custom rules here
+            'timezone' => ['nullable', 'string', 'timezone:all'],
         ]);
     }
 

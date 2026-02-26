@@ -15,6 +15,35 @@ use Omnify\SsoClient\Models\Base\Locales\BranchLocales;
 abstract class BranchStoreRequestBase extends FormRequest
 {
     /**
+     * Determine if the user is authorized to make this request.
+     * Override this method in the concrete request class to add authorization logic.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return $this->schemaRules();
+    }
+
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return $this->schemaAttributes();
+    }
+
+    /**
      * Get the schema-defined validation rules.
      *
      * @return array<string, array>
@@ -28,6 +57,7 @@ abstract class BranchStoreRequestBase extends FormRequest
             'name' => ['required', 'string', 'max:100'],
             'is_headquarters' => ['required', 'boolean'],
             'is_active' => ['required', 'boolean'],
+            'timezone' => ['nullable', 'string', 'max:50'],
         ];
     }
 
@@ -51,6 +81,7 @@ abstract class BranchStoreRequestBase extends FormRequest
             'name',
             'is_headquarters',
             'is_active',
+            'timezone',
         ];
 
         foreach ($keys as $key) {

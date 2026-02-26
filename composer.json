@@ -39,7 +39,8 @@
     "autoload": {
         "psr-4": {
             "Omnify\\SsoClient\\": "app/",
-            "Omnify\\SsoClient\\Database\\Factories\\": "database/factories/"
+            "Omnify\\SsoClient\\Database\\Factories\\": "database/factories/",
+            "Omnify\\SsoClient\\Database\\Seeders\\": "database/seeders/"
         },
         "files": [
             "app/helpers.php"

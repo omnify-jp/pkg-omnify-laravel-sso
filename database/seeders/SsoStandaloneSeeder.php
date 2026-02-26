@@ -3,6 +3,7 @@
 namespace Omnify\SsoClient\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Omnify\SsoClient\Models\Branch;
 use Omnify\SsoClient\Models\Location;
 use Omnify\SsoClient\Models\Permission;
@@ -47,22 +48,6 @@ class SsoStandaloneSeeder extends Seeder
         $this->seedBranches();
         $this->seedLocations();
         $this->seedUsers($roles);
-
-        $this->command?->newLine();
-        $this->command?->info('Seeding complete! Tài khoản demo:');
-        $this->command?->table(
-            ['Email', 'Password', 'Role'],
-            [
-                ['admin@abc-tech.vn',            'Admin@2024',   'admin (Quản trị viên)'],
-                ['nguyen.van.an@abc-tech.vn',    'Manager@2024', 'manager (Trưởng phòng)'],
-                ['tran.thi.bich@abc-tech.vn',    'Manager@2024', 'manager (Trưởng phòng)'],
-                ['pham.van.cuong@abc-tech.vn',   'Staff@2024',   'staff (Nhân viên)'],
-                ['le.thi.dung@abc-tech.vn',      'Staff@2024',   'staff (Nhân viên)'],
-                ['hoang.van.em@abc-tech.vn',     'Staff@2024',   'staff (Nhân viên)'],
-                ['nguyen.thi.phuong@abc-tech.vn', 'Staff@2024',   'staff (Nhân viên)'],
-                ['vu.minh.quan@abc-tech.vn',     'Staff@2024',   'staff (Nhân viên)'],
-            ]
-        );
     }
 
     // =========================================================================
@@ -317,51 +302,51 @@ class SsoStandaloneSeeder extends Seeder
         // console_organization_id = null → không bị unique constraint chồng chéo với SSO users.
         $users = [
             [
-                'name' => 'Admin ABC Tech',
-                'email' => 'admin@abc-tech.vn',
-                'password' => 'Admin@2024',
+                'name' => 'User',
+                'email' => 'user@dx-s.com',
+                'password' => 'password',
                 'role' => 'admin',
             ],
             [
-                'name' => 'Nguyễn Văn An',
-                'email' => 'nguyen.van.an@abc-tech.vn',
-                'password' => 'Manager@2024',
+                'name' => 'User 01',
+                'email' => 'user01@dx-s.com',
+                'password' => 'password',
                 'role' => 'manager',
             ],
             [
-                'name' => 'Trần Thị Bích',
-                'email' => 'tran.thi.bich@abc-tech.vn',
-                'password' => 'Manager@2024',
+                'name' => 'User 02',
+                'email' => 'user02@dx-s.com',
+                'password' => 'password',
                 'role' => 'manager',
             ],
             [
-                'name' => 'Phạm Văn Cường',
-                'email' => 'pham.van.cuong@abc-tech.vn',
-                'password' => 'Staff@2024',
+                'name' => 'User 03',
+                'email' => 'user03@dx-s.com',
+                'password' => 'password',
                 'role' => 'staff',
             ],
             [
-                'name' => 'Lê Thị Dung',
-                'email' => 'le.thi.dung@abc-tech.vn',
-                'password' => 'Staff@2024',
+                'name' => 'User 04',
+                'email' => 'user04@dx-s.com',
+                'password' => 'password',
                 'role' => 'staff',
             ],
             [
-                'name' => 'Hoàng Văn Em',
-                'email' => 'hoang.van.em@abc-tech.vn',
-                'password' => 'Staff@2024',
+                'name' => 'User 05',
+                'email' => 'user05@dx-s.com',
+                'password' => 'password',
                 'role' => 'staff',
             ],
             [
-                'name' => 'Nguyễn Thị Phương',
-                'email' => 'nguyen.thi.phuong@abc-tech.vn',
-                'password' => 'Staff@2024',
+                'name' => 'User 06',
+                'email' => 'user06@dx-s.com',
+                'password' => 'password',
                 'role' => 'staff',
             ],
             [
-                'name' => 'Vũ Minh Quân',
-                'email' => 'vu.minh.quan@abc-tech.vn',
-                'password' => 'Staff@2024',
+                'name' => 'User 07',
+                'email' => 'user07@dx-s.com',
+                'password' => 'password',
                 'role' => 'staff',
             ],
         ];
@@ -369,6 +354,8 @@ class SsoStandaloneSeeder extends Seeder
         foreach ($users as $userData) {
             $roleKey = $userData['role'];
             unset($userData['role']);
+
+            $userData['password'] = Hash::make($userData['password']);
 
             /** @var User $user */
             $user = User::withTrashed()->updateOrCreate(
@@ -381,5 +368,10 @@ class SsoStandaloneSeeder extends Seeder
         }
 
         $this->command?->info('  [users] '.count($users).' users seeded.');
+        $this->command?->newLine();
+        $this->command?->table(
+            ['Email', 'Password', 'Role'],
+            collect($users)->map(fn ($u) => [$u['email'], $u['password'], $u['role']])->toArray()
+        );
     }
 }

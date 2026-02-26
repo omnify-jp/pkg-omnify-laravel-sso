@@ -127,7 +127,7 @@ class UserBaseModel extends Authenticatable
      */
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(\Omnify\SsoClient\Models\Role::class, 'role_user')
+        return $this->belongsToMany(\Omnify\SsoClient\Models\Role::class, 'role_user_pivot')
             ->withPivot('console_branch_id', 'console_organization_id')
             ->withTimestamps();
     }

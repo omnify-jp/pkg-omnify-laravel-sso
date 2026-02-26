@@ -59,5 +59,10 @@ class BranchLocales
             'ja' => '有効',
             'vi' => 'Hoạt động',
         ],
+        'timezone' => [
+            'en' => 'Timezone',
+            'ja' => 'タイムゾーン',
+            'vi' => 'Múi giờ',
+        ],
     ];
 }

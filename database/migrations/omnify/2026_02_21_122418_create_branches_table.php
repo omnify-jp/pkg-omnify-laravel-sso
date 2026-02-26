@@ -32,6 +32,7 @@ return new class extends Migration
             $table->string('name', 100)->comment('Branch Name');
             $table->boolean('is_headquarters')->default(false)->comment('Is Headquarters');
             $table->boolean('is_active')->default(true)->comment('Active');
+            $table->string('timezone', 50)->nullable()->comment('Timezone');
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
             $table->timestamp('deleted_at')->nullable();

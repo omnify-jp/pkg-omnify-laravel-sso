@@ -96,3 +96,17 @@ properties:
       ja: 有効
       en: Active
       vi: Hoạt động
+
+  # Operational
+  timezone:
+    type: String
+    length: 50
+    nullable: true
+    displayName:
+      ja: タイムゾーン
+      en: Timezone
+      vi: Múi giờ
+    description:
+      ja: "IANA タイムゾーン（例: Asia/Tokyo）"
+      en: "IANA timezone (e.g. Asia/Tokyo)"
+      vi: "Múi giờ IANA (VD: Asia/Tokyo)"

@@ -41,7 +41,7 @@ class LocationFactory extends Factory
             'longitude' => fake()->randomFloat(2, 1, 10000),
             'phone' => fake()->phoneNumber(),
             'email' => fake()->unique()->safeEmail(),
-            'timezone' => fake()->words(3, true),
+            'timezone' => fake()->randomElement(\DateTimeZone::listIdentifiers()),
             'capacity' => fake()->numberBetween(1, 1000),
             'sort_order' => fake()->numberBetween(1, 100),
             'description' => fake()->paragraphs(3, true),

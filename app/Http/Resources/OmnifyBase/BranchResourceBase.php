@@ -15,6 +15,16 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class BranchResourceBase extends JsonResource
 {
     /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return $this->schemaArray($request);
+    }
+
+    /**
      * Transform the schema-defined fields into an array.
      *
      * @return array<string, mixed>
@@ -29,6 +39,7 @@ class BranchResourceBase extends JsonResource
             'name' => $this->name,
             'is_headquarters' => $this->is_headquarters,
             'is_active' => $this->is_active,
+            'timezone' => $this->timezone,
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
             'deleted_at' => $this->deleted_at?->toISOString(),

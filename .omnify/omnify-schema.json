@@ -63,6 +63,13 @@
         ]
       },
       "description": "Enum values (only when kind is 'enum')"
+    },
+    "policies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PolicyDefinition"
+      },
+      "description": "Cedar-style ABAC policy definitions (only for kind: object schemas). Generates Laravel Policy classes."
     }
   },
   "definitions": {
@@ -802,6 +809,47 @@
           }
         }
       ]
+    },
+    "PolicyDefinition": {
+      "type": "object",
+      "required": ["effect", "actions"],
+      "properties": {
+        "effect": {
+          "type": "string",
+          "enum": ["permit", "forbid"],
+          "description": "Policy effect — permit allows access, forbid denies access"
+        },
+        "actions": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["view", "list", "create", "edit", "delete", "*"]
+              }
+            },
+            {
+              "type": "string",
+              "enum": ["view", "list", "create", "edit", "delete", "*"]
+            }
+          ],
+          "description": "Actions this policy applies to. Use '*' for all actions."
+        },
+        "when": {
+          "oneOf": [
+            { "type": "string" },
+            {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          ],
+          "description": "Condition(s) for this policy. String for single condition, array for AND conditions."
+        },
+        "desc": {
+          "type": "string",
+          "description": "Human-readable description (becomes PHP comment in generated code)"
+        }
+      }
     },
     "AssociationProperty": {
       "type": "object",

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-24T01:58:21Z",
+  "generatedAt": "2026-02-25T22:59:48Z",
   "database": {
     "driver": "mysql"
   },
@@ -135,6 +135,21 @@
             "vi": "Định danh URL duy nhất"
           },
           "length": 100
+        },
+        "timezone": {
+          "type": "String",
+          "displayName": {
+            "en": "Timezone",
+            "ja": "タイムゾーン",
+            "vi": "Múi giờ"
+          },
+          "nullable": true,
+          "description": {
+            "en": "IANA timezone (e.g. Asia/Tokyo)",
+            "ja": "IANA タイムゾーン（例: Asia/Tokyo）",
+            "vi": "Múi giờ IANA (VD: Asia/Tokyo)"
+          },
+          "length": 50
         }
       },
       "propertyOrder": [
@@ -143,7 +158,8 @@
         "slug",
         "name",
         "is_headquarters",
-        "is_active"
+        "is_active",
+        "timezone"
       ],
       "tableName": "branches"
     },

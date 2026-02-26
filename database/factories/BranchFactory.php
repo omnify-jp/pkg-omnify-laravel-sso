@@ -30,6 +30,7 @@ class BranchFactory extends Factory
             'name' => fake()->sentence(3),
             'is_headquarters' => fake()->boolean(),
             'is_active' => fake()->boolean(),
+            'timezone' => fake()->randomElement(\DateTimeZone::listIdentifiers()),
         ];
     }
 

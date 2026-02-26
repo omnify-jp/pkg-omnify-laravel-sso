@@ -24,7 +24,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('role_user', function (Blueprint $table) {
+        Schema::create('role_user_pivot', function (Blueprint $table) {
             $table->uuid('user_id');
             $table->uuid('role_id');
             $table->string('console_branch_id', 36)->nullable();
@@ -45,6 +45,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('role_user');
+        Schema::dropIfExists('role_user_pivot');
     }
 };

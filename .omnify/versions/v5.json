@@ -696,19 +696,5 @@
         "authenticatable": true
       }
     }
-  },
-  "migrationTimestamps": {
-    "branches": "2026_02_21_122418",
-    "locations": "2026_02_22_000001",
-    "organizations": "2026_02_21_122419",
-    "password_reset_tokens": "2026_02_21_122420",
-    "permissions": "2026_02_21_122421",
-    "refresh_tokens": "2026_02_21_122423",
-    "role_permissions": "2026_02_21_122425",
-    "role_user_pivot": "2026_02_26_075948",
-    "roles": "2026_02_21_122424",
-    "team_permissions": "2026_02_24_100900",
-    "teams": "2026_02_24_100859",
-    "users": "2026_02_21_122422"
   }
 }

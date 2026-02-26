@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $name
  * @property bool $is_headquarters
  * @property bool $is_active
+ * @property string|null $timezone
  */
 class BranchBaseModel extends BaseModel
 {
@@ -87,6 +88,7 @@ class BranchBaseModel extends BaseModel
         'name',
         'is_headquarters',
         'is_active',
+        'timezone',
     ];
 
     /**
