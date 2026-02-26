@@ -90,7 +90,7 @@ export default function AdminBranchesIndex({ branches, organizations, filters }:
         },
         {
             accessorKey: 'is_active',
-            header: t('admin.branches.status', 'Status'),
+            header: t('admin.branches.columns.status', 'Status'),
             enableSorting: false,
             cell: ({ row }) => (
                 <Badge variant={row.original.is_active ? 'default' : 'secondary'}>

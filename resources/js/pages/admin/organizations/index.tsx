@@ -64,7 +64,7 @@ export default function AdminOrganizationsIndex({ organizations, filters }: Prop
         },
         {
             accessorKey: 'is_active',
-            header: t('admin.organizations.status', 'Status'),
+            header: t('admin.organizations.columns.status', 'Status'),
             enableSorting: false,
             cell: ({ row }) => (
                 <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
