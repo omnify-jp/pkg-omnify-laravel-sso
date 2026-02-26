@@ -24,6 +24,7 @@ return [
         'redirect_after_login' => env('OMNIFY_AUTH_REDIRECT_AFTER_LOGIN', 'dashboard'),
         'redirect_after_logout' => env('OMNIFY_AUTH_REDIRECT_AFTER_LOGOUT', 'login'),
         'route_prefix' => env('OMNIFY_AUTH_ROUTE_PREFIX', ''),
+        'admin_enabled' => env('OMNIFY_STANDALONE_ADMIN_ENABLED', true),
         'pages' => [
             'login' => env('OMNIFY_AUTH_PAGE_LOGIN', 'auth/login'),
             'register' => env('OMNIFY_AUTH_PAGE_REGISTER', 'auth/register'),
@@ -122,7 +123,23 @@ return [
         'auth_prefix' => env('SSO_AUTH_PREFIX', 'sso'),
         'auth_middleware' => ['web', 'guest'],
         'auth_pages_path' => env('SSO_AUTH_PAGES_PATH', 'sso'),
+        'standalone_admin_prefix' => env('SSO_STANDALONE_ADMIN_PREFIX', 'admin'),
+        // null = auto-detect: ['web', 'auth']
+        'standalone_admin_middleware' => null,
+        'standalone_admin_pages_path' => env('SSO_STANDALONE_ADMIN_PAGES_PATH', 'admin'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Layout
+    |--------------------------------------------------------------------------
+    |
+    | The Inertia layout component path provided by the host app.
+    | Package pages render inside this layout.
+    | Set to null to use the host app's default layout.
+    |
+    */
+    'layout' => env('OMNIFY_AUTH_LAYOUT', null),
 
     /*
     |--------------------------------------------------------------------------

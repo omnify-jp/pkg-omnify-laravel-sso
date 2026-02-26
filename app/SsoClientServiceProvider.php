@@ -10,6 +10,7 @@ use Illuminate\Support\ServiceProvider;
 use Omnify\SsoClient\Http\Middleware\SetBranchFromHeader;
 use Omnify\SsoClient\Http\Middleware\ShareSsoData;
 use Omnify\SsoClient\Http\Middleware\SsoAuthenticate;
+use Omnify\SsoClient\Http\Middleware\StandaloneOrganizationContext;
 use Omnify\SsoClient\Http\Middleware\SsoOrganizationAccess;
 use Omnify\SsoClient\Http\Middleware\SsoPermissionCheck;
 use Omnify\SsoClient\Http\Middleware\SsoRoleCheck;
@@ -186,6 +187,13 @@ class SsoClientServiceProvider extends ServiceProvider
                 __DIR__.'/../database/seeders' => database_path('seeders/sso'),
             ], 'sso-seeders');
 
+            // Publish standalone admin pages
+            $this->publishes([
+                __DIR__.'/../resources/js/pages/admin/organizations' => resource_path('js/pages/admin/organizations'),
+                __DIR__.'/../resources/js/pages/admin/branches' => resource_path('js/pages/admin/branches'),
+                __DIR__.'/../resources/js/pages/admin/users' => resource_path('js/pages/admin/users'),
+            ], 'sso-admin-pages');
+
             // Publish all
             $this->publishes([
                 __DIR__.'/../config/omnify-auth.php' => config_path('omnify-auth.php'),
@@ -197,6 +205,13 @@ class SsoClientServiceProvider extends ServiceProvider
             $this->commands([
                 \Omnify\SsoClient\Console\Commands\SyncFromConsoleCommand::class,
             ]);
+
+            // Standalone-only commands
+            if (config('omnify-auth.mode') === 'standalone') {
+                $this->commands([
+                    \Omnify\SsoClient\Console\Commands\AdminCreateCommand::class,
+                ]);
+            }
         }
     }
 
@@ -230,6 +245,12 @@ class SsoClientServiceProvider extends ServiceProvider
                 $this->loadRoutesFrom(__DIR__.'/../routes/access-invite.php');
             }
         }
+
+        // Standalone admin routes (org/branch/user CRUD) — standalone mode only
+        if (config('omnify-auth.mode') === 'standalone'
+            && config('omnify-auth.standalone.admin_enabled', true)) {
+            $this->loadRoutesFrom(__DIR__.'/../routes/admin-standalone.php');
+        }
     }
 
     /**
@@ -246,6 +267,7 @@ class SsoClientServiceProvider extends ServiceProvider
         $router->aliasMiddleware('sso.permission', SsoPermissionCheck::class);
         $router->aliasMiddleware('sso.branch', SetBranchFromHeader::class);
         $router->aliasMiddleware('sso.share', ShareSsoData::class);
+        $router->aliasMiddleware('sso.standalone.org', StandaloneOrganizationContext::class);
     }
 
     /**
