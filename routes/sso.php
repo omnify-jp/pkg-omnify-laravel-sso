@@ -10,6 +10,8 @@ use Omnify\SsoClient\Http\Controllers\SsoCallbackController;
 use Omnify\SsoClient\Http\Controllers\SsoLocationController;
 use Omnify\SsoClient\Http\Controllers\SsoReadOnlyController;
 use Omnify\SsoClient\Http\Controllers\SsoTokenController;
+use Omnify\SsoClient\Http\Controllers\WebhookController;
+use Omnify\SsoClient\Http\Middleware\VerifyWebhookSignature;
 
 /*
 |--------------------------------------------------------------------------
@@ -87,4 +89,11 @@ Route::prefix($adminPrefix)
         Route::post('users/{userId}/roles', [UserRoleAdminController::class, 'store']);
         Route::put('users/{userId}/roles/sync', [UserRoleAdminController::class, 'sync']);
         Route::delete('users/{userId}/roles/{roleId}', [UserRoleAdminController::class, 'destroy']);
+    });
+
+// Console Webhook — cache purge when permissions change
+Route::prefix($prefix)
+    ->middleware(array_merge($middleware, [VerifyWebhookSignature::class]))
+    ->group(function () {
+        Route::post('/webhook/cache-purge', [WebhookController::class, 'cachePurge']);
     });
