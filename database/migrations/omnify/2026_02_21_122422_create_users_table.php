@@ -35,6 +35,9 @@ return new class extends Migration
             $table->text('console_access_token')->nullable()->comment('Console Access Token');
             $table->text('console_refresh_token')->nullable()->comment('Console Refresh Token');
             $table->timestamp('console_token_expires_at')->nullable()->comment('Console Token Expiry');
+            $table->string('google2fa_secret', 100)->nullable()->comment('2FA Secret');
+            $table->text('two_factor_recovery_codes')->nullable()->comment('2FA Recovery Codes');
+            $table->timestamp('two_factor_confirmed_at')->nullable()->comment('2FA Confirmed At');
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
             $table->timestamp('deleted_at')->nullable();

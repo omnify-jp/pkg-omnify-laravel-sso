@@ -37,6 +37,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $console_access_token
  * @property string|null $console_refresh_token
  * @property mixed|null $console_token_expires_at
+ * @property string|null $google2fa_secret
+ * @property string|null $two_factor_recovery_codes
+ * @property mixed|null $two_factor_confirmed_at
  */
 class UserBaseModel extends Authenticatable
 {
@@ -96,6 +99,9 @@ class UserBaseModel extends Authenticatable
         'console_access_token',
         'console_refresh_token',
         'console_token_expires_at',
+        'google2fa_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
     ];
 
     /**
@@ -104,6 +110,8 @@ class UserBaseModel extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'google2fa_secret',
+        'two_factor_recovery_codes',
     ];
 
     /**
@@ -119,6 +127,7 @@ class UserBaseModel extends Authenticatable
     {
         return [
             'console_token_expires_at' => 'datetime',
+            'two_factor_confirmed_at' => 'datetime',
         ];
     }
 

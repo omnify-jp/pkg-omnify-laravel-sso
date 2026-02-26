@@ -140,6 +140,46 @@ properties:
       en: Access token expiration time
       vi: Thời gian hết hạn của token truy cập
 
+  # 2FA / TOTP fields
+  google2fa_secret:
+    type: String
+    length: 100
+    nullable: true
+    hidden: true
+    displayName:
+      ja: 2FAシークレット
+      en: 2FA Secret
+      vi: 2FA Secret
+    description:
+      ja: TOTP認証用のBase32シークレットキー
+      en: Base32 secret key for TOTP authentication
+      vi: Khoa bi mat Base32 cho xac thuc TOTP
+
+  two_factor_recovery_codes:
+    type: Text
+    nullable: true
+    hidden: true
+    displayName:
+      ja: 2FAリカバリーコード
+      en: 2FA Recovery Codes
+      vi: Ma khoi phuc 2FA
+    description:
+      ja: JSON形式の暗号化されたリカバリーコード
+      en: Encrypted recovery codes in JSON format
+      vi: Ma khoi phuc ma hoa o dinh dang JSON
+
+  two_factor_confirmed_at:
+    type: Timestamp
+    nullable: true
+    displayName:
+      ja: 2FA確認日時
+      en: 2FA Confirmed At
+      vi: Thoi gian xac nhan 2FA
+    description:
+      ja: 2FAが有効化された日時
+      en: Timestamp when 2FA was enabled
+      vi: Thoi gian khi 2FA duoc kich hoat
+
   # Relationship: User ↔ Role (N:M with scoped pivot)
   roles:
     type: Association
