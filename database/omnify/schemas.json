@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-25T22:59:48Z",
+  "generatedAt": "2026-02-26T11:18:21Z",
   "database": {
     "driver": "mysql"
   },
@@ -1214,6 +1214,22 @@
             "vi": "Duy nhất trong tổ chức"
           }
         },
+        "google2fa_secret": {
+          "type": "String",
+          "displayName": {
+            "en": "2FA Secret",
+            "ja": "2FAシークレット",
+            "vi": "2FA Secret"
+          },
+          "nullable": true,
+          "description": {
+            "en": "Base32 secret key for TOTP authentication",
+            "ja": "TOTP認証用のBase32シークレットキー",
+            "vi": "Khoa bi mat Base32 cho xac thuc TOTP"
+          },
+          "hidden": true,
+          "length": 100
+        },
         "name": {
           "type": "String",
           "displayName": {
@@ -1290,6 +1306,35 @@
               }
             }
           }
+        },
+        "two_factor_confirmed_at": {
+          "type": "Timestamp",
+          "displayName": {
+            "en": "2FA Confirmed At",
+            "ja": "2FA確認日時",
+            "vi": "Thoi gian xac nhan 2FA"
+          },
+          "nullable": true,
+          "description": {
+            "en": "Timestamp when 2FA was enabled",
+            "ja": "2FAが有効化された日時",
+            "vi": "Thoi gian khi 2FA duoc kich hoat"
+          }
+        },
+        "two_factor_recovery_codes": {
+          "type": "Text",
+          "displayName": {
+            "en": "2FA Recovery Codes",
+            "ja": "2FAリカバリーコード",
+            "vi": "Ma khoi phuc 2FA"
+          },
+          "nullable": true,
+          "description": {
+            "en": "Encrypted recovery codes in JSON format",
+            "ja": "JSON形式の暗号化されたリカバリーコード",
+            "vi": "Ma khoi phuc ma hoa o dinh dang JSON"
+          },
+          "hidden": true
         }
       },
       "propertyOrder": [
@@ -1302,6 +1347,9 @@
         "console_access_token",
         "console_refresh_token",
         "console_token_expires_at",
+        "google2fa_secret",
+        "two_factor_recovery_codes",
+        "two_factor_confirmed_at",
         "roles"
       ],
       "tableName": "users"

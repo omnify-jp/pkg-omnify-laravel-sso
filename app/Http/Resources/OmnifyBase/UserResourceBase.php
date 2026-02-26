@@ -40,6 +40,7 @@ class UserResourceBase extends JsonResource
             'console_access_token' => $this->console_access_token,
             'console_refresh_token' => $this->console_refresh_token,
             'console_token_expires_at' => $this->console_token_expires_at?->toISOString(),
+            'two_factor_confirmed_at' => $this->two_factor_confirmed_at?->toISOString(),
             'roles' => $this->whenLoaded('roles', fn() => \Omnify\SsoClient\Http\Resources\RoleResource::collection($this->roles)),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),

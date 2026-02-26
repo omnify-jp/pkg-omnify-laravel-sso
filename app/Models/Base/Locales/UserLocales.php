@@ -74,5 +74,20 @@ class UserLocales
             'ja' => 'Console Token有効期限',
             'vi' => 'Hạn Token Console',
         ],
+        'google2fa_secret' => [
+            'en' => '2FA Secret',
+            'ja' => '2FAシークレット',
+            'vi' => '2FA Secret',
+        ],
+        'two_factor_recovery_codes' => [
+            'en' => '2FA Recovery Codes',
+            'ja' => '2FAリカバリーコード',
+            'vi' => 'Ma khoi phuc 2FA',
+        ],
+        'two_factor_confirmed_at' => [
+            'en' => '2FA Confirmed At',
+            'ja' => '2FA確認日時',
+            'vi' => 'Thoi gian xac nhan 2FA',
+        ],
     ];
 }

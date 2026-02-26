@@ -60,6 +60,9 @@ abstract class UserUpdateRequestBase extends FormRequest
             'console_access_token' => ['nullable', 'string'],
             'console_refresh_token' => ['nullable', 'string'],
             'console_token_expires_at' => ['nullable', 'date'],
+            'google2fa_secret' => ['nullable', 'string', 'max:100'],
+            'two_factor_recovery_codes' => ['nullable', 'string'],
+            'two_factor_confirmed_at' => ['nullable', 'date'],
         ];
     }
 
@@ -86,6 +89,9 @@ abstract class UserUpdateRequestBase extends FormRequest
             'console_access_token',
             'console_refresh_token',
             'console_token_expires_at',
+            'google2fa_secret',
+            'two_factor_recovery_codes',
+            'two_factor_confirmed_at',
         ];
 
         foreach ($keys as $key) {
