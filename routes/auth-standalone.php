@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Omnify\SsoClient\Http\Controllers\Auth\StandaloneLoginController;
+use Omnify\SsoClient\Http\Controllers\Auth\StandaloneNewPasswordController;
+use Omnify\SsoClient\Http\Controllers\Auth\StandalonePasswordResetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,3 +31,14 @@ Route::prefix($prefix)
     ->group(function () {
         Route::post('/logout', [StandaloneLoginController::class, 'logout'])->name('logout');
     });
+
+if (config('omnify-auth.standalone.password_reset', true)) {
+    Route::prefix($prefix)
+        ->middleware($guestMiddleware)
+        ->group(function () {
+            Route::get('/forgot-password', [StandalonePasswordResetController::class, 'create'])->name('password.request');
+            Route::post('/forgot-password', [StandalonePasswordResetController::class, 'store'])->name('password.email');
+            Route::get('/reset-password/{token}', [StandaloneNewPasswordController::class, 'create'])->name('password.reset');
+            Route::post('/reset-password', [StandaloneNewPasswordController::class, 'store'])->name('password.update');
+        });
+}
