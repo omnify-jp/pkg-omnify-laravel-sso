@@ -6,14 +6,18 @@ namespace Omnify\Core;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Omnify\Core\Http\Middleware\AdminAuthenticate;
+use Omnify\Core\Http\Middleware\AdminRedirectIfAuthenticated;
+use Omnify\Core\Http\Middleware\ResolveOrganizationFromUrl;
 use Omnify\Core\Http\Middleware\SetBranchFromHeader;
 use Omnify\Core\Http\Middleware\ShareSsoData;
 use Omnify\Core\Http\Middleware\SsoAuthenticate;
-use Omnify\Core\Http\Middleware\StandaloneOrganizationContext;
 use Omnify\Core\Http\Middleware\SsoOrganizationAccess;
 use Omnify\Core\Http\Middleware\SsoPermissionCheck;
 use Omnify\Core\Http\Middleware\SsoRoleCheck;
+use Omnify\Core\Http\Middleware\StandaloneOrganizationContext;
 use Omnify\Core\Services\ConsoleApiService;
 use Omnify\Core\Services\ConsoleTokenService;
 use Omnify\Core\Services\JwksService;
@@ -37,6 +41,9 @@ class CoreServiceProvider extends ServiceProvider
             __DIR__.'/../config/omnify-auth.php',
             'omnify-auth'
         );
+
+        // Register admin guard & provider (standalone mode only)
+        $this->registerAdminGuard();
 
         // Register services as singletons
         $this->app->singleton(JwksService::class, function ($app) {
@@ -205,6 +212,7 @@ class CoreServiceProvider extends ServiceProvider
             // Register Artisan commands
             $this->commands([
                 \Omnify\Core\Console\Commands\SyncFromConsoleCommand::class,
+                \Omnify\Core\Console\Commands\OdgSetupCommand::class,
             ]);
 
             // Standalone-only commands
@@ -223,12 +231,19 @@ class CoreServiceProvider extends ServiceProvider
     {
         $mode = config('omnify-auth.mode', 'standalone');
 
-        // API routes — always loaded (both modes)
+        // API routes — always loaded (both modes), never org-prefixed
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
 
-        // Access management pages — both modes (IAM roles/permissions)
+        // Access management pages — org-prefixed when configured (IAM roles/permissions)
         if (config('omnify-auth.routes.access_enabled', true)) {
-            $this->loadRoutesFrom(__DIR__.'/../routes/access.php');
+            $this->withOrgPrefix(function () {
+                $this->loadRoutesFrom(__DIR__.'/../routes/access.php');
+            });
+        }
+
+        // Settings page — never org-prefixed (user-level, not org-scoped)
+        if (config('omnify-auth.settings.enabled', true)) {
+            $this->loadRoutesFrom(__DIR__.'/../routes/standalone/settings.php');
         }
 
         // Mode-specific routes
@@ -244,12 +259,16 @@ class CoreServiceProvider extends ServiceProvider
      */
     protected function registerConsoleRoutes(): void
     {
+        // Auth routes — never org-prefixed (SSO login/callback)
         if (config('omnify-auth.routes.auth_enabled', true)) {
             $this->loadRoutesFrom(__DIR__.'/../routes/console/auth.php');
         }
 
+        // Invite routes — org-prefixed (part of IAM settings)
         if (config('omnify-auth.routes.access_enabled', true)) {
-            $this->loadRoutesFrom(__DIR__.'/../routes/console/invite.php');
+            $this->withOrgPrefix(function () {
+                $this->loadRoutesFrom(__DIR__.'/../routes/console/invite.php');
+            });
         }
     }
 
@@ -258,12 +277,35 @@ class CoreServiceProvider extends ServiceProvider
      */
     protected function registerStandaloneRoutes(): void
     {
+        // Auth routes — never org-prefixed (login/register/2fa)
         if (config('omnify-auth.routes.auth_enabled', true)) {
             $this->loadRoutesFrom(__DIR__.'/../routes/standalone/auth.php');
         }
 
         if (config('omnify-auth.standalone.admin_enabled', true)) {
+            // Admin routes — never org-prefixed (admin manages orgs, doesn't need org context)
+            $this->loadRoutesFrom(__DIR__.'/../routes/standalone/admin-auth.php');
             $this->loadRoutesFrom(__DIR__.'/../routes/standalone/admin.php');
+        }
+    }
+
+    /**
+     * Wrap route registration in the org URL prefix when configured.
+     *
+     * When org_route_prefix is set (e.g. '@{organization}'), routes are nested
+     * under that prefix with ResolveOrganizationFromUrl middleware.
+     * When empty, routes are loaded without wrapping (cookie-only mode).
+     */
+    protected function withOrgPrefix(callable $callback): void
+    {
+        $orgPrefix = config('omnify-auth.routes.org_route_prefix', '');
+
+        if ($orgPrefix !== '') {
+            Route::prefix($orgPrefix)
+                ->middleware(['core.org.url'])
+                ->group($callback);
+        } else {
+            $callback();
         }
     }
 
@@ -282,6 +324,32 @@ class CoreServiceProvider extends ServiceProvider
         $router->aliasMiddleware('core.branch', SetBranchFromHeader::class);
         $router->aliasMiddleware('core.share', ShareSsoData::class);
         $router->aliasMiddleware('core.standalone.org', StandaloneOrganizationContext::class);
+        $router->aliasMiddleware('core.org.url', ResolveOrganizationFromUrl::class);
+        $router->aliasMiddleware('core.admin', AdminAuthenticate::class);
+        $router->aliasMiddleware('core.admin.guest', AdminRedirectIfAuthenticated::class);
+    }
+
+    /**
+     * Register the admin auth guard and provider.
+     *
+     * Programmatically injects 'admin' guard + 'admins' provider into
+     * Laravel's auth config. Host apps don't need to touch config/auth.php.
+     */
+    protected function registerAdminGuard(): void
+    {
+        if (config('omnify-auth.mode', 'standalone') !== 'standalone') {
+            return;
+        }
+
+        $this->app['config']->set('auth.guards.admin', [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ]);
+
+        $this->app['config']->set('auth.providers.admins', [
+            'driver' => 'eloquent',
+            'model' => config('omnify-auth.admin_model', \Omnify\Core\Models\Admin::class),
+        ]);
     }
 
     /**

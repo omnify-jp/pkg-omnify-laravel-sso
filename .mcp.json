@@ -5,6 +5,10 @@
       "args": [
         "mcp"
       ]
+    },
+    "odg": {
+      "command": "bin/odg",
+      "args": []
     }
   }
 }
