@@ -1,13 +1,13 @@
 <?php
 
-namespace Omnify\SsoClient\Models;
+namespace Omnify\Core\Models;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Omnify\SsoClient\Database\Factories\TeamFactory;
-use Omnify\SsoClient\Models\Base\TeamBaseModel;
+use Omnify\Core\Database\Factories\TeamFactory;
+use Omnify\Core\Models\Base\TeamBaseModel;
 
 /**
  * Team Model

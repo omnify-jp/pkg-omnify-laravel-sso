@@ -10,7 +10,7 @@ namespace App\Http\Requests\OmnifyBase;
  */
 
 use Illuminate\Foundation\Http\FormRequest;
-use Omnify\SsoClient\Models\Base\Locales\UserLocales;
+use Omnify\Core\Models\Base\Locales\UserLocales;
 
 abstract class UserUpdateRequestBase extends FormRequest
 {
@@ -55,6 +55,16 @@ abstract class UserUpdateRequestBase extends FormRequest
             'email' => ['sometimes', 'string', 'max:255'],
             'password' => ['nullable', 'string', 'max:255'],
             'remember_token' => ['nullable', 'string', 'max:100'],
+            'email_verified_at' => ['nullable', 'date'],
+            'is_default_password' => ['sometimes', 'boolean'],
+            'is_active' => ['sometimes', 'boolean'],
+            'date_of_birth' => ['nullable', 'date'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string'],
+            'bank' => ['nullable', 'array'],
+            'avatar_url' => ['nullable', 'string', 'max:500'],
+            'bio' => ['nullable', 'string'],
+            'is_standalone' => ['sometimes', 'boolean'],
             'console_user_id' => ['nullable', 'string', 'uuid'],
             'console_organization_id' => ['nullable', 'string', 'uuid'],
             'console_access_token' => ['nullable', 'string'],
@@ -84,6 +94,16 @@ abstract class UserUpdateRequestBase extends FormRequest
             'email',
             'password',
             'remember_token',
+            'email_verified_at',
+            'is_default_password',
+            'is_active',
+            'date_of_birth',
+            'phone',
+            'address',
+            'bank',
+            'avatar_url',
+            'bio',
+            'is_standalone',
             'console_user_id',
             'console_organization_id',
             'console_access_token',

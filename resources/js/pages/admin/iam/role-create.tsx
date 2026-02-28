@@ -1,36 +1,35 @@
-import {
-    Button, Card, CardContent, CardHeader,
-    CardTitle, Input, Label, PermissionGrid,
-    Textarea,
-} from '@omnifyjp/ui';
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import { useIamLayout } from '@omnify-core/contexts/iam-layout-context';
+import { useFormMutation } from '@omnify-core/hooks';
+import { api } from '@omnify-core/services/api';
+import { Button, Card, Col, Flex, Form, Input, InputNumber, Row, Typography } from 'antd';
+import { isAxiosError } from 'axios';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useIamLayout } from '@omnify-sso/contexts/iam-layout-context';
 
 import { IamBreadcrumb } from '../../../components/access/iam-breadcrumb';
+import { PermissionGrid } from '../../../components/access/permission-grid';
 import type { IamPermission } from '../../../types/iam';
-import { buildPermissionModules, fromGridIds, toGridIds } from '../../../utils/scope-utils';
+import { buildPermissionModules, fromGridIds } from '../../../utils/scope-utils';
 
 type Props = {
     all_permissions: IamPermission[];
 };
 
+type RoleFormValues = {
+    name: string;
+    description: string;
+    level: number;
+};
+
+type RolePayload = RoleFormValues & {
+    permission_ids: string[];
+};
+
 export default function IamRoleCreate({ all_permissions }: Props) {
     const Layout = useIamLayout();
     const { t } = useTranslation();
-
-    const { data, setData, post, processing, errors } = useForm<{
-        name: string;
-        description: string;
-        level: number;
-        permission_ids: string[];
-    }>({
-        name: '',
-        description: '',
-        level: 3,
-        permission_ids: [],
-    });
+    const [form] = Form.useForm<RoleFormValues>();
 
     const permissionModules = useMemo(
         () => buildPermissionModules(all_permissions),
@@ -38,15 +37,32 @@ export default function IamRoleCreate({ all_permissions }: Props) {
     );
 
     const [selectedGridIds, setSelectedGridIds] = useState<string[]>([]);
+    const [permissionError, setPermissionError] = useState<string | null>(null);
 
     const handlePermissionChange = (gridIds: string[]) => {
         setSelectedGridIds(gridIds);
-        setData('permission_ids', fromGridIds(all_permissions, gridIds));
+        setPermissionError(null);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post('/admin/iam/roles');
+    const mutation = useFormMutation({
+        form,
+        mutationFn: (data: RolePayload) => api.post('/admin/iam/roles', data),
+        redirectTo: '/admin/iam/roles',
+        onError: (error) => {
+            if (isAxiosError(error) && error.response?.status === 422) {
+                const errors = error.response.data.errors as Record<string, string[]>;
+                if (errors.permission_ids) {
+                    setPermissionError(errors.permission_ids[0]);
+                }
+            }
+        },
+    });
+
+    const handleFinish = (values: RoleFormValues) => {
+        mutation.mutate({
+            ...values,
+            permission_ids: fromGridIds(all_permissions, selectedGridIds),
+        });
     };
 
     return (
@@ -62,99 +78,67 @@ export default function IamRoleCreate({ all_permissions }: Props) {
         >
             <Head title={t('iam.createRole', 'Create Role')} />
 
-            <div className="space-y-section">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-page-title font-semibold">
-                            {t('iam.createRole', 'Create Role')}
-                        </h1>
-                    </div>
+            <Flex vertical gap={24}>
+                <Flex justify="space-between" align="center">
+                    <Typography.Title level={4}>
+                        {t('iam.createRole', 'Create Role')}
+                    </Typography.Title>
                     <IamBreadcrumb
                         segments={[
                             { label: t('iam.roles', 'Roles'), href: '/admin/iam/roles' },
                             { label: t('iam.createRole', 'Create Role') },
                         ]}
                     />
-                </div>
+                </Flex>
 
-                <form onSubmit={handleSubmit} className="space-y-section">
-                    <div className="max-w-2xl">
-                        <Card>
-                            <CardHeader className="px-card pb-3 pt-card">
-                                <CardTitle className="text-base">
-                                    {t('iam.roleInfo', 'Role Information')}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4 px-card pb-card">
-                                <div className="space-y-2">
-                                    <Label htmlFor="name">
-                                        {t('iam.roleName', 'Role Name')}
-                                    </Label>
-                                    <Input
-                                        id="name"
-                                        placeholder={t('iam.roleNamePlaceholder', 'e.g. Manager')}
-                                        value={data.name}
-                                        onChange={(e) => setData('name', e.target.value)}
-                                    />
-                                    {errors.name && (
-                                        <p className="text-sm text-destructive">{errors.name}</p>
-                                    )}
-                                </div>
+                <Form
+                    form={form}
+                    layout="vertical"
+                    initialValues={{ name: '', description: '', level: 3 }}
+                    onFinish={handleFinish}
+                >
+                    <Flex vertical gap={24}>
+                        <Row>
+                            <Col xs={24} lg={16}>
+                                <Card title={t('iam.roleInfo', 'Role Information')}>
+                                    <Flex vertical gap={16}>
+                                        <Form.Item
+                                            name="name"
+                                            label={t('iam.roleName', 'Role Name')}
+                                        >
+                                            <Input
+                                                placeholder={t('iam.roleNamePlaceholder', 'e.g. Manager')}
+                                            />
+                                        </Form.Item>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="description">
-                                        {t('iam.description', 'Description')}
-                                    </Label>
-                                    <Textarea
-                                        id="description"
-                                        placeholder={t(
-                                            'iam.descriptionPlaceholder',
-                                            'Describe this role…',
-                                        )}
-                                        value={data.description}
-                                        onChange={(e) => setData('description', e.target.value)}
-                                    />
-                                    {errors.description && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.description}
-                                        </p>
-                                    )}
-                                </div>
+                                        <Form.Item
+                                            name="description"
+                                            label={t('iam.description', 'Description')}
+                                        >
+                                            <Input.TextArea
+                                                placeholder={t(
+                                                    'iam.descriptionPlaceholder',
+                                                    'Describe this role\u2026',
+                                                )}
+                                            />
+                                        </Form.Item>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="level">{t('iam.level', 'Level')}</Label>
-                                    <Input
-                                        id="level"
-                                        type="number"
-                                        min={1}
-                                        max={10}
-                                        value={data.level}
-                                        onChange={(e) =>
-                                            setData('level', parseInt(e.target.value, 10))
-                                        }
-                                    />
-                                    <p className="text-xs text-muted-foreground">
-                                        {t(
-                                            'iam.levelHelp',
-                                            'Lower number = higher privilege (1 = Admin).',
-                                        )}
-                                    </p>
-                                    {errors.level && (
-                                        <p className="text-sm text-destructive">{errors.level}</p>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
+                                        <Form.Item
+                                            name="level"
+                                            label={t('iam.level', 'Level')}
+                                            extra={t(
+                                                'iam.levelHelp',
+                                                'Lower number = higher privilege (1 = Admin).',
+                                            )}
+                                        >
+                                            <InputNumber min={1} max={10} style={{ width: '100%' }} />
+                                        </Form.Item>
+                                    </Flex>
+                                </Card>
+                            </Col>
+                        </Row>
 
-                    {/* Permission Matrix */}
-                    <Card>
-                        <CardHeader className="px-card pb-3 pt-card">
-                            <CardTitle className="text-base">
-                                {t('iam.permissionMatrix', 'Permission Matrix')}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="px-card pb-card">
+                        <Card title={t('iam.permissionMatrix', 'Permission Matrix')}>
                             <PermissionGrid
                                 modules={permissionModules}
                                 selectedIds={selectedGridIds}
@@ -164,28 +148,27 @@ export default function IamRoleCreate({ all_permissions }: Props) {
                                     selectAll: t('iam.selectAll', 'All'),
                                 }}
                             />
-                            {errors.permission_ids && (
-                                <p className="mt-2 text-sm text-destructive">
-                                    {errors.permission_ids}
-                                </p>
+                            {permissionError && (
+                                <Typography.Text type="danger">
+                                    {permissionError}
+                                </Typography.Text>
                             )}
-                        </CardContent>
-                    </Card>
+                        </Card>
 
-                    <div className="flex justify-end gap-2">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => window.history.back()}
-                        >
-                            {t('iam.cancel', 'Cancel')}
-                        </Button>
-                        <Button type="submit" disabled={processing}>
-                            {t('iam.save', 'Save')}
-                        </Button>
-                    </div>
-                </form>
-            </div>
+                        <Flex justify="end" gap={8}>
+                            <Button
+                                type="default"
+                                onClick={() => window.history.back()}
+                            >
+                                {t('iam.cancel', 'Cancel')}
+                            </Button>
+                            <Button type="primary" htmlType="submit" loading={mutation.isPending}>
+                                {t('iam.save', 'Save')}
+                            </Button>
+                        </Flex>
+                    </Flex>
+                </Form>
+            </Flex>
         </Layout>
     );
 }

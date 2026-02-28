@@ -11,8 +11,8 @@ use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token\Builder;
-use Omnify\SsoClient\Services\JwksService;
-use Omnify\SsoClient\Services\JwtVerifier;
+use Omnify\Core\Services\JwksService;
+use Omnify\Core\Services\JwtVerifier;
 
 beforeEach(function () {
     // テスト用のRSA鍵ペアを生成
@@ -56,7 +56,7 @@ test('JwtVerifier throws exception for token without kid header', function () {
         ->getToken(new Sha256, InMemory::plainText($this->privateKey));
 
     $verifier->verify($token->toString());
-})->throws(\Omnify\SsoClient\Exceptions\ConsoleAuthException::class, 'Token missing key ID');
+})->throws(\Omnify\Core\Exceptions\ConsoleAuthException::class, 'Token missing key ID');
 
 test('JwtVerifier throws exception when public key not found', function () {
     $jwksService = Mockery::mock(JwksService::class);
@@ -77,7 +77,7 @@ test('JwtVerifier throws exception when public key not found', function () {
         ->getToken(new Sha256, InMemory::plainText($this->privateKey));
 
     $verifier->verify($token->toString());
-})->throws(\Omnify\SsoClient\Exceptions\ConsoleAuthException::class);
+})->throws(\Omnify\Core\Exceptions\ConsoleAuthException::class);
 
 test('JwtVerifier successfully verifies valid token', function () {
     // 完全なトークン検証は実際のSSO Consoleを使ったintegrationテストで確認

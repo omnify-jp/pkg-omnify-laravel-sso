@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Auth;
-use Omnify\SsoClient\Models\User;
-use Omnify\SsoClient\Services\ConsoleApiService;
-use Omnify\SsoClient\Services\ConsoleTokenService;
-use Omnify\SsoClient\Services\JwtVerifier;
-use Omnify\SsoClient\Services\OrganizationAccessService;
+use Omnify\Core\Models\User;
+use Omnify\Core\Services\ConsoleApiService;
+use Omnify\Core\Services\ConsoleTokenService;
+use Omnify\Core\Services\JwtVerifier;
+use Omnify\Core\Services\OrganizationAccessService;
 
 // =============================================================================
 // Open Redirect Prevention Tests
@@ -451,13 +451,13 @@ describe('Session Security', function () {
         $organizationAccessService = \Mockery::mock(OrganizationAccessService::class);
         $organizationAccessService->shouldReceive('getOrganizations')->andReturn([]);
 
-        $tokenService = \Mockery::mock(\Omnify\SsoClient\Services\ConsoleTokenService::class);
+        $tokenService = \Mockery::mock(\Omnify\Core\Services\ConsoleTokenService::class);
         $tokenService->shouldReceive('storeTokens')->once();
 
         $this->app->instance(ConsoleApiService::class, $consoleApi);
         $this->app->instance(JwtVerifier::class, $jwtVerifier);
         $this->app->instance(OrganizationAccessService::class, $organizationAccessService);
-        $this->app->instance(\Omnify\SsoClient\Services\ConsoleTokenService::class, $tokenService);
+        $this->app->instance(\Omnify\Core\Services\ConsoleTokenService::class, $tokenService);
 
         $response = $this->postJson('/api/sso/callback', [
             'code' => 'valid-code',

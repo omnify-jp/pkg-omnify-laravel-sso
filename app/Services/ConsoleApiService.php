@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Services;
+namespace Omnify\Core\Services;
 
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
-use Omnify\SsoClient\Exceptions\ConsoleAccessDeniedException;
-use Omnify\SsoClient\Exceptions\ConsoleApiException;
-use Omnify\SsoClient\Exceptions\ConsoleAuthException;
-use Omnify\SsoClient\Exceptions\ConsoleNotFoundException;
-use Omnify\SsoClient\Exceptions\ConsoleServerException;
+use Omnify\Core\Exceptions\ConsoleAccessDeniedException;
+use Omnify\Core\Exceptions\ConsoleApiException;
+use Omnify\Core\Exceptions\ConsoleAuthException;
+use Omnify\Core\Exceptions\ConsoleNotFoundException;
+use Omnify\Core\Exceptions\ConsoleServerException;
 
 class ConsoleApiService
 {

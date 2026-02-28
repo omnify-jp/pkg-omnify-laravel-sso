@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Omnify\SsoClient\Http\Controllers\AccessPageController;
+use Omnify\Core\Http\Controllers\AccessPageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -9,10 +9,10 @@ use Omnify\SsoClient\Http\Controllers\AccessPageController;
 |--------------------------------------------------------------------------
 |
 | Routes for managing users, roles, teams, permissions, and assignments.
-| These routes are loaded by the SsoClientServiceProvider.
+| These routes are loaded by the CoreServiceProvider.
 |
 | Middleware is resolved based on mode (unless explicitly overridden):
-|   console    → ['web', 'sso.auth']   (Console SSO authentication)
+|   console    → ['web', 'core.auth']   (Console SSO authentication)
 |   standalone → ['web', 'auth']        (standard Laravel session auth)
 |
 */
@@ -20,7 +20,7 @@ use Omnify\SsoClient\Http\Controllers\AccessPageController;
 $mode = config('omnify-auth.mode', 'standalone');
 $accessPrefix = config('omnify-auth.routes.access_prefix', 'admin/iam');
 $accessMiddleware = config('omnify-auth.routes.access_middleware')
-    ?? ($mode === 'console' ? ['web', 'sso.auth'] : ['web', 'auth']);
+    ?? ($mode === 'console' ? ['web', 'core.auth'] : ['web', 'auth']);
 
 Route::prefix($accessPrefix)
     ->name('access.')

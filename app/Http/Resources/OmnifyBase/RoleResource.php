@@ -6,10 +6,10 @@
  * SAFE TO EDIT - This file is never overwritten by Omnify.
  */
 
-namespace Omnify\SsoClient\Http\Resources\OmnifyBase;
+namespace Omnify\Core\Http\Resources\OmnifyBase;
 
 use Illuminate\Http\Request;
-use Omnify\SsoClient\Http\Resources\OmnifyBase\OmnifyBase\RoleResourceBase;
+use Omnify\Core\Http\Resources\OmnifyBase\OmnifyBase\RoleResourceBase;
 
 class RoleResource extends RoleResourceBase
 {

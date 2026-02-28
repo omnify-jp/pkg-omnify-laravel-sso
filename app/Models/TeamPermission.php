@@ -1,10 +1,10 @@
 <?php
 
-namespace Omnify\SsoClient\Models;
+namespace Omnify\Core\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Omnify\SsoClient\Database\Factories\TeamPermissionFactory;
-use Omnify\SsoClient\Models\Base\TeamPermissionBaseModel;
+use Omnify\Core\Database\Factories\TeamPermissionFactory;
+use Omnify\Core\Models\Base\TeamPermissionBaseModel;
 
 /**
  * TeamPermission Model

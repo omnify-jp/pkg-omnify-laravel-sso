@@ -270,7 +270,7 @@ namespace App\Listeners;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Omnify\SsoClient\Events\OrganizationCreated;
+use Omnify\Core\Events\OrganizationCreated;
 
 class SetupOrganizationDefaults
 {
@@ -320,7 +320,7 @@ class SetupOrganizationDefaults
 
 ```php
 use Illuminate\Support\Facades\Event;
-use Omnify\SsoClient\Events\OrganizationCreated;
+use Omnify\Core\Events\OrganizationCreated;
 use App\Listeners\SetupOrganizationDefaults;
 
 class AppServiceProvider extends ServiceProvider

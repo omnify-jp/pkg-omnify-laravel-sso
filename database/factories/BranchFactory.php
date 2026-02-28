@@ -1,9 +1,9 @@
 <?php
 
-namespace Omnify\SsoClient\Database\Factories;
+namespace Omnify\Core\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Omnify\SsoClient\Models\Branch;
+use Omnify\Core\Models\Branch;
 
 /**
  * Branch Factory
@@ -25,7 +25,7 @@ class BranchFactory extends Factory
     {
         return [
             'console_branch_id' => (string) \Illuminate\Support\Str::uuid(),
-            'console_organization_id' => (string) \Illuminate\Support\Str::uuid(),
+            'console_organization_id' => fn () => \Omnify\Core\Models\Organization::factory()->create()->console_organization_id,
             'slug' => fake()->unique()->slug(2),
             'name' => fake()->sentence(3),
             'is_headquarters' => fake()->boolean(),
@@ -38,6 +38,20 @@ class BranchFactory extends Factory
     {
         return $this->state([
             'console_organization_id' => $organizationId,
+        ]);
+    }
+
+    public function standalone(): static
+    {
+        return $this->state([
+            'is_standalone' => true,
+        ]);
+    }
+
+    public function console(): static
+    {
+        return $this->state([
+            'is_standalone' => false,
         ]);
     }
 

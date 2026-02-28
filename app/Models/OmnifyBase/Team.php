@@ -1,9 +1,9 @@
 <?php
 
-namespace Omnify\SsoClient\Models\OmnifyBase;
+namespace Omnify\Core\Models\OmnifyBase;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Omnify\SsoClient\Models\OmnifyBase\Base\TeamBaseModel;
+use Omnify\Core\Models\OmnifyBase\Base\TeamBaseModel;
 
 /**
  * Team Model

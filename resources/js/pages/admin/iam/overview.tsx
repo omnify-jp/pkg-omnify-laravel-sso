@@ -1,13 +1,11 @@
-import {
-    Avatar, AvatarFallback, Button, Card,
-    CardContent, CardHeader, CardTitle, ScopeTypeBadge,
-} from '@omnifyjp/ui';
+import { Avatar, Button, Card, Col, Flex, Row, Typography } from 'antd';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowRight, Globe, Network, Shield, ShieldCheck, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useIamLayout } from '@omnify-sso/contexts/iam-layout-context';
+import { useIamLayout } from '@omnify-core/contexts/iam-layout-context';
 
 import { IamBreadcrumb } from '../../../components/access/iam-breadcrumb';
+import { ScopeTypeBadge } from '../../../components/access/scope-type-badge';
 import { formatScopeLocation, toScopeBadgeType } from '../../../utils/scope-utils';
 import type { IamRoleAssignment } from '../../../types/iam';
 
@@ -41,29 +39,21 @@ export default function IamOverview({ stats, recent_assignments }: Props) {
             label: t('iam.totalUsers', 'Total Users'),
             value: stats.total_users,
             icon: Users,
-            color: 'text-blue-600 dark:text-blue-400',
-            bg: 'bg-blue-50 dark:bg-blue-500/15',
         },
         {
             label: t('iam.totalRoles', 'Total Roles'),
             value: stats.total_roles,
             icon: Shield,
-            color: 'text-purple-600 dark:text-purple-400',
-            bg: 'bg-purple-50 dark:bg-purple-500/15',
         },
         {
             label: t('iam.globalRoles', 'Global Roles'),
             value: stats.global_roles,
             icon: Globe,
-            color: 'text-amber-600 dark:text-amber-400',
-            bg: 'bg-amber-50 dark:bg-amber-500/15',
         },
         {
             label: t('iam.totalPermissions', 'Permissions'),
             value: stats.total_permissions,
             icon: ShieldCheck,
-            color: 'text-green-600 dark:text-green-400',
-            bg: 'bg-green-50 dark:bg-green-500/15',
         },
     ];
 
@@ -83,102 +73,100 @@ export default function IamOverview({ stats, recent_assignments }: Props) {
         >
             <Head title={t('iam.title', 'IAM')} />
 
-            <div className="space-y-section">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-page-title font-semibold">{t('iam.title', 'Identity & Access Management')}</h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
+            <Flex vertical gap={16}>
+                <Flex justify="space-between" align="start">
+                    <Flex vertical gap={2}>
+                        <Typography.Title level={4}>
+                            {t('iam.title', 'Identity & Access Management')}
+                        </Typography.Title>
+                        <Typography.Text type="secondary">
                             {t('iam.subtitle', 'Manage users, roles, and permissions across your organization.')}
-                        </p>
-                    </div>
+                        </Typography.Text>
+                    </Flex>
                     <IamBreadcrumb segments={[]} />
-                </div>
+                </Flex>
 
-                {/* Stats */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <Row gutter={[16, 16]}>
                     {statCards.map((stat) => {
                         const Icon = stat.icon;
                         return (
-                            <Card key={stat.label}>
-                                <CardContent className="px-card pb-card pt-card">
-                                    <div className="flex items-center gap-3">
-                                        <div className={`rounded-lg p-2 ${stat.bg} ${stat.color}`}>
-                                            <Icon className="h-5 w-5" />
-                                        </div>
-                                        <div>
-                                            <p className="text-2xl font-semibold">{stat.value}</p>
-                                            <p className="text-xs text-muted-foreground">{stat.label}</p>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                            <Col key={stat.label} xs={24} sm={12} lg={6}>
+                                <Card>
+                                    <Flex align="center" gap={8}>
+                                        <Icon size={16} />
+                                        <Flex vertical>
+                                            <Typography.Text type="secondary">{stat.label}</Typography.Text>
+                                            <Typography.Title level={4} style={{ margin: 0 }}>{stat.value}</Typography.Title>
+                                        </Flex>
+                                    </Flex>
+                                </Card>
+                            </Col>
                         );
                     })}
-                </div>
+                </Row>
 
-                <div className="grid grid-cols-1 gap-section lg:grid-cols-2">
-                    {/* Quick Links */}
-                    <Card>
-                        <CardHeader className="px-card pb-3 pt-card">
-                            <CardTitle className="text-base">{t('iam.quickLinks', 'Quick Links')}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="px-card pb-card space-y-2">
-                            {quickLinks.map((link) => {
-                                const Icon = link.icon;
-                                return (
-                                    <Button key={link.href} variant="outline" className="w-full justify-between" asChild>
-                                        <Link href={link.href}>
-                                            <span className="flex items-center gap-2">
-                                                <Icon className="h-4 w-4" />
-                                                {link.label}
-                                            </span>
-                                            <ArrowRight className="h-4 w-4" />
+                <Row gutter={[16, 16]}>
+                    <Col xs={24} lg={12}>
+                        <Card title={t('iam.quickLinks', 'Quick Links')}>
+                            <Flex vertical gap={4}>
+                                {quickLinks.map((link) => {
+                                    const Icon = link.icon;
+                                    return (
+                                        <Link key={link.href} href={link.href}>
+                                            <Button type="text" block style={{ height: 'auto', padding: '8px 12px', justifyContent: 'flex-start' }}>
+                                                <Flex align="center" gap={8} style={{ width: '100%' }}>
+                                                    <Icon size={16} />
+                                                    <Typography.Text style={{ flex: 1, textAlign: 'left' }}>{link.label}</Typography.Text>
+                                                    <ArrowRight size={14} />
+                                                </Flex>
+                                            </Button>
                                         </Link>
-                                    </Button>
-                                );
-                            })}
-                        </CardContent>
-                    </Card>
+                                    );
+                                })}
+                            </Flex>
+                        </Card>
+                    </Col>
 
-                    {/* Recent Assignments */}
-                    <Card>
-                        <CardHeader className="px-card pb-3 pt-card">
-                            <CardTitle className="text-base">{t('iam.recentAssignments', 'Recent Assignments')}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="px-card pb-card">
+                    <Col xs={24} lg={12}>
+                        <Card title={t('iam.recentAssignments', 'Recent Assignments')}>
                             {recent_assignments.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">{t('iam.noAssignments', 'No assignments yet.')}</p>
+                                <Typography.Text type="secondary">
+                                    {t('iam.noAssignments', 'No assignments yet.')}
+                                </Typography.Text>
                             ) : (
-                                <div className="space-y-3">
+                                <Flex vertical gap={4}>
                                     {recent_assignments.map((assignment, index) => (
                                         <Link
                                             key={index}
                                             href={`/admin/iam/users/${assignment.user.id}`}
-                                            className="flex items-center gap-3 rounded-md p-2 transition-colors hover:bg-accent"
                                         >
-                                            <Avatar className="h-8 w-8">
-                                                <AvatarFallback className="text-xs">
-                                                    {assignment.user.name.slice(0, 2).toUpperCase()}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className="min-w-0 flex-1">
-                                                <p className="truncate text-sm font-medium">{assignment.user.name}</p>
-                                                <p className="truncate text-xs text-muted-foreground">
-                                                    {assignment.role.name} @ {formatScopeLocation(assignment)}
-                                                </p>
-                                            </div>
-                                            <ScopeTypeBadge
-                                                type={toScopeBadgeType(assignment.scope_type)}
-                                                label={assignment.scope_type}
-                                            />
+                                            <Button type="text" block style={{ height: 'auto', padding: '8px 12px', justifyContent: 'flex-start' }}>
+                                                <Flex align="center" gap={8} style={{ width: '100%' }}>
+                                                    <Avatar size={28}>
+                                                        {assignment.user.name.slice(0, 2).toUpperCase()}
+                                                    </Avatar>
+                                                    <Flex vertical style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
+                                                        <Typography.Text strong ellipsis>
+                                                            {assignment.user.name}
+                                                        </Typography.Text>
+                                                        <Typography.Text type="secondary" ellipsis>
+                                                            {assignment.role.name} @ {formatScopeLocation(assignment)}
+                                                        </Typography.Text>
+                                                    </Flex>
+                                                    <ScopeTypeBadge
+                                                        type={toScopeBadgeType(assignment.scope_type)}
+                                                        label={assignment.scope_type}
+                                                    />
+                                                </Flex>
+                                            </Button>
                                         </Link>
                                     ))}
-                                </div>
+                                </Flex>
                             )}
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
+                        </Card>
+                    </Col>
+                </Row>
+            </Flex>
         </Layout>
     );
 }

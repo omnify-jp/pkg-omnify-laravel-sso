@@ -13,7 +13,8 @@
     "paths": {
       "@/*": ["../../resources/js/*"],
       "@omnify/*": ["./types/*"],
-      "@omnify-base/*": ["./node_modules/@omnify-base/*"]
+      "@omnify-base/*": ["./node_modules/@omnify-base/*"],
+      "@omnify-core/*": ["./resources/js/*"]
     }
   },
   "include": [

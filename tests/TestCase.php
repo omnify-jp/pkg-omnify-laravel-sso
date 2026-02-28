@@ -1,10 +1,10 @@
 <?php
 
-namespace Omnify\SsoClient\Tests;
+namespace Omnify\Core\Tests;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Omnify\SsoClient\Models\User;
-use Omnify\SsoClient\SsoClientServiceProvider;
+use Omnify\Core\Models\User;
+use Omnify\Core\CoreServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 /**
@@ -20,7 +20,7 @@ abstract class TestCase extends OrchestraTestCase
     protected function getPackageProviders($app): array
     {
         return [
-            SsoClientServiceProvider::class,
+            CoreServiceProvider::class,
             \Laravel\Sanctum\SanctumServiceProvider::class,
             \Inertia\ServiceProvider::class,
         ];

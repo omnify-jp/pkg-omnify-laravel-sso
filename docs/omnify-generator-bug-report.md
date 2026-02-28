@@ -1,8 +1,8 @@
 # Omnify Generator Bug Report
 
-**Package**: `pkg-omnify-laravel-sso`
+**Package**: `pkg-omnify-laravel-core`
 **Date**: 2026-02-24
-**Context**: Laravel package with `omnify.yaml` configured for custom namespace `Omnify\SsoClient`
+**Context**: Laravel package with `omnify.yaml` configured for custom namespace `Omnify\Core`
 
 ---
 
@@ -16,17 +16,17 @@ codegen:
   laravel:
     resource:
       path: app/Http/Resources
-      namespace: Omnify\SsoClient\Http\Resources
+      namespace: Omnify\Core\Http\Resources
 ```
 
 ### Expected
 All generated `*ResourceBase.php` files under `app/Http/Resources/OmnifyBase/` should have:
 ```php
-namespace Omnify\SsoClient\Http\Resources\OmnifyBase;
+namespace Omnify\Core\Http\Resources\OmnifyBase;
 ```
 And all internal cross-references should use the same namespace:
 ```php
-new \Omnify\SsoClient\Http\Resources\PermissionResource($this->permission)
+new \Omnify\Core\Http\Resources\PermissionResource($this->permission)
 ```
 
 ### Actual
@@ -34,12 +34,12 @@ Two files are generated with the wrong `App\` namespace:
 
 **`app/Http/Resources/OmnifyBase/TeamResourceBase.php`**:
 ```php
-namespace App\Http\Resources\OmnifyBase;  // ❌ should be Omnify\SsoClient\Http\Resources\OmnifyBase
+namespace App\Http\Resources\OmnifyBase;  // ❌ should be Omnify\Core\Http\Resources\OmnifyBase
 ```
 
 **`app/Http/Resources/OmnifyBase/TeamPermissionResourceBase.php`**:
 ```php
-namespace App\Http\Resources\OmnifyBase;  // ❌ should be Omnify\SsoClient\Http\Resources\OmnifyBase
+namespace App\Http\Resources\OmnifyBase;  // ❌ should be Omnify\Core\Http\Resources\OmnifyBase
 // ...
 'permission' => $this->whenLoaded('permission', fn () => new \App\Http\Resources\PermissionResource($this->permission)),  // ❌
 ```
@@ -124,7 +124,7 @@ Or better: the generator should detect composite PK schemas and add this method 
 
 ### Full File Path
 ```
-packages/pkg-omnify-laravel-sso/database/migrations/omnify/2026_02_21_122428_create_role_user_table.php
+packages/pkg-omnify-laravel-core/database/migrations/omnify/2026_02_21_122428_create_role_user_table.php
 ```
 
 ### Generated Migration (lines 30-40 of the file above)
@@ -178,7 +178,7 @@ Schema::create('role_user', function (Blueprint $table) {
 ### Severity: HIGH (all `Model::factory()` calls fail in non-standard namespaces)
 
 ### Problem
-Laravel's default factory resolution uses `Database\Factories\{ModelName}Factory`. When the package uses a custom namespace (`Omnify\SsoClient\Models`), Laravel resolves factory class as `Database\Factories\Omnify\SsoClient\Models\UserFactory` — which doesn't exist.
+Laravel's default factory resolution uses `Database\Factories\{ModelName}Factory`. When the package uses a custom namespace (`Omnify\Core\Models`), Laravel resolves factory class as `Database\Factories\Omnify\Core\Models\UserFactory` — which doesn't exist.
 
 ### Generated `User.php` (user-editable)
 ```php
@@ -264,37 +264,37 @@ These files are labeled with the comment `SAFE TO EDIT - This file is never over
 
 **Models (user-editable, should never be overwritten):**
 ```
-packages/pkg-omnify-laravel-sso/app/Models/User.php
-packages/pkg-omnify-laravel-sso/app/Models/Branch.php
-packages/pkg-omnify-laravel-sso/app/Models/Location.php
-packages/pkg-omnify-laravel-sso/app/Models/Organization.php
-packages/pkg-omnify-laravel-sso/app/Models/PasswordResetToken.php
-packages/pkg-omnify-laravel-sso/app/Models/Permission.php
-packages/pkg-omnify-laravel-sso/app/Models/RefreshToken.php
-packages/pkg-omnify-laravel-sso/app/Models/Role.php
-packages/pkg-omnify-laravel-sso/app/Models/RolePermission.php
-packages/pkg-omnify-laravel-sso/app/Models/Team.php
-packages/pkg-omnify-laravel-sso/app/Models/TeamPermission.php
+packages/pkg-omnify-laravel-core/app/Models/User.php
+packages/pkg-omnify-laravel-core/app/Models/Branch.php
+packages/pkg-omnify-laravel-core/app/Models/Location.php
+packages/pkg-omnify-laravel-core/app/Models/Organization.php
+packages/pkg-omnify-laravel-core/app/Models/PasswordResetToken.php
+packages/pkg-omnify-laravel-core/app/Models/Permission.php
+packages/pkg-omnify-laravel-core/app/Models/RefreshToken.php
+packages/pkg-omnify-laravel-core/app/Models/Role.php
+packages/pkg-omnify-laravel-core/app/Models/RolePermission.php
+packages/pkg-omnify-laravel-core/app/Models/Team.php
+packages/pkg-omnify-laravel-core/app/Models/TeamPermission.php
 ```
 
 **Factories (user-editable, should never be overwritten):**
 ```
-packages/pkg-omnify-laravel-sso/database/factories/BranchFactory.php
-packages/pkg-omnify-laravel-sso/database/factories/LocationFactory.php
-packages/pkg-omnify-laravel-sso/database/factories/OrganizationFactory.php
-packages/pkg-omnify-laravel-sso/database/factories/PermissionFactory.php
-packages/pkg-omnify-laravel-sso/database/factories/RefreshTokenFactory.php
-packages/pkg-omnify-laravel-sso/database/factories/RoleFactory.php
-packages/pkg-omnify-laravel-sso/database/factories/RolePermissionFactory.php
-packages/pkg-omnify-laravel-sso/database/factories/TeamFactory.php
-packages/pkg-omnify-laravel-sso/database/factories/TeamPermissionFactory.php
-packages/pkg-omnify-laravel-sso/database/factories/UserFactory.php
+packages/pkg-omnify-laravel-core/database/factories/BranchFactory.php
+packages/pkg-omnify-laravel-core/database/factories/LocationFactory.php
+packages/pkg-omnify-laravel-core/database/factories/OrganizationFactory.php
+packages/pkg-omnify-laravel-core/database/factories/PermissionFactory.php
+packages/pkg-omnify-laravel-core/database/factories/RefreshTokenFactory.php
+packages/pkg-omnify-laravel-core/database/factories/RoleFactory.php
+packages/pkg-omnify-laravel-core/database/factories/RolePermissionFactory.php
+packages/pkg-omnify-laravel-core/database/factories/TeamFactory.php
+packages/pkg-omnify-laravel-core/database/factories/TeamPermissionFactory.php
+packages/pkg-omnify-laravel-core/database/factories/UserFactory.php
 ```
 
 **Resources (user-editable, should never be overwritten):**
 ```
-packages/pkg-omnify-laravel-sso/app/Http/Resources/PermissionResource.php
-packages/pkg-omnify-laravel-sso/app/Http/Resources/UserResource.php
+packages/pkg-omnify-laravel-core/app/Http/Resources/PermissionResource.php
+packages/pkg-omnify-laravel-core/app/Http/Resources/UserResource.php
 ```
 
 ### Impact
@@ -326,7 +326,7 @@ packages/pkg-omnify-laravel-sso/app/Http/Resources/UserResource.php
 ## Reproduction Steps
 
 ```bash
-# 1. Create new package with omnify.yaml namespace = "Omnify\SsoClient"
+# 1. Create new package with omnify.yaml namespace = "Omnify\Core"
 # 2. Run:
 omnify generate --force
 

@@ -8,8 +8,8 @@
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
-use Omnify\SsoClient\Exceptions\ConsoleServerException;
-use Omnify\SsoClient\Services\JwksService;
+use Omnify\Core\Exceptions\ConsoleServerException;
+use Omnify\Core\Services\JwksService;
 
 beforeEach(function () {
     Cache::flush();

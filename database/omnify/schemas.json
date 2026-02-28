@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-26T11:18:21Z",
+  "generatedAt": "2026-02-28T03:42:10Z",
   "database": {
     "driver": "mysql"
   },
@@ -21,6 +21,95 @@
     "enums": {}
   },
   "schemas": {
+    "Admin": {
+      "connection": "default",
+      "displayName": {
+        "en": "Admin",
+        "ja": "管理者",
+        "vi": "Quản trị viên"
+      },
+      "kind": "object",
+      "name": "Admin",
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "indexes": [
+          {
+            "columns": [
+              "email"
+            ],
+            "unique": true
+          }
+        ],
+        "authenticatable": true
+      },
+      "package": null,
+      "properties": {
+        "email": {
+          "type": "String",
+          "displayName": {
+            "en": "Email",
+            "ja": "メールアドレス",
+            "vi": "Email"
+          }
+        },
+        "email_verified_at": {
+          "type": "Timestamp",
+          "displayName": {
+            "en": "Email Verified At",
+            "ja": "メール認証日時",
+            "vi": "Thời gian xác thực email"
+          },
+          "nullable": true
+        },
+        "is_active": {
+          "type": "Boolean",
+          "displayName": {
+            "en": "Active",
+            "ja": "有効",
+            "vi": "Hoạt động"
+          },
+          "default": true
+        },
+        "name": {
+          "type": "String",
+          "displayName": {
+            "en": "Name",
+            "ja": "名前",
+            "vi": "Tên"
+          }
+        },
+        "password": {
+          "type": "String",
+          "displayName": {
+            "en": "Password",
+            "ja": "パスワード",
+            "vi": "Mật khẩu"
+          },
+          "hidden": true
+        },
+        "remember_token": {
+          "type": "String",
+          "displayName": {
+            "en": "Remember Token",
+            "ja": "Remember Token",
+            "vi": "Remember Token"
+          },
+          "nullable": true,
+          "hidden": true,
+          "length": 100
+        }
+      },
+      "propertyOrder": [
+        "name",
+        "email",
+        "password",
+        "is_active",
+        "email_verified_at",
+        "remember_token"
+      ],
+      "tableName": "admins"
+    },
     "Branch": {
       "connection": "default",
       "displayName": {
@@ -58,11 +147,45 @@
               "console_organization_id",
               "is_headquarters"
             ]
+          },
+          {
+            "columns": [
+              "console_brand_id"
+            ]
+          },
+          {
+            "columns": [
+              "is_standalone"
+            ]
           }
         ]
       },
       "package": null,
       "properties": {
+        "address": {
+          "type": "Text",
+          "displayName": {
+            "en": "Address",
+            "ja": "住所",
+            "vi": "Địa chỉ"
+          },
+          "nullable": true
+        },
+        "code": {
+          "type": "String",
+          "displayName": {
+            "en": "Branch Code",
+            "ja": "支店コード",
+            "vi": "Mã chi nhánh"
+          },
+          "nullable": true,
+          "description": {
+            "en": "Unique code within organization (e.g., HQ, HCM-01, HN-MAIN)",
+            "ja": "組織内でユニークなコード（例：HQ、HCM-01、HN-MAIN）",
+            "vi": "Mã duy nhất trong tổ chức (VD: HQ, HCM-01, HN-MAIN)"
+          },
+          "length": 20
+        },
         "console_branch_id": {
           "type": "Uuid",
           "displayName": {
@@ -77,6 +200,20 @@
             "vi": "ID chi nhánh từ Console"
           }
         },
+        "console_brand_id": {
+          "type": "Uuid",
+          "displayName": {
+            "en": "Console Brand ID",
+            "ja": "Console Brand ID",
+            "vi": "Console Brand ID"
+          },
+          "nullable": true,
+          "description": {
+            "en": "Brand ID from Console (nullable - not all branches have a brand)",
+            "ja": "Console側のブランドID（nullable - すべての支店にブランドがあるわけではない）",
+            "vi": "ID thương hiệu từ Console (nullable - không phải chi nhánh nào cũng có thương hiệu)"
+          }
+        },
         "console_organization_id": {
           "type": "Uuid",
           "displayName": {
@@ -89,6 +226,30 @@
             "ja": "Console側の組織ID",
             "vi": "ID tổ chức từ Console"
           }
+        },
+        "currency": {
+          "type": "String",
+          "displayName": {
+            "en": "Currency",
+            "ja": "通貨",
+            "vi": "Tiền tệ"
+          },
+          "nullable": true,
+          "description": {
+            "en": "ISO 4217 currency code (e.g., VND, USD, JPY)",
+            "ja": "ISO 4217通貨コード（例：VND、USD、JPY）",
+            "vi": "Mã tiền tệ ISO 4217 (VD: VND, USD, JPY)"
+          },
+          "length": 3
+        },
+        "email": {
+          "type": "String",
+          "displayName": {
+            "en": "Email",
+            "ja": "メール",
+            "vi": "Email"
+          },
+          "nullable": true
         },
         "is_active": {
           "type": "Boolean",
@@ -113,6 +274,49 @@
             "vi": "Chi nhánh này có phải là trụ sở chính không"
           }
         },
+        "is_standalone": {
+          "type": "Boolean",
+          "displayName": {
+            "en": "Standalone",
+            "ja": "スタンドアローン",
+            "vi": "Standalone"
+          },
+          "default": false,
+          "description": {
+            "en": "Whether this record was created in standalone mode",
+            "ja": "スタンドアローンモードで作成されたデータかどうか",
+            "vi": "Bản ghi được tạo ở chế độ standalone hay không"
+          }
+        },
+        "locale": {
+          "type": "String",
+          "displayName": {
+            "en": "Locale",
+            "ja": "ロケール",
+            "vi": "Ngôn ngữ"
+          },
+          "nullable": true,
+          "description": {
+            "en": "Locale code (e.g., vi-VN, en-US, ja-JP)",
+            "ja": "ロケールコード（例：vi-VN、en-US、ja-JP）",
+            "vi": "Mã ngôn ngữ (VD: vi-VN, en-US, ja-JP)"
+          },
+          "length": 10
+        },
+        "metadata": {
+          "type": "Json",
+          "displayName": {
+            "en": "Metadata",
+            "ja": "メタデータ",
+            "vi": "Metadata"
+          },
+          "nullable": true,
+          "description": {
+            "en": "Additional data that can be used by external services",
+            "ja": "外部サービスが使用できる追加データ",
+            "vi": "Dữ liệu bổ sung có thể được sử dụng bởi các dịch vụ bên ngoài"
+          }
+        },
         "name": {
           "type": "String",
           "displayName": {
@@ -121,6 +325,25 @@
             "vi": "Tên chi nhánh"
           },
           "length": 100
+        },
+        "phone": {
+          "type": "String",
+          "displayName": {
+            "en": "Phone",
+            "ja": "電話番号",
+            "vi": "Số điện thoại"
+          },
+          "nullable": true,
+          "length": 20
+        },
+        "settings": {
+          "type": "Json",
+          "displayName": {
+            "en": "Settings",
+            "ja": "設定",
+            "vi": "Cài đặt"
+          },
+          "nullable": true
         },
         "slug": {
           "type": "String",
@@ -155,13 +378,211 @@
       "propertyOrder": [
         "console_branch_id",
         "console_organization_id",
+        "code",
         "slug",
         "name",
         "is_headquarters",
         "is_active",
-        "timezone"
+        "console_brand_id",
+        "is_standalone",
+        "address",
+        "phone",
+        "email",
+        "timezone",
+        "currency",
+        "locale",
+        "settings",
+        "metadata"
       ],
       "tableName": "branches"
+    },
+    "Brand": {
+      "connection": "default",
+      "displayName": {
+        "en": "Brand",
+        "ja": "ブランド",
+        "vi": "Thương hiệu"
+      },
+      "kind": "object",
+      "name": "Brand",
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "softDelete": true,
+        "indexes": [
+          {
+            "columns": [
+              "console_brand_id"
+            ],
+            "unique": true
+          },
+          {
+            "columns": [
+              "slug"
+            ],
+            "unique": true
+          },
+          {
+            "columns": [
+              "console_organization_id",
+              "is_active"
+            ]
+          },
+          {
+            "columns": [
+              "is_standalone"
+            ]
+          }
+        ]
+      },
+      "package": null,
+      "properties": {
+        "console_brand_id": {
+          "type": "Uuid",
+          "displayName": {
+            "en": "Console Brand ID",
+            "ja": "Console Brand ID",
+            "vi": "Console Brand ID"
+          },
+          "unique": true,
+          "description": {
+            "en": "Brand ID from Console",
+            "ja": "Console側のブランドID",
+            "vi": "ID thương hiệu từ Console"
+          }
+        },
+        "console_organization_id": {
+          "type": "Uuid",
+          "displayName": {
+            "en": "Console Organization ID",
+            "ja": "Console Organization ID",
+            "vi": "Console Organization ID"
+          },
+          "description": {
+            "en": "Owning organization ID from Console",
+            "ja": "Console側のオーナー組織ID",
+            "vi": "ID tổ chức sở hữu từ Console"
+          }
+        },
+        "cover_image_url": {
+          "type": "String",
+          "displayName": {
+            "en": "Cover Image URL",
+            "ja": "カバー画像URL",
+            "vi": "URL ảnh bìa"
+          },
+          "nullable": true,
+          "length": 500
+        },
+        "description": {
+          "type": "Text",
+          "displayName": {
+            "en": "Description",
+            "ja": "説明",
+            "vi": "Mô tả"
+          },
+          "nullable": true
+        },
+        "is_active": {
+          "type": "Boolean",
+          "displayName": {
+            "en": "Active",
+            "ja": "有効",
+            "vi": "Hoạt động"
+          },
+          "default": true
+        },
+        "is_standalone": {
+          "type": "Boolean",
+          "displayName": {
+            "en": "Standalone",
+            "ja": "スタンドアローン",
+            "vi": "Standalone"
+          },
+          "default": false,
+          "description": {
+            "en": "Whether this record was created in standalone mode",
+            "ja": "スタンドアローンモードで作成されたデータかどうか",
+            "vi": "Bản ghi được tạo ở chế độ standalone hay không"
+          }
+        },
+        "logo_url": {
+          "type": "String",
+          "displayName": {
+            "en": "Logo URL",
+            "ja": "ロゴURL",
+            "vi": "URL logo"
+          },
+          "nullable": true,
+          "length": 500
+        },
+        "metadata": {
+          "type": "Json",
+          "displayName": {
+            "en": "Metadata",
+            "ja": "メタデータ",
+            "vi": "Metadata"
+          },
+          "nullable": true
+        },
+        "name": {
+          "type": "String",
+          "displayName": {
+            "en": "Brand Name",
+            "ja": "ブランド名",
+            "vi": "Tên thương hiệu"
+          },
+          "length": 100
+        },
+        "settings": {
+          "type": "Json",
+          "displayName": {
+            "en": "Settings",
+            "ja": "設定",
+            "vi": "Cài đặt"
+          },
+          "nullable": true
+        },
+        "slug": {
+          "type": "String",
+          "displayName": {
+            "en": "Slug",
+            "ja": "スラッグ",
+            "vi": "Slug"
+          },
+          "description": {
+            "en": "Unique identifier for the brand (e.g. starbucks, kfc)",
+            "ja": "ブランドのユニーク識別子（例: starbucks, kfc）",
+            "vi": "Mã định danh duy nhất cho thương hiệu (VD: starbucks, kfc)"
+          },
+          "length": 50
+        },
+        "website": {
+          "type": "String",
+          "displayName": {
+            "en": "Website",
+            "ja": "ウェブサイト",
+            "vi": "Website"
+          },
+          "nullable": true,
+          "length": 500
+        }
+      },
+      "propertyOrder": [
+        "console_brand_id",
+        "console_organization_id",
+        "slug",
+        "name",
+        "description",
+        "logo_url",
+        "cover_image_url",
+        "website",
+        "is_active",
+        "is_standalone",
+        "settings",
+        "metadata"
+      ],
+      "tableName": "brands"
     },
     "Location": {
       "connection": "default",
@@ -206,6 +627,11 @@
             "columns": [
               "console_organization_id",
               "type"
+            ]
+          },
+          {
+            "columns": [
+              "is_standalone"
             ]
           }
         ]
@@ -318,6 +744,20 @@
             "vi": "Hoạt động"
           },
           "default": true
+        },
+        "is_standalone": {
+          "type": "Boolean",
+          "displayName": {
+            "en": "Standalone",
+            "ja": "スタンドアローン",
+            "vi": "Standalone"
+          },
+          "default": false,
+          "description": {
+            "en": "Whether this record was created in standalone mode",
+            "ja": "スタンドアローンモードで作成されたデータかどうか",
+            "vi": "Bản ghi được tạo ở chế độ standalone hay không"
+          }
         },
         "latitude": {
           "type": "Decimal",
@@ -448,6 +888,7 @@
         "name",
         "type",
         "is_active",
+        "is_standalone",
         "address",
         "city",
         "state_province",
@@ -485,11 +926,25 @@
               "slug"
             ],
             "unique": true
+          },
+          {
+            "columns": [
+              "is_standalone"
+            ]
           }
         ]
       },
       "package": null,
       "properties": {
+        "allowed_ips": {
+          "type": "Json",
+          "displayName": {
+            "en": "Allowed IPs",
+            "ja": "許可IPアドレス",
+            "vi": "IP được phép"
+          },
+          "nullable": true
+        },
         "console_organization_id": {
           "type": "Uuid",
           "displayName": {
@@ -513,6 +968,20 @@
           },
           "default": true
         },
+        "is_standalone": {
+          "type": "Boolean",
+          "displayName": {
+            "en": "Standalone",
+            "ja": "スタンドアローン",
+            "vi": "Standalone"
+          },
+          "default": false,
+          "description": {
+            "en": "Whether this record was created in standalone mode",
+            "ja": "スタンドアローンモードで作成されたデータかどうか",
+            "vi": "Bản ghi được tạo ở chế độ standalone hay không"
+          }
+        },
         "name": {
           "type": "String",
           "displayName": {
@@ -521,6 +990,15 @@
             "vi": "Tên tổ chức"
           },
           "length": 100
+        },
+        "settings": {
+          "type": "Json",
+          "displayName": {
+            "en": "Settings",
+            "ja": "設定",
+            "vi": "Cài đặt"
+          },
+          "nullable": true
         },
         "slug": {
           "type": "String",
@@ -535,13 +1013,46 @@
             "vi": "Định danh URL duy nhất"
           },
           "length": 100
+        },
+        "suspended_at": {
+          "type": "Timestamp",
+          "displayName": {
+            "en": "Suspended At",
+            "ja": "停止日時",
+            "vi": "Thời gian tạm ngừng"
+          },
+          "nullable": true,
+          "description": {
+            "en": "When organization was suspended (30-day grace period)",
+            "ja": "組織が停止された日時（30日間の猶予期間）",
+            "vi": "Thời điểm tổ chức bị tạm ngừng (30 ngày gia hạn)"
+          }
+        },
+        "terminated_at": {
+          "type": "Timestamp",
+          "displayName": {
+            "en": "Terminated At",
+            "ja": "終了日時",
+            "vi": "Thời gian chấm dứt"
+          },
+          "nullable": true,
+          "description": {
+            "en": "When organization was terminated (operational data will be deleted after 90 days, but employment history preserved)",
+            "ja": "組織が終了した日時（運営データは90日後に削除されますが、雇用履歴は保存されます）",
+            "vi": "Thời điểm tổ chức bị chấm dứt (dữ liệu hoạt động sẽ bị xóa sau 90 ngày, nhưng lịch sử làm việc được giữ lại)"
+          }
         }
       },
       "propertyOrder": [
         "console_organization_id",
         "name",
         "slug",
-        "is_active"
+        "is_standalone",
+        "is_active",
+        "settings",
+        "allowed_ips",
+        "suspended_at",
+        "terminated_at"
       ],
       "tableName": "organizations"
     },
@@ -1125,12 +1636,59 @@
               "console_organization_id"
             ],
             "unique": true
+          },
+          {
+            "columns": [
+              "is_standalone"
+            ]
           }
         ],
         "authenticatable": true
       },
       "package": null,
       "properties": {
+        "address": {
+          "type": "Text",
+          "displayName": {
+            "en": "Address",
+            "ja": "住所",
+            "vi": "Địa chỉ"
+          },
+          "nullable": true
+        },
+        "avatar_url": {
+          "type": "String",
+          "displayName": {
+            "en": "Avatar URL",
+            "ja": "アバターURL",
+            "vi": "URL ảnh đại diện"
+          },
+          "nullable": true,
+          "length": 500
+        },
+        "bank": {
+          "type": "Json",
+          "displayName": {
+            "en": "Bank Account",
+            "ja": "銀行口座",
+            "vi": "Tài khoản ngân hàng"
+          },
+          "nullable": true,
+          "description": {
+            "en": "Bank account information for salary payments (bank_code, branch_code, account_number, account_holder)",
+            "ja": "給与支払い用の銀行口座情報（bank_code, branch_code, account_number, account_holder）",
+            "vi": "Thông tin tài khoản ngân hàng (bank_code, branch_code, account_number, account_holder)"
+          }
+        },
+        "bio": {
+          "type": "Text",
+          "displayName": {
+            "en": "Bio",
+            "ja": "自己紹介",
+            "vi": "Giới thiệu bản thân"
+          },
+          "nullable": true
+        },
         "console_access_token": {
           "type": "Text",
           "displayName": {
@@ -1201,6 +1759,20 @@
             "vi": "ID người dùng từ Console SSO"
           }
         },
+        "date_of_birth": {
+          "type": "Date",
+          "displayName": {
+            "en": "Date of Birth",
+            "ja": "生年月日",
+            "vi": "Ngày sinh"
+          },
+          "nullable": true,
+          "description": {
+            "en": "User's date of birth - portable across organizations",
+            "ja": "ユーザーの生年月日 - 組織間で持ち運び可能",
+            "vi": "Ngày sinh của người dùng - di chuyển được giữa các tổ chức"
+          }
+        },
         "email": {
           "type": "String",
           "displayName": {
@@ -1213,6 +1785,15 @@
             "ja": "組織内でユニーク",
             "vi": "Duy nhất trong tổ chức"
           }
+        },
+        "email_verified_at": {
+          "type": "Timestamp",
+          "displayName": {
+            "en": "Email Verified At",
+            "ja": "メール認証日時",
+            "vi": "Thời gian xác minh email"
+          },
+          "nullable": true
         },
         "google2fa_secret": {
           "type": "String",
@@ -1229,6 +1810,43 @@
           },
           "hidden": true,
           "length": 100
+        },
+        "is_active": {
+          "type": "Boolean",
+          "displayName": {
+            "en": "Active",
+            "ja": "有効",
+            "vi": "Hoạt động"
+          },
+          "default": true
+        },
+        "is_default_password": {
+          "type": "Boolean",
+          "displayName": {
+            "en": "Is Default Password",
+            "ja": "デフォルトパスワード",
+            "vi": "Mật khẩu mặc định"
+          },
+          "default": false,
+          "description": {
+            "en": "Whether this is a random password from social account login",
+            "ja": "ソーシャルアカウントログイン時のランダムパスワードかどうか",
+            "vi": "Mật khẩu ngẫu nhiên khi đăng nhập bằng tài khoản mạng xã hội"
+          }
+        },
+        "is_standalone": {
+          "type": "Boolean",
+          "displayName": {
+            "en": "Standalone",
+            "ja": "スタンドアローン",
+            "vi": "Standalone"
+          },
+          "default": false,
+          "description": {
+            "en": "Whether this record was created in standalone mode",
+            "ja": "スタンドアローンモードで作成されたデータかどうか",
+            "vi": "Bản ghi được tạo ở chế độ standalone hay không"
+          }
         },
         "name": {
           "type": "String",
@@ -1252,6 +1870,16 @@
             "vi": "Dùng ở chế độ standalone. Null khi dùng Console SSO."
           },
           "hidden": true
+        },
+        "phone": {
+          "type": "String",
+          "displayName": {
+            "en": "Phone Number",
+            "ja": "電話番号",
+            "vi": "Số điện thoại"
+          },
+          "nullable": true,
+          "length": 20
         },
         "remember_token": {
           "type": "String",
@@ -1342,6 +1970,16 @@
         "email",
         "password",
         "remember_token",
+        "email_verified_at",
+        "is_default_password",
+        "is_active",
+        "date_of_birth",
+        "phone",
+        "address",
+        "bank",
+        "avatar_url",
+        "bio",
+        "is_standalone",
         "console_user_id",
         "console_organization_id",
         "console_access_token",

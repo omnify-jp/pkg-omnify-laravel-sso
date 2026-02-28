@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnify\SsoClient\Http\Requests\Admin;
+namespace Omnify\Core\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Events;
+namespace Omnify\Core\Events;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Omnify\SsoClient\Models\Organization;
+use Omnify\Core\Models\Organization;
 
 /**
  * Event dispatched when an organization is cached for the first time.

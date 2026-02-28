@@ -1,0 +1,78 @@
+# ==============================================================================
+# Admin (管理者 / Quản trị viên)
+# ==============================================================================
+#
+# Mục đích (Purpose):
+#   Model cho admin authentication ở standalone mode.
+#   Tách biệt hoàn toàn với User model — Admin quản lý hệ thống,
+#   User là end-user được sync từ Console SSO.
+#
+# Chỉ dùng khi:
+#   omnify-auth.mode = 'standalone'
+#   (Console mode không có Admin — admin dùng Console SSO trực tiếp)
+#
+# ==============================================================================
+
+kind: object
+
+displayName:
+  ja: 管理者
+  en: Admin
+  vi: Quản trị viên
+
+options:
+  timestamps: true
+  id: Uuid
+  authenticatable: true
+  indexes:
+    - columns: [email]
+      unique: true
+
+properties:
+  name:
+    type: String
+    displayName:
+      ja: 名前
+      en: Name
+      vi: Tên
+
+  email:
+    type: String
+    displayName:
+      ja: メールアドレス
+      en: Email
+      vi: Email
+
+  password:
+    type: String
+    hidden: true
+    displayName:
+      ja: パスワード
+      en: Password
+      vi: Mật khẩu
+
+  is_active:
+    type: Boolean
+    default: true
+    displayName:
+      ja: 有効
+      en: Active
+      vi: Hoạt động
+
+  email_verified_at:
+    type: Timestamp
+    nullable: true
+    displayName:
+      ja: メール認証日時
+      en: Email Verified At
+      vi: Thời gian xác thực email
+
+  remember_token:
+    type: String
+    length: 100
+    nullable: true
+    hidden: true
+    displayName:
+      ja: Remember Token
+      en: Remember Token
+      vi: Remember Token

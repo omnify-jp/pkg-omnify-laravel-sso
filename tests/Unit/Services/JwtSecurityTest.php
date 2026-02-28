@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Omnify\SsoClient\Services\JwksService;
-use Omnify\SsoClient\Services\JwtVerifier;
+use Omnify\Core\Services\JwksService;
+use Omnify\Core\Services\JwtVerifier;
 
 // =============================================================================
 // JWT Security Tests

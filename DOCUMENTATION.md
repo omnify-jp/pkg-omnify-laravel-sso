@@ -203,7 +203,7 @@ omnify-client-laravel-sso/
 │   │   ├── ConsoleNotFoundException.php
 │   │   └── ConsoleServerException.php
 │   ├── Facades/
-│   │   └── SsoClient.php
+│   │   └── Core.php
 │   ├── Http/
 │   │   ├── Controllers/
 │   │   │   ├── SsoCallbackController.php
@@ -241,7 +241,7 @@ omnify-client-laravel-sso/
 │   │   ├── RedirectUrlValidator.php
 │   │   └── SsoLogger.php
 │   └── Providers/
-│       └── SsoClientServiceProvider.php
+│       └── CoreServiceProvider.php
 ├── routes/
 │   └── sso.php
 └── tests/

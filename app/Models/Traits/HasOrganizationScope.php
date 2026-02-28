@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Models\Traits;
+namespace Omnify\Core\Models\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
-use Omnify\SsoClient\Facades\Context;
+use Omnify\Core\Facades\Context;
 
 /**
  * Trait for models that belong to an organization.

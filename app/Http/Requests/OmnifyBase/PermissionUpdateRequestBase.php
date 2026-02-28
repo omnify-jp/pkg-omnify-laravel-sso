@@ -11,7 +11,7 @@ namespace App\Http\Requests\OmnifyBase;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Omnify\SsoClient\Models\Base\Locales\PermissionLocales;
+use Omnify\Core\Models\Base\Locales\PermissionLocales;
 
 abstract class PermissionUpdateRequestBase extends FormRequest
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnify\SsoClient\Models\Base;
+namespace Omnify\Core\Models\Base;
 
 /**
  * Base model class for all Omnify-generated models.

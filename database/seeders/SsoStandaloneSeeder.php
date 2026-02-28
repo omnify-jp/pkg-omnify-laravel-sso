@@ -1,14 +1,14 @@
 <?php
 
-namespace Omnify\SsoClient\Database\Seeders;
+namespace Omnify\Core\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Omnify\SsoClient\Models\Branch;
-use Omnify\SsoClient\Models\Location;
-use Omnify\SsoClient\Models\Permission;
-use Omnify\SsoClient\Models\Role;
-use Omnify\SsoClient\Models\User;
+use Omnify\Core\Models\Branch;
+use Omnify\Core\Models\Location;
+use Omnify\Core\Models\Permission;
+use Omnify\Core\Models\Role;
+use Omnify\Core\Models\User;
 
 /**
  * Standalone Mode Demo Seeder
@@ -19,7 +19,7 @@ use Omnify\SsoClient\Models\User;
  * Bối cảnh: Công ty CP Giải Pháp Công Nghệ ABC — 3 chi nhánh, 8 nhân viên.
  *
  * Usage:
- *   php artisan db:seed --class=\\Omnify\\SsoClient\\Database\\Seeders\\SsoStandaloneSeeder
+ *   php artisan db:seed --class=\\Omnify\\Core\\Database\\Seeders\\SsoStandaloneSeeder
  *
  * Hoặc trong DatabaseSeeder của ứng dụng:
  *   $this->call(SsoStandaloneSeeder::class);
@@ -153,6 +153,7 @@ class SsoStandaloneSeeder extends Seeder
                 'name' => 'Hà Nội (Trụ sở chính)',
                 'is_headquarters' => true,
                 'is_active' => true,
+                'is_standalone' => true,
             ],
             [
                 'console_branch_id' => self::BRANCH_HCM,
@@ -161,6 +162,7 @@ class SsoStandaloneSeeder extends Seeder
                 'name' => 'Hồ Chí Minh',
                 'is_headquarters' => false,
                 'is_active' => true,
+                'is_standalone' => true,
             ],
             [
                 'console_branch_id' => self::BRANCH_DAD,
@@ -169,6 +171,7 @@ class SsoStandaloneSeeder extends Seeder
                 'name' => 'Đà Nẵng',
                 'is_headquarters' => false,
                 'is_active' => true,
+                'is_standalone' => true,
             ],
         ];
 
@@ -198,6 +201,7 @@ class SsoStandaloneSeeder extends Seeder
                 'name' => 'Văn phòng Hà Nội',
                 'type' => 'office',
                 'is_active' => true,
+                'is_standalone' => true,
                 'address' => '18 Láng Hạ, Đống Đa',
                 'city' => 'Hà Nội',
                 'state_province' => 'Hà Nội',
@@ -215,6 +219,7 @@ class SsoStandaloneSeeder extends Seeder
                 'name' => 'Kho Hà Nội',
                 'type' => 'warehouse',
                 'is_active' => true,
+                'is_standalone' => true,
                 'address' => 'Lô B-12, KCN Bắc Thăng Long, Đông Anh',
                 'city' => 'Hà Nội',
                 'state_province' => 'Hà Nội',
@@ -233,6 +238,7 @@ class SsoStandaloneSeeder extends Seeder
                 'name' => 'Văn phòng TP.HCM',
                 'type' => 'office',
                 'is_active' => true,
+                'is_standalone' => true,
                 'address' => '136 Nguyễn Văn Trỗi, Phường 8, Quận Phú Nhuận',
                 'city' => 'Hồ Chí Minh',
                 'state_province' => 'TP. Hồ Chí Minh',
@@ -250,6 +256,7 @@ class SsoStandaloneSeeder extends Seeder
                 'name' => 'Kho TP.HCM',
                 'type' => 'warehouse',
                 'is_active' => true,
+                'is_standalone' => true,
                 'address' => 'Lô C-07, KCN Tân Bình, Quận Tân Phú',
                 'city' => 'Hồ Chí Minh',
                 'state_province' => 'TP. Hồ Chí Minh',
@@ -268,6 +275,7 @@ class SsoStandaloneSeeder extends Seeder
                 'name' => 'Văn phòng Đà Nẵng',
                 'type' => 'office',
                 'is_active' => true,
+                'is_standalone' => true,
                 'address' => '112 Trần Phú, Quận Hải Châu',
                 'city' => 'Đà Nẵng',
                 'state_province' => 'Đà Nẵng',
@@ -356,6 +364,7 @@ class SsoStandaloneSeeder extends Seeder
             unset($userData['role']);
 
             $userData['password'] = Hash::make($userData['password']);
+            $userData['is_standalone'] = true;
 
             /** @var User $user */
             $user = User::withTrashed()->updateOrCreate(

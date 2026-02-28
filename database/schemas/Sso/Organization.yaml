@@ -27,6 +27,7 @@ options:
   indexes:
     - columns: [slug]
       unique: true
+    - columns: [is_standalone]
 
 properties:
   # Console reference - Primary identifier from Console
@@ -63,6 +64,19 @@ properties:
       en: URL-friendly unique identifier
       vi: Định danh URL duy nhất
 
+  # Data origin flag
+  is_standalone:
+    type: Boolean
+    default: false
+    displayName:
+      ja: スタンドアローン
+      en: Standalone
+      vi: Standalone
+    description:
+      ja: スタンドアローンモードで作成されたデータかどうか
+      en: Whether this record was created in standalone mode
+      vi: Bản ghi được tạo ở chế độ standalone hay không
+
   # Status
   is_active:
     type: Boolean
@@ -71,3 +85,44 @@ properties:
       ja: 有効
       en: Active
       vi: Hoạt động
+
+  # SaaS lifecycle fields
+  settings:
+    type: Json
+    nullable: true
+    displayName:
+      ja: 設定
+      en: Settings
+      vi: Cài đặt
+
+  allowed_ips:
+    type: Json
+    nullable: true
+    displayName:
+      ja: 許可IPアドレス
+      en: Allowed IPs
+      vi: IP được phép
+
+  suspended_at:
+    type: Timestamp
+    nullable: true
+    displayName:
+      ja: 停止日時
+      en: Suspended At
+      vi: Thời gian tạm ngừng
+    description:
+      ja: 組織が停止された日時（30日間の猶予期間）
+      en: "When organization was suspended (30-day grace period)"
+      vi: "Thời điểm tổ chức bị tạm ngừng (30 ngày gia hạn)"
+
+  terminated_at:
+    type: Timestamp
+    nullable: true
+    displayName:
+      ja: 終了日時
+      en: Terminated At
+      vi: Thời gian chấm dứt
+    description:
+      ja: 組織が終了した日時（運営データは90日後に削除されますが、雇用履歴は保存されます）
+      en: "When organization was terminated (operational data will be deleted after 90 days, but employment history preserved)"
+      vi: "Thời điểm tổ chức bị chấm dứt (dữ liệu hoạt động sẽ bị xóa sau 90 ngày, nhưng lịch sử làm việc được giữ lại)"

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Services;
+namespace Omnify\Core\Services;
 
 use Illuminate\Support\Collection;
-use Omnify\SsoClient\Models\Permission;
-use Omnify\SsoClient\Models\Role;
+use Omnify\Core\Models\Permission;
+use Omnify\Core\Models\Role;
 
 class PermissionService
 {

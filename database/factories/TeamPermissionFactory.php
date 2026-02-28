@@ -1,11 +1,11 @@
 <?php
 
-namespace Omnify\SsoClient\Database\Factories;
+namespace Omnify\Core\Database\Factories;
 
-use Omnify\SsoClient\Models\TeamPermission;
+use Omnify\Core\Models\TeamPermission;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-use Omnify\SsoClient\Models\Permission;
+use Omnify\Core\Models\Permission;
 
 /**
  * TeamPermission Factory

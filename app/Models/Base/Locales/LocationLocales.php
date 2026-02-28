@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnify\SsoClient\Models\Base\Locales;
+namespace Omnify\Core\Models\Base\Locales;
 
 /**
  * Localized display names for Location.
@@ -63,6 +63,11 @@ class LocationLocales
             'en' => 'Active',
             'ja' => '有効',
             'vi' => 'Hoạt động',
+        ],
+        'is_standalone' => [
+            'en' => 'Standalone',
+            'ja' => 'スタンドアローン',
+            'vi' => 'Standalone',
         ],
         'address' => [
             'en' => 'Address',

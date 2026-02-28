@@ -69,7 +69,7 @@ Target:  packages/.../src/Traits/HasOrganizationScope.php (SSO Package)
 - Middleware (require-organization, require-branch, with-branch)
 
 ### Phase 3: Update Main App
-- Change `use App\Traits\HasOrganizationScope` to `use Omnify\SsoClient\Traits\HasOrganizationScope`
+- Change `use App\Traits\HasOrganizationScope` to `use Omnify\Core\Traits\HasOrganizationScope`
 
 ---
 
@@ -102,7 +102,7 @@ Omnify đã generate sẵn trong BaseModel:
 ### 1. Model có organization_id
 
 ```php
-use Omnify\SsoClient\Traits\HasOrganizationScope;
+use Omnify\Core\Traits\HasOrganizationScope;
 
 class Department extends DepartmentBaseModel
 {
@@ -122,7 +122,7 @@ Department::inCurrentOrganization()->get();
 ### 2. Model có branch_id
 
 ```php
-use Omnify\SsoClient\Traits\HasBranchScope;
+use Omnify\Core\Traits\HasBranchScope;
 
 class Device extends DeviceBaseModel
 {
@@ -143,7 +143,7 @@ Device::inCurrentContext()->get();
 ### 3. Model có team_id
 
 ```php
-use Omnify\SsoClient\Traits\HasTeamScope;
+use Omnify\Core\Traits\HasTeamScope;
 
 class TaskAssignment extends TaskAssignmentBaseModel
 {

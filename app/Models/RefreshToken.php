@@ -1,9 +1,9 @@
 <?php
 
-namespace Omnify\SsoClient\Models;
+namespace Omnify\Core\Models;
 
-use Omnify\SsoClient\Models\Base\RefreshTokenBaseModel;
-use Omnify\SsoClient\Database\Factories\RefreshTokenFactory;
+use Omnify\Core\Models\Base\RefreshTokenBaseModel;
+use Omnify\Core\Database\Factories\RefreshTokenFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**

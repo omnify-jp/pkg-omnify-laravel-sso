@@ -1,4 +1,77 @@
 {
+  "common": {
+    "back": "戻る",
+    "next": "次へ",
+    "select": "選択",
+    "cancel": "キャンセル",
+    "save": "変更を保存",
+    "delete": "削除",
+    "edit": "編集",
+    "view": "詳細",
+    "search": "検索",
+    "assign": "割り当て",
+    "active": "アクティブ",
+    "inactive": "無効",
+    "actions": "操作",
+    "yes": "はい",
+    "no": "いいえ",
+    "all": "すべて",
+    "optional": "任意",
+    "previous": "前へ",
+    "from": "開始日",
+    "to": "終了日",
+    "filters": "フィルター",
+    "advancedFilters": "詳細フィルター",
+    "createdFrom": "作成日（開始）",
+    "createdTo": "作成日（終了）",
+    "or": "または",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "logout": "ログアウト",
+    "navigation": "ナビゲーション",
+    "submittedFrom": "申請日（開始）",
+    "submittedTo": "申請日（終了）",
+    "dateLocale": "ja-JP"
+  },
+  "validation": {
+    "required": "この項目は必須です。",
+    "slug": "小文字・数字・ハイフンのみ使用できます。"
+  },
+  "sso": {
+    "org": {
+      "noOrgSelected": "組織を選択",
+      "selectOrg": "組織を選択",
+      "selectBranch": "拠点を選択",
+      "selectOrgDesc": "作業する組織を選択してください",
+      "selectBranchDesc": "組織内の拠点を選択してください",
+      "orgStep": "組織",
+      "branchStep": "拠点",
+      "branchCount": "{{count}}拠点",
+      "selectedOrg": "選択中の組織",
+      "searchBranch": "拠点を検索...",
+      "noBranchFound": "拠点が見つかりません"
+    },
+    "login": {
+      "pageTitle": "ログイン",
+      "title": "SSOログイン",
+      "description": "組織アカウントでサインインしてください",
+      "secureAuth": "安全な認証",
+      "secureAuthDescription": "Omnify Consoleにリダイレクトされ、安全にサインインします。認証後、このアプリケーションに戻ります。",
+      "redirecting": "リダイレクト中...",
+      "submit": "Console SSOでサインイン"
+    },
+    "callback": {
+      "pageTitle": "認証中...",
+      "processing": "認証中...",
+      "processingDescription": "本人確認を行っています。しばらくお待ちください。",
+      "success": "認証に成功しました",
+      "successDescription": "ダッシュボードにリダイレクトしています...",
+      "error": "認証に失敗しました",
+      "tryAgain": "もう一度試す",
+      "noCode": "認証コードが受信されませんでした。",
+      "unknownError": "予期しないエラーが発生しました。"
+    }
+  },
   "iam": {
     "title": "IAM",
     "subtitle": "ユーザー、ロール、権限を管理します。",

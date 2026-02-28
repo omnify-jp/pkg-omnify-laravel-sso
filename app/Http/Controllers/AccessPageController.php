@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Http\Controllers;
+namespace Omnify\Core\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
 use Inertia\Response;
-use Omnify\SsoClient\Models\Branch;
-use Omnify\SsoClient\Models\Organization;
-use Omnify\SsoClient\Models\Permission;
-use Omnify\SsoClient\Models\Role;
-use Omnify\SsoClient\Models\User;
+use Omnify\Core\Models\Branch;
+use Omnify\Core\Models\Organization;
+use Omnify\Core\Models\Permission;
+use Omnify\Core\Models\Role;
+use Omnify\Core\Models\User;
 
 /**
  * Controller for Access Management (IAM) pages.

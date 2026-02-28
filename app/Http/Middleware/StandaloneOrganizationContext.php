@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Http\Middleware;
+namespace Omnify\Core\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Omnify\SsoClient\Models\Organization;
+use Omnify\Core\Models\Organization;
 use Symfony\Component\HttpFoundation\Response;
 
 class StandaloneOrganizationContext
@@ -32,11 +32,12 @@ class StandaloneOrganizationContext
 
             if ($user->console_organization_id) {
                 $organization = Organization::where('is_active', true)
+                    ->currentMode()
                     ->where('console_organization_id', $user->console_organization_id)
                     ->first();
             }
 
-            $organization ??= Organization::where('is_active', true)->first();
+            $organization ??= Organization::where('is_active', true)->currentMode()->first();
 
             if ($organization) {
                 // CRITICAL: must be camelCase 'organizationId' — ContextService reads

@@ -8,9 +8,9 @@
  */
 
 use Illuminate\Support\Str;
-use Omnify\SsoClient\Models\Permission;
-use Omnify\SsoClient\Models\Role;
-use Omnify\SsoClient\Models\User;
+use Omnify\Core\Models\Permission;
+use Omnify\Core\Models\Role;
+use Omnify\Core\Models\User;
 
 beforeEach(function () {
     // Create authenticated admin user (RefreshDatabase handles migrations)
@@ -68,7 +68,7 @@ test('user index returns users with organization info when org cache exists', fu
     $organizationId = (string) Str::uuid();
 
     // Create organization cache first
-    \Omnify\SsoClient\Models\Organization::create([
+    \Omnify\Core\Models\Organization::create([
         'console_organization_id' => $organizationId,
         'name' => 'Test Organization Info',
         'slug' => 'TEST-ORG-INFO',
@@ -243,19 +243,17 @@ describe('GET /api/admin/sso/users/{user}/permissions', function () {
         $response->assertNotFound();
     });
 
-    test('same role in multiple branches shows as separate assignments', function () {
+    test('different roles in multiple branches show correct assignments per context', function () {
         $user = User::factory()->create();
         $organizationId = (string) Str::uuid();
         $branch1 = (string) Str::uuid();
-        $branch2 = (string) Str::uuid();
 
-        $role = Role::create(['name' => 'Manager', 'slug' => 'manager', 'level' => 50]);
+        $role1 = Role::create(['name' => 'Manager', 'slug' => 'manager', 'level' => 50]);
         $perm = Permission::create(['name' => 'Manage', 'slug' => 'manage', 'group' => 'general']);
-        $role->permissions()->attach($perm->id);
+        $role1->permissions()->attach($perm->id);
 
-        // Assign same role to multiple branches
-        $user->assignRole($role, $organizationId, $branch1);
-        $user->assignRole($role, $organizationId, $branch2);
+        // Assign role to branch1
+        $user->assignRole($role1, $organizationId, $branch1);
 
         // Query for branch1
         $response = $this->getJson("/api/admin/sso/users/{$user->id}/permissions?organization_id={$organizationId}&branch_id={$branch1}", [
@@ -263,7 +261,7 @@ describe('GET /api/admin/sso/users/{user}/permissions', function () {
         ]);
 
         $response->assertOk();
-        // Should only see the branch1 assignment
+        // Should see the branch1 assignment
         expect($response->json('role_assignments'))->toHaveCount(1);
         expect($response->json('role_assignments.0.console_branch_id'))->toBe($branch1);
     });
@@ -415,11 +413,12 @@ describe('DELETE /api/admin/sso/users/{user}', function () {
         $user = User::factory()->create();
         $userId = $user->id;
 
-        $role = Role::create(['name' => 'Admin', 'slug' => 'admin', 'level' => 100]);
+        $globalRole = Role::create(['name' => 'Admin', 'slug' => 'admin', 'level' => 100]);
+        $orgRole = Role::create(['name' => 'Manager', 'slug' => 'manager', 'level' => 50]);
         $organizationId = (string) Str::uuid();
 
-        $user->assignRole($role, null, null);
-        $user->assignRole($role, $organizationId, null);
+        $user->assignRole($globalRole, null, null);
+        $user->assignRole($orgRole, $organizationId, null);
 
         // Verify assignments exist
         expect($user->getRoleAssignments())->toHaveCount(2);

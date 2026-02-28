@@ -1,12 +1,12 @@
 <?php
 
-namespace Omnify\SsoClient\Database\Seeders;
+namespace Omnify\Core\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Omnify\SsoClient\Database\Seeders\Concerns\AssignsRoles;
-use Omnify\SsoClient\Database\Seeders\Concerns\FetchesConsoleData;
-use Omnify\SsoClient\Models\Permission;
-use Omnify\SsoClient\Models\Role;
+use Omnify\Core\Database\Seeders\Concerns\AssignsRoles;
+use Omnify\Core\Database\Seeders\Concerns\FetchesConsoleData;
+use Omnify\Core\Models\Permission;
+use Omnify\Core\Models\Role;
 
 /**
  * Seeder for default SSO roles and permissions.
@@ -15,7 +15,7 @@ use Omnify\SsoClient\Models\Role;
  * and base permissions for service administration.
  *
  * Usage in your DatabaseSeeder:
- *   $this->call(\Omnify\SsoClient\Database\Seeders\SsoRolesSeeder::class);
+ *   $this->call(\Omnify\Core\Database\Seeders\SsoRolesSeeder::class);
  */
 class SsoRolesSeeder extends Seeder
 {

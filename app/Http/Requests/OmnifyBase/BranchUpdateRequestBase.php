@@ -11,7 +11,7 @@ namespace App\Http\Requests\OmnifyBase;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Omnify\SsoClient\Models\Base\Locales\BranchLocales;
+use Omnify\Core\Models\Base\Locales\BranchLocales;
 
 abstract class BranchUpdateRequestBase extends FormRequest
 {
@@ -54,11 +54,21 @@ abstract class BranchUpdateRequestBase extends FormRequest
         return [
             'console_branch_id' => ['sometimes', 'string', 'uuid', Rule::unique('branches')->ignore($this->route('branch'))],
             'console_organization_id' => ['sometimes', 'string', 'uuid'],
+            'code' => ['nullable', 'string', 'max:20'],
             'slug' => ['sometimes', 'string', 'max:100'],
             'name' => ['sometimes', 'string', 'max:100'],
             'is_headquarters' => ['sometimes', 'boolean'],
             'is_active' => ['sometimes', 'boolean'],
+            'console_brand_id' => ['nullable', 'string', 'uuid'],
+            'is_standalone' => ['sometimes', 'boolean'],
+            'address' => ['nullable', 'string'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'email' => ['nullable', 'string', 'max:255'],
             'timezone' => ['nullable', 'string', 'max:50'],
+            'currency' => ['nullable', 'string', 'max:3'],
+            'locale' => ['nullable', 'string', 'max:10'],
+            'settings' => ['nullable', 'array'],
+            'metadata' => ['nullable', 'array'],
         ];
     }
 
@@ -78,11 +88,21 @@ abstract class BranchUpdateRequestBase extends FormRequest
         $keys = [
             'console_branch_id',
             'console_organization_id',
+            'code',
             'slug',
             'name',
             'is_headquarters',
             'is_active',
+            'console_brand_id',
+            'is_standalone',
+            'address',
+            'phone',
+            'email',
             'timezone',
+            'currency',
+            'locale',
+            'settings',
+            'metadata',
         ];
 
         foreach ($keys as $key) {

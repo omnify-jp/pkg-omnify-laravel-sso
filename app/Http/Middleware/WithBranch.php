@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Http\Middleware;
+namespace Omnify\Core\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Omnify\SsoClient\Facades\Context;
-use Omnify\SsoClient\Models\Branch;
+use Omnify\Core\Facades\Context;
+use Omnify\Core\Models\Branch;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -22,10 +22,10 @@ use Symfony\Component\HttpFoundation\Response;
  * 3. Query parameter `branch_id`
  *
  * Usage in routes:
- *   Route::get('/devices', ...)->middleware('sso.with-branch');
- *   Route::get('/branches/{branch}/devices', ...)->middleware('sso.with-branch');
+ *   Route::get('/devices', ...)->middleware('core.with-branch');
+ *   Route::get('/branches/{branch}/devices', ...)->middleware('core.with-branch');
  *
- * @see \Omnify\SsoClient\Http\Middleware\SsoOrganizationAccess
+ * @see \Omnify\Core\Http\Middleware\SsoOrganizationAccess
  */
 class WithBranch
 {

@@ -28,6 +28,8 @@ options:
       unique: true
     - columns: [console_organization_id, is_active]
     - columns: [console_organization_id, is_headquarters]
+    - columns: [console_brand_id]
+    - columns: [is_standalone]
 
 properties:
   # Console reference - Primary identifier from Console
@@ -54,6 +56,20 @@ properties:
       ja: Console側の組織ID
       en: Organization ID from Console
       vi: ID tổ chức từ Console
+
+  # Branch code - unique within organization
+  code:
+    type: String
+    length: 20
+    nullable: true
+    displayName:
+      ja: 支店コード
+      en: Branch Code
+      vi: Mã chi nhánh
+    description:
+      ja: "組織内でユニークなコード（例：HQ、HCM-01、HN-MAIN）"
+      en: "Unique code within organization (e.g., HQ, HCM-01, HN-MAIN)"
+      vi: "Mã duy nhất trong tổ chức (VD: HQ, HCM-01, HN-MAIN)"
 
   # Basic info - Cached from Console
   slug:
@@ -97,6 +113,58 @@ properties:
       en: Active
       vi: Hoạt động
 
+  # Brand reference (optional franchise)
+  console_brand_id:
+    type: Uuid
+    nullable: true
+    displayName:
+      ja: Console Brand ID
+      en: Console Brand ID
+      vi: Console Brand ID
+    description:
+      ja: Console側のブランドID（nullable - すべての支店にブランドがあるわけではない）
+      en: Brand ID from Console (nullable - not all branches have a brand)
+      vi: ID thương hiệu từ Console (nullable - không phải chi nhánh nào cũng có thương hiệu)
+
+  # Data origin flag
+  is_standalone:
+    type: Boolean
+    default: false
+    displayName:
+      ja: スタンドアローン
+      en: Standalone
+      vi: Standalone
+    description:
+      ja: スタンドアローンモードで作成されたデータかどうか
+      en: Whether this record was created in standalone mode
+      vi: Bản ghi được tạo ở chế độ standalone hay không
+
+  # Contact fields
+  address:
+    type: Text
+    nullable: true
+    displayName:
+      ja: 住所
+      en: Address
+      vi: Địa chỉ
+
+  phone:
+    type: String
+    length: 20
+    nullable: true
+    displayName:
+      ja: 電話番号
+      en: Phone
+      vi: Số điện thoại
+
+  email:
+    type: String
+    nullable: true
+    displayName:
+      ja: メール
+      en: Email
+      vi: Email
+
   # Operational
   timezone:
     type: String
@@ -110,3 +178,49 @@ properties:
       ja: "IANA タイムゾーン（例: Asia/Tokyo）"
       en: "IANA timezone (e.g. Asia/Tokyo)"
       vi: "Múi giờ IANA (VD: Asia/Tokyo)"
+
+  currency:
+    type: String
+    length: 3
+    nullable: true
+    displayName:
+      ja: 通貨
+      en: Currency
+      vi: Tiền tệ
+    description:
+      ja: "ISO 4217通貨コード（例：VND、USD、JPY）"
+      en: "ISO 4217 currency code (e.g., VND, USD, JPY)"
+      vi: "Mã tiền tệ ISO 4217 (VD: VND, USD, JPY)"
+
+  locale:
+    type: String
+    length: 10
+    nullable: true
+    displayName:
+      ja: ロケール
+      en: Locale
+      vi: Ngôn ngữ
+    description:
+      ja: "ロケールコード（例：vi-VN、en-US、ja-JP）"
+      en: "Locale code (e.g., vi-VN, en-US, ja-JP)"
+      vi: "Mã ngôn ngữ (VD: vi-VN, en-US, ja-JP)"
+
+  settings:
+    type: Json
+    nullable: true
+    displayName:
+      ja: 設定
+      en: Settings
+      vi: Cài đặt
+
+  metadata:
+    type: Json
+    nullable: true
+    displayName:
+      ja: メタデータ
+      en: Metadata
+      vi: Metadata
+    description:
+      ja: 外部サービスが使用できる追加データ
+      en: "Additional data that can be used by external services"
+      vi: "Dữ liệu bổ sung có thể được sử dụng bởi các dịch vụ bên ngoài"

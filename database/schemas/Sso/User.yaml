@@ -29,6 +29,7 @@ options:
       unique: true
     - columns: [console_user_id, console_organization_id]
       unique: true
+    - columns: [is_standalone]
 
 properties:
   # Basic user info - Cached from Console
@@ -77,6 +78,107 @@ properties:
       ja: ブラウザ記憶トークン（スタンドアローンモード用）
       en: Browser remember-me token (standalone auth mode)
       vi: Token ghi nhớ đăng nhập (standalone mode)
+
+  # Account status
+  email_verified_at:
+    type: Timestamp
+    nullable: true
+    displayName:
+      ja: メール認証日時
+      en: Email Verified At
+      vi: Thời gian xác minh email
+
+  is_default_password:
+    type: Boolean
+    default: false
+    displayName:
+      ja: デフォルトパスワード
+      en: Is Default Password
+      vi: Mật khẩu mặc định
+    description:
+      ja: ソーシャルアカウントログイン時のランダムパスワードかどうか
+      en: Whether this is a random password from social account login
+      vi: Mật khẩu ngẫu nhiên khi đăng nhập bằng tài khoản mạng xã hội
+
+  is_active:
+    type: Boolean
+    default: true
+    displayName:
+      ja: 有効
+      en: Active
+      vi: Hoạt động
+
+  # Personal data - portable across organizations
+  date_of_birth:
+    type: Date
+    nullable: true
+    displayName:
+      ja: 生年月日
+      en: Date of Birth
+      vi: Ngày sinh
+    description:
+      ja: ユーザーの生年月日 - 組織間で持ち運び可能
+      en: "User's date of birth - portable across organizations"
+      vi: "Ngày sinh của người dùng - di chuyển được giữa các tổ chức"
+
+  phone:
+    type: String
+    length: 20
+    nullable: true
+    displayName:
+      ja: 電話番号
+      en: Phone Number
+      vi: Số điện thoại
+
+  address:
+    type: Text
+    nullable: true
+    displayName:
+      ja: 住所
+      en: Address
+      vi: Địa chỉ
+
+  bank:
+    type: Json
+    nullable: true
+    displayName:
+      ja: 銀行口座
+      en: Bank Account
+      vi: Tài khoản ngân hàng
+    description:
+      ja: 給与支払い用の銀行口座情報（bank_code, branch_code, account_number, account_holder）
+      en: "Bank account information for salary payments (bank_code, branch_code, account_number, account_holder)"
+      vi: "Thông tin tài khoản ngân hàng (bank_code, branch_code, account_number, account_holder)"
+
+  avatar_url:
+    type: String
+    length: 500
+    nullable: true
+    displayName:
+      ja: アバターURL
+      en: Avatar URL
+      vi: URL ảnh đại diện
+
+  bio:
+    type: Text
+    nullable: true
+    displayName:
+      ja: 自己紹介
+      en: Bio
+      vi: Giới thiệu bản thân
+
+  # Data origin flag
+  is_standalone:
+    type: Boolean
+    default: false
+    displayName:
+      ja: スタンドアローン
+      en: Standalone
+      vi: Standalone
+    description:
+      ja: スタンドアローンモードで作成されたデータかどうか
+      en: Whether this record was created in standalone mode
+      vi: Bản ghi được tạo ở chế độ standalone hay không
 
   # SSO fields - Console reference
   console_user_id:

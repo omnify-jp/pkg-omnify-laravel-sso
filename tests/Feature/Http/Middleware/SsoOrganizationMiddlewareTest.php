@@ -7,12 +7,12 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Omnify\SsoClient\Services\OrganizationAccessService;
-use Omnify\SsoClient\Tests\Fixtures\Models\User;
+use Omnify\Core\Services\OrganizationAccessService;
+use Omnify\Core\Tests\Fixtures\Models\User;
 
 beforeEach(function () {
     // テスト用のルートを定義
-    Route::middleware(['sso.auth', 'sso.organization'])->get('/test-org-access', function () {
+    Route::middleware(['core.auth', 'core.organization'])->get('/test-org-access', function () {
         return response()->json([
             'message' => 'organization access granted',
             'organization_id' => request()->attributes->get('organizationId'),
@@ -22,7 +22,7 @@ beforeEach(function () {
     });
 });
 
-test('sso.organization middleware rejects request without X-Organization-Id header', function () {
+test('core.organization middleware rejects request without X-Organization-Id header', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->getJson('/test-org-access');
@@ -34,7 +34,7 @@ test('sso.organization middleware rejects request without X-Organization-Id head
         ]);
 });
 
-test('sso.organization middleware rejects unauthorized organization access', function () {
+test('core.organization middleware rejects unauthorized organization access', function () {
     $user = User::factory()->create();
 
     // OrganizationAccessServiceをモック
@@ -56,7 +56,7 @@ test('sso.organization middleware rejects unauthorized organization access', fun
         ]);
 });
 
-test('sso.organization middleware allows authorized organization access', function () {
+test('core.organization middleware allows authorized organization access', function () {
     $user = User::factory()->create();
 
     // OrganizationAccessServiceをモック
@@ -86,7 +86,7 @@ test('sso.organization middleware allows authorized organization access', functi
         ]);
 });
 
-test('sso.organization middleware sets organization info on request attributes', function () {
+test('core.organization middleware sets organization info on request attributes', function () {
     $user = User::factory()->create();
 
     // OrganizationAccessServiceをモック

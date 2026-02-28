@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnify\SsoClient\Models\Base\Locales;
+namespace Omnify\Core\Models\Base\Locales;
 
 /**
  * Localized display names for PasswordResetToken.

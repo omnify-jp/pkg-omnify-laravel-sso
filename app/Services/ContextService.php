@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Services;
+namespace Omnify\Core\Services;
 
 use Illuminate\Http\Request;
 
@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
  * - Request attributes (set by middleware)
  * - Session (fallback)
  *
- * @see \Omnify\SsoClient\Http\Middleware\SsoOrganizationAccess
+ * @see \Omnify\Core\Http\Middleware\SsoOrganizationAccess
  */
 class ContextService
 {

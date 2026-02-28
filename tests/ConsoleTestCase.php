@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnify\SsoClient\Tests;
+namespace Omnify\Core\Tests;
 
 /**
  * Console Mode TestCase

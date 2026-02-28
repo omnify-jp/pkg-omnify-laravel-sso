@@ -1,8 +1,8 @@
 <?php
 
-namespace Omnify\SsoClient\Database\Factories;
+namespace Omnify\Core\Database\Factories;
 
-use Omnify\SsoClient\Models\Organization;
+use Omnify\Core\Models\Organization;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 
@@ -30,5 +30,19 @@ class OrganizationFactory extends Factory
             'slug' => fake()->unique()->slug(2),
             'is_active' => fake()->boolean(),
         ];
+    }
+
+    public function standalone(): static
+    {
+        return $this->state([
+            'is_standalone' => true,
+        ]);
+    }
+
+    public function console(): static
+    {
+        return $this->state([
+            'is_standalone' => false,
+        ]);
     }
 }

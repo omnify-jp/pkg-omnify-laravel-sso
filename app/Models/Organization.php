@@ -1,10 +1,11 @@
 <?php
 
-namespace Omnify\SsoClient\Models;
+namespace Omnify\Core\Models;
 
-use Omnify\SsoClient\Models\Base\OrganizationBaseModel;
-use Omnify\SsoClient\Database\Factories\OrganizationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Omnify\Core\Database\Factories\OrganizationFactory;
+use Omnify\Core\Models\Base\OrganizationBaseModel;
+use Omnify\Core\Models\Traits\HasStandaloneScope;
 
 /**
  * Organization Model
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Organization extends OrganizationBaseModel
 {
     use HasFactory;
+    use HasStandaloneScope;
 
     /**
      * Create a new model instance.

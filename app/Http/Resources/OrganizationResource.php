@@ -6,10 +6,10 @@
  * SAFE TO EDIT - This file is never overwritten by Omnify.
  */
 
-namespace Omnify\SsoClient\Http\Resources;
+namespace Omnify\Core\Http\Resources;
 
 use Illuminate\Http\Request;
-use Omnify\SsoClient\Http\Resources\OmnifyBase\OrganizationResourceBase;
+use Omnify\Core\Http\Resources\OmnifyBase\OrganizationResourceBase;
 
 class OrganizationResource extends OrganizationResourceBase
 {

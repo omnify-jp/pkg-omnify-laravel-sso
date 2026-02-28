@@ -10,7 +10,7 @@
 ## Step 1: Install via Composer
 
 ```bash
-composer require omnifyjp/pkg-omnify-laravel-sso
+composer require omnifyjp/pkg-omnify-laravel-core
 ```
 
 Laravel auto-discovers the service provider. No manual registration needed.
@@ -69,7 +69,7 @@ Your `app/Models/User.php` must extend the package's User:
 
 namespace App\Models;
 
-use Omnify\SsoClient\Models\User as SsoUser;
+use Omnify\Core\Models\User as SsoUser;
 
 class User extends SsoUser
 {
@@ -84,9 +84,9 @@ In `bootstrap/app.php`:
 ```php
 ->withMiddleware(function (Middleware $middleware) {
     $middleware->alias([
-        'sso.auth'         => \Omnify\SsoClient\Http\Middleware\SsoRoleCheck::class,
-        'sso.organization' => \Omnify\SsoClient\Http\Middleware\SsoOrganizationAccess::class,
-        'sso.role'         => \Omnify\SsoClient\Http\Middleware\SsoRoleCheck::class,
+        'sso.auth'         => \Omnify\Core\Http\Middleware\SsoRoleCheck::class,
+        'sso.organization' => \Omnify\Core\Http\Middleware\SsoOrganizationAccess::class,
+        'sso.role'         => \Omnify\Core\Http\Middleware\SsoRoleCheck::class,
     ]);
 })
 ```
@@ -96,7 +96,7 @@ In `bootstrap/app.php`:
 **Standalone mode** — seed a full demo org:
 
 ```bash
-php artisan db:seed --class=\\Omnify\\SsoClient\\Database\\Seeders\\SsoStandaloneSeeder
+php artisan db:seed --class=\\Omnify\\Core\\Database\\Seeders\\SsoStandaloneSeeder
 ```
 
 **Console mode** — bulk import from Console:

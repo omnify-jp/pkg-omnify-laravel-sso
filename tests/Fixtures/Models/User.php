@@ -1,8 +1,8 @@
 <?php
 
-namespace Omnify\SsoClient\Tests\Fixtures\Models;
+namespace Omnify\Core\Tests\Fixtures\Models;
 
-use Omnify\SsoClient\Models\User as SsoUser;
+use Omnify\Core\Models\User as SsoUser;
 
 /**
  * テスト用Userモデル

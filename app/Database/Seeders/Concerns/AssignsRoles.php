@@ -1,10 +1,10 @@
 <?php
 
-namespace Omnify\SsoClient\Database\Seeders\Concerns;
+namespace Omnify\Core\Database\Seeders\Concerns;
 
 use Illuminate\Support\Facades\DB;
-use Omnify\SsoClient\Models\Role;
-use Omnify\SsoClient\Models\User;
+use Omnify\Core\Models\Role;
+use Omnify\Core\Models\User;
 
 /**
  * Trait for assigning roles to users with scope support.
@@ -41,8 +41,8 @@ use Omnify\SsoClient\Models\User;
  * }
  * ```
  *
- * @see \Omnify\SsoClient\Database\Seeders\Concerns\FetchesConsoleData
- * @see \Omnify\SsoClient\Database\Seeders\SsoRolesSeeder
+ * @see \Omnify\Core\Database\Seeders\Concerns\FetchesConsoleData
+ * @see \Omnify\Core\Database\Seeders\SsoRolesSeeder
  */
 trait AssignsRoles
 {

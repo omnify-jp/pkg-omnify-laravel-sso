@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnify\SsoClient\Database\Seeders\Concerns;
+namespace Omnify\Core\Database\Seeders\Concerns;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -35,8 +35,8 @@ use Illuminate\Support\Facades\Http;
  * }
  * ```
  *
- * @see \Omnify\SsoClient\Database\Seeders\Concerns\AssignsRoles
- * @see \Omnify\SsoClient\Database\Seeders\SsoRolesSeeder
+ * @see \Omnify\Core\Database\Seeders\Concerns\AssignsRoles
+ * @see \Omnify\Core\Database\Seeders\SsoRolesSeeder
  */
 trait FetchesConsoleData
 {

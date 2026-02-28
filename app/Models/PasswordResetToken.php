@@ -1,9 +1,9 @@
 <?php
 
-namespace Omnify\SsoClient\Models;
+namespace Omnify\Core\Models;
 
-use Omnify\SsoClient\Models\Base\PasswordResetTokenBaseModel;
-use Omnify\SsoClient\Database\Factories\PasswordResetTokenFactory;
+use Omnify\Core\Models\Base\PasswordResetTokenBaseModel;
+use Omnify\Core\Database\Factories\PasswordResetTokenFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**

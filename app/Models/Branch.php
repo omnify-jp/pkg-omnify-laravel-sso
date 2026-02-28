@@ -1,11 +1,13 @@
 <?php
 
-namespace Omnify\SsoClient\Models;
+namespace Omnify\Core\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Omnify\SsoClient\Database\Factories\BranchFactory;
-use Omnify\SsoClient\Models\Base\BranchBaseModel;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Omnify\Core\Database\Factories\BranchFactory;
+use Omnify\Core\Models\Base\BranchBaseModel;
+use Omnify\Core\Models\Traits\HasStandaloneScope;
 
 /**
  * Branch Model
@@ -16,6 +18,7 @@ use Omnify\SsoClient\Models\Base\BranchBaseModel;
 class Branch extends BranchBaseModel
 {
     use HasFactory;
+    use HasStandaloneScope;
 
     protected static function newFactory(): BranchFactory
     {
@@ -28,5 +31,21 @@ class Branch extends BranchBaseModel
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class, 'console_organization_id', 'console_organization_id');
+    }
+
+    /**
+     * Get the brand this branch belongs to.
+     */
+    public function brand(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class, 'console_brand_id', 'console_brand_id');
+    }
+
+    /**
+     * Get the locations for this branch.
+     */
+    public function locations(): HasMany
+    {
+        return $this->hasMany(Location::class, 'console_branch_id', 'console_branch_id');
     }
 }

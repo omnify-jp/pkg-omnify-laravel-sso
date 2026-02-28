@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Log;
-use Omnify\SsoClient\Support\SsoLogger;
+use Omnify\Core\Support\SsoLogger;
 
 beforeEach(function () {
     config(['omnify-auth.logging.enabled' => true]);

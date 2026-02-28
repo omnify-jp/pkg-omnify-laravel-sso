@@ -57,7 +57,7 @@ sso_log()->error('Critical issue', ['details' => $error]);
 ### Via Dependency Injection
 
 ```php
-use Omnify\SsoClient\Support\SsoLogger;
+use Omnify\Core\Support\SsoLogger;
 
 class MyController extends Controller
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Enums;
+namespace Omnify\Core\Enums;
 
 /**
  * Scope type for role assignments and permissions.

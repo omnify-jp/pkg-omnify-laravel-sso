@@ -8,7 +8,7 @@
  */
 
 use Illuminate\Support\Facades\Auth;
-use Omnify\SsoClient\Tests\Fixtures\Models\User;
+use Omnify\Core\Tests\Fixtures\Models\User;
 
 beforeEach(function () {
     // Register a dashboard route for redirect after successful login

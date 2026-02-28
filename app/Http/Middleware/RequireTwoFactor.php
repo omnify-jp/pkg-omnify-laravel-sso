@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Http\Middleware;
+namespace Omnify\Core\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;

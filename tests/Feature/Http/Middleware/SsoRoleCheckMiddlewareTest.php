@@ -10,10 +10,10 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Omnify\SsoClient\Models\Branch;
-use Omnify\SsoClient\Models\Role;
-use Omnify\SsoClient\Models\User;
-use Omnify\SsoClient\Services\OrganizationAccessService;
+use Omnify\Core\Models\Branch;
+use Omnify\Core\Models\Role;
+use Omnify\Core\Models\User;
+use Omnify\Core\Services\OrganizationAccessService;
 
 beforeEach(function () {
     // Fixed UUIDs for testing
@@ -34,14 +34,14 @@ beforeEach(function () {
     Role::create(['name' => 'Member', 'slug' => 'member', 'level' => 10]);
 
     // Create branches for testing
-    \Omnify\SsoClient\Models\Branch::create([
+    \Omnify\Core\Models\Branch::create([
         'console_branch_id' => $this->tokyoBranchId,
         'console_organization_id' => $this->organizationId,
         'slug' => 'TKY',
         'name' => 'Tokyo Branch',
         'is_headquarters' => true,
     ]);
-    \Omnify\SsoClient\Models\Branch::create([
+    \Omnify\Core\Models\Branch::create([
         'console_branch_id' => $this->osakaBranchId,
         'console_organization_id' => $this->organizationId,
         'slug' => 'OSK',
@@ -63,13 +63,13 @@ beforeEach(function () {
     $this->app->instance(OrganizationAccessService::class, $organizationAccessService);
 
     // Test routes requiring different role levels
-    Route::middleware(['sso.auth', 'sso.organization', 'sso.role:admin'])
+    Route::middleware(['core.auth', 'core.organization', 'core.role:admin'])
         ->get('/test-admin-only', fn () => response()->json(['message' => 'admin access granted']));
 
-    Route::middleware(['sso.auth', 'sso.organization', 'sso.role:manager'])
+    Route::middleware(['core.auth', 'core.organization', 'core.role:manager'])
         ->get('/test-manager-only', fn () => response()->json(['message' => 'manager access granted']));
 
-    Route::middleware(['sso.auth', 'sso.organization', 'sso.role:member'])
+    Route::middleware(['core.auth', 'core.organization', 'core.role:member'])
         ->get('/test-member-only', fn () => response()->json(['message' => 'member access granted']));
 });
 
@@ -77,7 +77,7 @@ beforeEach(function () {
 // Basic Role Check Tests - 基本的なロールチェックテスト
 // =============================================================================
 
-test('sso.role:admin rejects users without any role', function () {
+test('core.role:admin rejects users without any role', function () {
     $user = User::factory()->create();
     // No roles assigned
 
@@ -93,7 +93,7 @@ test('sso.role:admin rejects users without any role', function () {
         ]);
 });
 
-test('sso.role:admin rejects member role users', function () {
+test('core.role:admin rejects member role users', function () {
     $user = User::factory()->create();
     $user->assignRole('member'); // Global member role
 
@@ -109,7 +109,7 @@ test('sso.role:admin rejects member role users', function () {
         ]);
 });
 
-test('sso.role:admin rejects manager role users', function () {
+test('core.role:admin rejects manager role users', function () {
     $user = User::factory()->create();
     $user->assignRole('manager'); // Global manager role
 
@@ -125,7 +125,7 @@ test('sso.role:admin rejects manager role users', function () {
         ]);
 });
 
-test('sso.role:admin allows admin role users', function () {
+test('core.role:admin allows admin role users', function () {
     $user = User::factory()->create();
     $user->assignRole('admin'); // Global admin role
 
@@ -137,7 +137,7 @@ test('sso.role:admin allows admin role users', function () {
         ->assertJson(['message' => 'admin access granted']);
 });
 
-test('sso.role:manager allows manager role users', function () {
+test('core.role:manager allows manager role users', function () {
     $user = User::factory()->create();
     $user->assignRole('manager');
 
@@ -149,7 +149,7 @@ test('sso.role:manager allows manager role users', function () {
         ->assertJson(['message' => 'manager access granted']);
 });
 
-test('sso.role:manager allows admin role users (higher role)', function () {
+test('core.role:manager allows admin role users (higher role)', function () {
     $user = User::factory()->create();
     $user->assignRole('admin');
 
@@ -161,7 +161,7 @@ test('sso.role:manager allows admin role users (higher role)', function () {
         ->assertJson(['message' => 'manager access granted']);
 });
 
-test('sso.role:member allows all authenticated users with role', function () {
+test('core.role:member allows all authenticated users with role', function () {
     $user = User::factory()->create();
     $user->assignRole('member');
 

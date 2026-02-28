@@ -1,4 +1,77 @@
 {
+  "common": {
+    "back": "Quay lại",
+    "next": "Tiếp",
+    "select": "Chọn",
+    "cancel": "Hủy",
+    "save": "Lưu thay đổi",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "view": "Xem",
+    "search": "Tìm kiếm",
+    "assign": "Gán",
+    "active": "Hoạt động",
+    "inactive": "Không hoạt động",
+    "actions": "Thao tác",
+    "yes": "Có",
+    "no": "Không",
+    "all": "Tất cả",
+    "optional": "tùy chọn",
+    "previous": "Trước",
+    "from": "Từ",
+    "to": "Đến",
+    "filters": "Bộ lọc",
+    "advancedFilters": "Bộ lọc nâng cao",
+    "createdFrom": "Tạo từ ngày",
+    "createdTo": "Tạo đến ngày",
+    "or": "hoặc",
+    "email": "Địa chỉ Email",
+    "password": "Mật khẩu",
+    "logout": "Đăng Xuất",
+    "navigation": "Điều hướng",
+    "submittedFrom": "Gửi từ ngày",
+    "submittedTo": "Gửi đến ngày",
+    "dateLocale": "vi-VN"
+  },
+  "validation": {
+    "required": "Trường này là bắt buộc.",
+    "slug": "Chỉ cho phép chữ thường, số và dấu gạch ngang."
+  },
+  "sso": {
+    "org": {
+      "noOrgSelected": "Chọn tổ chức",
+      "selectOrg": "Chọn tổ chức",
+      "selectBranch": "Chọn chi nhánh",
+      "selectOrgDesc": "Chọn tổ chức bạn muốn làm việc",
+      "selectBranchDesc": "Chọn chi nhánh trong tổ chức",
+      "orgStep": "Tổ chức",
+      "branchStep": "Chi nhánh",
+      "branchCount": "{{count}} chi nhánh",
+      "selectedOrg": "Tổ chức đã chọn",
+      "searchBranch": "Tìm chi nhánh...",
+      "noBranchFound": "Không tìm thấy chi nhánh"
+    },
+    "login": {
+      "pageTitle": "Đăng nhập",
+      "title": "Đăng nhập SSO",
+      "description": "Đăng nhập bằng tài khoản tổ chức",
+      "secureAuth": "Xác thực an toàn",
+      "secureAuthDescription": "Bạn sẽ được chuyển hướng đến Omnify Console để đăng nhập an toàn. Sau khi xác thực, bạn sẽ được quay lại ứng dụng này.",
+      "redirecting": "Đang chuyển hướng...",
+      "submit": "Đăng nhập bằng Console SSO"
+    },
+    "callback": {
+      "pageTitle": "Đang xác thực...",
+      "processing": "Đang xác thực...",
+      "processingDescription": "Vui lòng đợi trong khi chúng tôi xác minh danh tính của bạn.",
+      "success": "Xác thực thành công",
+      "successDescription": "Đang chuyển hướng đến bảng điều khiển...",
+      "error": "Xác thực thất bại",
+      "tryAgain": "Thử lại",
+      "noCode": "Không nhận được mã xác thực.",
+      "unknownError": "Đã xảy ra lỗi không mong muốn."
+    }
+  },
   "iam": {
     "title": "IAM",
     "subtitle": "Quản lý người dùng, vai trò và quyền hạn trong tổ chức.",

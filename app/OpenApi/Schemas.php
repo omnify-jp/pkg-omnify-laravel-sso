@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\OpenApi;
+namespace Omnify\Core\OpenApi;
 
 use OpenApi\Attributes as OA;
 

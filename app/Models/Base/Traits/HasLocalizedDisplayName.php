@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnify\SsoClient\Models\Base\Traits;
+namespace Omnify\Core\Models\Base\Traits;
 
 /**
  * Trait for localized display names.

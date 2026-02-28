@@ -110,7 +110,7 @@ $user->assignRole($staffRole, $organizationId, $osakaBranchId);
 Roles are **global templates** - they are defined once and reused across all orgs/branches.
 
 ```php
-use Omnify\SsoClient\Models\Role;
+use Omnify\Core\Models\Role;
 
 // Create a role (global template)
 $role = Role::create([
@@ -132,7 +132,7 @@ $permissions = $role->permissions;
 ### Permission
 
 ```php
-use Omnify\SsoClient\Models\Permission;
+use Omnify\Core\Models\Permission;
 
 // Create a permission
 $permission = Permission::create([
@@ -327,8 +327,8 @@ $this->authorize('users.update', $user);
 Team permissions work the same as before, providing organization-level permissions via Console:
 
 ```php
-use Omnify\SsoClient\Models\Team;
-use Omnify\SsoClient\Models\TeamPermission;
+use Omnify\Core\Models\Team;
+use Omnify\Core\Models\TeamPermission;
 
 // Create team
 $team = Team::create([

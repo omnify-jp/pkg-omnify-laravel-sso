@@ -13,12 +13,12 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
-use Omnify\SsoClient\Database\Factories\BranchFactory;
-use Omnify\SsoClient\Database\Factories\OrganizationFactory;
-use Omnify\SsoClient\Database\Factories\RoleFactory;
-use Omnify\SsoClient\Http\Middleware\ShareSsoData;
-use Omnify\SsoClient\Models\Organization;
-use Omnify\SsoClient\Models\User;
+use Omnify\Core\Database\Factories\BranchFactory;
+use Omnify\Core\Database\Factories\OrganizationFactory;
+use Omnify\Core\Database\Factories\RoleFactory;
+use Omnify\Core\Http\Middleware\ShareSsoData;
+use Omnify\Core\Models\Organization;
+use Omnify\Core\Models\User;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

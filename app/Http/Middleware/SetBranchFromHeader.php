@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Http\Middleware;
+namespace Omnify\Core\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Omnify\SsoClient\Models\Branch;
+use Omnify\Core\Models\Branch;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @example
  * // In bootstrap/app.php
- * $middleware->append(\Omnify\SsoClient\Http\Middleware\SetBranchFromHeader::class);
+ * $middleware->append(\Omnify\Core\Http\Middleware\SetBranchFromHeader::class);
  *
  * // In controller
  * $branch = $request->attributes->get('branch');

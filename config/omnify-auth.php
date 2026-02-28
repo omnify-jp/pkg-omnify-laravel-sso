@@ -108,14 +108,14 @@ return [
         'admin_middleware' => [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'api',
-            'sso.auth',
-            'sso.organization',
-            'sso.role:admin',
+            'core.auth',
+            'core.organization',
+            'core.role:admin',
         ],
         'access_enabled' => env('SSO_ACCESS_ROUTES_ENABLED', true),
         'access_prefix' => env('SSO_ACCESS_PREFIX', 'admin/iam'),
         // null = auto-detect theo mode:
-        //   console    → ['web', 'sso.auth']  (Console SSO authentication)
+        //   console    → ['web', 'core.auth']  (Console SSO authentication)
         //   standalone → ['web', 'auth']       (standard Laravel session auth)
         'access_middleware' => null,
         'access_pages_path' => env('SSO_ACCESS_PAGES_PATH', 'admin/iam'),

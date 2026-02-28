@@ -1,11 +1,9 @@
-import {
-    Button, Card, CardContent, CardHeader,
-    CardTitle, Label, Select, SelectContent,
-    SelectItem, SelectTrigger, SelectValue,
-} from '@omnifyjp/ui';
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import { useIamLayout } from '@omnify-core/contexts/iam-layout-context';
+import { useFormMutation } from '@omnify-core/hooks';
+import { api } from '@omnify-core/services/api';
+import { Button, Card, Col, Flex, Form, Radio, Row, Select, Space, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useIamLayout } from '@omnify-sso/contexts/iam-layout-context';
 
 import { IamBreadcrumb } from '../../../components/access/iam-breadcrumb';
 import type { IamBranch, IamOrganization, IamRole, IamUser, ScopeType } from '../../../types/iam';
@@ -17,6 +15,14 @@ type Props = {
     branches: IamBranch[];
     default_scope?: ScopeType;
     default_scope_id?: string | null;
+};
+
+type AssignmentFormData = {
+    user_id: string;
+    role_id: string;
+    scope_type: ScopeType;
+    organization_id: string;
+    branch_id: string;
 };
 
 const SCOPE_OPTIONS: { value: ScopeType; label: string }[] = [
@@ -35,43 +41,23 @@ export default function IamAssignmentCreate({
 }: Props) {
     const Layout = useIamLayout();
     const { t } = useTranslation();
+    const [form] = Form.useForm<AssignmentFormData>();
+    const scopeType = Form.useWatch('scope_type', form);
 
-    const { data, setData, post, processing, errors } = useForm<{
-        user_id: string;
-        role_id: string;
-        scope_type: ScopeType;
-        organization_id: string;
-        branch_id: string;
-    }>({
-        user_id: '',
-        role_id: '',
-        scope_type: default_scope,
-        organization_id: default_scope === 'org-wide' ? (default_scope_id ?? '') : '',
-        branch_id: default_scope === 'branch' ? (default_scope_id ?? '') : '',
+    const mutation = useFormMutation({
+        form,
+        mutationFn: (data: AssignmentFormData) => api.post('/admin/iam/assignments', data),
+        redirectTo: '/admin/iam/assignments',
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post('/admin/iam/assignments');
-    };
-
     const scopeEntities = () => {
-        if (data.scope_type === 'org-wide') {
+        if (scopeType === 'org-wide') {
             return organizations.map((o) => ({ id: o.id, name: o.name }));
         }
-        if (data.scope_type === 'branch') {
+        if (scopeType === 'branch') {
             return branches.map((b) => ({ id: b.id, name: b.name }));
         }
         return [];
-    };
-
-    const handleScopeTypeChange = (value: string) => {
-        setData({
-            ...data,
-            scope_type: value as ScopeType,
-            organization_id: '',
-            branch_id: '',
-        });
     };
 
     return (
@@ -87,19 +73,19 @@ export default function IamAssignmentCreate({
         >
             <Head title={t('iam.createAssignment', 'Create Assignment')} />
 
-            <div className="space-y-section">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-page-title font-semibold">
+            <Flex vertical gap={24}>
+                <Flex justify="space-between" align="center">
+                    <Flex vertical>
+                        <Typography.Title level={4}>
                             {t('iam.createAssignment', 'Create Assignment')}
-                        </h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
+                        </Typography.Title>
+                        <Typography.Text type="secondary">
                             {t(
                                 'iam.createAssignmentSubtitle',
                                 'Assign a role to a user at a specific scope.',
                             )}
-                        </p>
-                    </div>
+                        </Typography.Text>
+                    </Flex>
                     <IamBreadcrumb
                         segments={[
                             {
@@ -109,175 +95,123 @@ export default function IamAssignmentCreate({
                             { label: t('iam.createAssignment', 'Create Assignment') },
                         ]}
                     />
-                </div>
+                </Flex>
 
-                <form onSubmit={handleSubmit} className="max-w-2xl space-y-section">
-                    {/* User & Role */}
-                    <Card>
-                        <CardHeader className="px-card pb-3 pt-card">
-                            <CardTitle className="text-base">
-                                {t('iam.userAndRole', 'User & Role')}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4 px-card pb-card">
-                            <div className="space-y-2">
-                                <Label>{t('iam.selectUser', 'Select User')}</Label>
-                                <Select
-                                    value={data.user_id}
-                                    onValueChange={(v) => setData('user_id', v)}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue
-                                            placeholder={t('iam.selectUser', 'Select User')}
-                                        />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {users.map((user) => (
-                                            <SelectItem key={user.id} value={user.id}>
-                                                {user.name}{' '}
-                                                <span className="text-muted-foreground">
-                                                    ({user.email})
-                                                </span>
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {errors.user_id && (
-                                    <p className="text-sm text-destructive">{errors.user_id}</p>
-                                )}
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label>{t('iam.selectRole', 'Select Role')}</Label>
-                                <Select
-                                    value={data.role_id}
-                                    onValueChange={(v) => setData('role_id', v)}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue
-                                            placeholder={t('iam.selectRole', 'Select Role')}
-                                        />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {roles.map((role) => (
-                                            <SelectItem key={role.id} value={role.id}>
-                                                <span className="flex items-center gap-2">
-                                                    <span className="text-xs text-muted-foreground">
-                                                        Lv.{role.level}
-                                                    </span>
-                                                    {role.name}
-                                                </span>
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {errors.role_id && (
-                                    <p className="text-sm text-destructive">{errors.role_id}</p>
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Scope */}
-                    <Card>
-                        <CardHeader className="px-card pb-3 pt-card">
-                            <CardTitle className="text-base">
-                                {t('iam.scopeType', 'Scope')}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4 px-card pb-card">
-                            <div className="space-y-2">
-                                <Label>{t('iam.scopeType', 'Scope Type')}</Label>
-                                <div className="grid grid-cols-3 gap-3">
-                                    {SCOPE_OPTIONS.map((opt) => (
-                                        <label
-                                            key={opt.value}
-                                            className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-accent ${
-                                                data.scope_type === opt.value
-                                                    ? 'border-primary bg-primary/5'
-                                                    : 'border-border'
-                                            }`}
+                <Form
+                    form={form}
+                    layout="vertical"
+                    initialValues={{
+                        user_id: undefined,
+                        role_id: undefined,
+                        scope_type: default_scope,
+                        organization_id: default_scope === 'org-wide' ? (default_scope_id ?? undefined) : undefined,
+                        branch_id: default_scope === 'branch' ? (default_scope_id ?? undefined) : undefined,
+                    }}
+                    onValuesChange={(changedValues) => {
+                        if ('scope_type' in changedValues) {
+                            form.setFieldsValue({ organization_id: undefined, branch_id: undefined });
+                        }
+                    }}
+                    onFinish={(values) => mutation.mutate(values)}
+                >
+                    <Row>
+                        <Col xs={24} lg={16}>
+                            <Flex vertical gap={24}>
+                                <Card title={t('iam.userAndRole', 'User & Role')}>
+                                    <Flex vertical gap={16}>
+                                        <Form.Item
+                                            name="user_id"
+                                            label={t('iam.selectUser', 'Select User')}
                                         >
-                                            <input
-                                                type="radio"
-                                                name="scope_type"
-                                                value={opt.value}
-                                                checked={data.scope_type === opt.value}
-                                                onChange={() => handleScopeTypeChange(opt.value)}
-                                                className="accent-primary"
+                                            <Select
+                                                placeholder={t('iam.selectUser', 'Select User')}
+                                                options={users.map((user) => ({
+                                                    value: user.id,
+                                                    label: `${user.name} (${user.email})`,
+                                                }))}
                                             />
-                                            <span className="text-sm font-medium">
-                                                {opt.label}
-                                            </span>
-                                        </label>
-                                    ))}
-                                </div>
-                                {errors.scope_type && (
-                                    <p className="text-sm text-destructive">{errors.scope_type}</p>
-                                )}
-                            </div>
+                                        </Form.Item>
 
-                            {data.scope_type !== 'global' && (
-                                <div className="space-y-2">
-                                    <Label>
-                                        {data.scope_type === 'org-wide'
-                                            ? t('iam.selectOrganization', 'Select Organization')
-                                            : t('iam.selectBranch', 'Select Branch')}
-                                    </Label>
-                                    <Select
-                                        value={
-                                            data.scope_type === 'org-wide'
-                                                ? data.organization_id
-                                                : data.branch_id
-                                        }
-                                        onValueChange={(v) => {
-                                            if (data.scope_type === 'org-wide') {
-                                                setData('organization_id', v);
-                                            } else {
-                                                setData('branch_id', v);
-                                            }
-                                        }}
+                                        <Form.Item
+                                            name="role_id"
+                                            label={t('iam.selectRole', 'Select Role')}
+                                        >
+                                            <Select
+                                                placeholder={t('iam.selectRole', 'Select Role')}
+                                                options={roles.map((role) => ({
+                                                    value: role.id,
+                                                    label: `Lv.${role.level} ${role.name}`,
+                                                }))}
+                                            />
+                                        </Form.Item>
+                                    </Flex>
+                                </Card>
+
+                                <Card title={t('iam.scopeType', 'Scope')}>
+                                    <Flex vertical gap={16}>
+                                        <Form.Item
+                                            name="scope_type"
+                                            label={t('iam.scopeType', 'Scope Type')}
+                                        >
+                                            <Radio.Group>
+                                                <Space direction="horizontal" size="middle">
+                                                    {SCOPE_OPTIONS.map((opt) => (
+                                                        <Radio key={opt.value} value={opt.value}>
+                                                            {opt.label}
+                                                        </Radio>
+                                                    ))}
+                                                </Space>
+                                            </Radio.Group>
+                                        </Form.Item>
+
+                                        {scopeType === 'org-wide' && (
+                                            <Form.Item
+                                                name="organization_id"
+                                                label={t('iam.selectOrganization', 'Select Organization')}
+                                            >
+                                                <Select
+                                                    placeholder={t('iam.selectScopeEntity', 'Select\u2026')}
+                                                    options={scopeEntities().map((entity) => ({
+                                                        value: entity.id,
+                                                        label: entity.name,
+                                                    }))}
+                                                />
+                                            </Form.Item>
+                                        )}
+
+                                        {scopeType === 'branch' && (
+                                            <Form.Item
+                                                name="branch_id"
+                                                label={t('iam.selectBranch', 'Select Branch')}
+                                            >
+                                                <Select
+                                                    placeholder={t('iam.selectScopeEntity', 'Select\u2026')}
+                                                    options={scopeEntities().map((entity) => ({
+                                                        value: entity.id,
+                                                        label: entity.name,
+                                                    }))}
+                                                />
+                                            </Form.Item>
+                                        )}
+                                    </Flex>
+                                </Card>
+
+                                <Flex justify="end" gap={8}>
+                                    <Button
+                                        type="default"
+                                        onClick={() => window.history.back()}
                                     >
-                                        <SelectTrigger>
-                                            <SelectValue
-                                                placeholder={t(
-                                                    'iam.selectScopeEntity',
-                                                    'Select…',
-                                                )}
-                                            />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {scopeEntities().map((entity) => (
-                                                <SelectItem key={entity.id} value={entity.id}>
-                                                    {entity.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {(errors.organization_id || errors.branch_id) && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.organization_id || errors.branch_id}
-                                        </p>
-                                    )}
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                    <div className="flex justify-end gap-2">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => window.history.back()}
-                        >
-                            {t('iam.cancel', 'Cancel')}
-                        </Button>
-                        <Button type="submit" disabled={processing}>
-                            {t('iam.save', 'Save')}
-                        </Button>
-                    </div>
-                </form>
-            </div>
+                                        {t('iam.cancel', 'Cancel')}
+                                    </Button>
+                                    <Button type="primary" htmlType="submit" loading={mutation.isPending}>
+                                        {t('iam.save', 'Save')}
+                                    </Button>
+                                </Flex>
+                            </Flex>
+                        </Col>
+                    </Row>
+                </Form>
+            </Flex>
         </Layout>
     );
 }

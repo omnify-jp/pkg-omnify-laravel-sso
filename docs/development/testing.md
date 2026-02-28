@@ -45,9 +45,9 @@ cd packages/omnify-sso-client
 namespace Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-use Omnify\SsoClient\Models\User;
-use Omnify\SsoClient\Models\Role;
-use Omnify\SsoClient\Models\Permission;
+use Omnify\Core\Models\User;
+use Omnify\Core\Models\Role;
+use Omnify\Core\Models\Permission;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -88,9 +88,9 @@ abstract class TestCase extends BaseTestCase
 <?php
 // tests/Feature/AuthenticationTest.php
 
-use Omnify\SsoClient\Models\User;
-use Omnify\SsoClient\Services\ConsoleApiService;
-use Omnify\SsoClient\Services\JwtVerifier;
+use Omnify\Core\Models\User;
+use Omnify\Core\Services\ConsoleApiService;
+use Omnify\Core\Services\JwtVerifier;
 
 test('user can authenticate via SSO', function () {
     // Mock Console API
@@ -157,9 +157,9 @@ test('unauthenticated user cannot access protected routes', function () {
 <?php
 // tests/Feature/AuthorizationTest.php
 
-use Omnify\SsoClient\Models\User;
-use Omnify\SsoClient\Models\Role;
-use Omnify\SsoClient\Models\Permission;
+use Omnify\Core\Models\User;
+use Omnify\Core\Models\Role;
+use Omnify\Core\Models\Permission;
 
 test('user with permission can access resource', function () {
     $user = $this->createUserWithPermissions(['users.view']);
@@ -247,9 +247,9 @@ test('user has all permissions', function () {
 <?php
 // tests/Unit/FactoryTest.php
 
-use Omnify\SsoClient\Models\User;
-use Omnify\SsoClient\Models\Role;
-use Omnify\SsoClient\Models\Permission;
+use Omnify\Core\Models\User;
+use Omnify\Core\Models\Role;
+use Omnify\Core\Models\Permission;
 
 test('user factory creates valid user', function () {
     $user = User::factory()->create();
@@ -287,7 +287,7 @@ test('permission factory creates valid permission', function () {
 <?php
 // tests/Feature/MiddlewareTest.php
 
-use Omnify\SsoClient\Models\User;
+use Omnify\Core\Models\User;
 
 test('sso.auth middleware rejects unauthenticated', function () {
     $this->getJson('/api/protected-route')

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Http\Middleware;
+namespace Omnify\Core\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Omnify\SsoClient\Models\Branch;
-use Omnify\SsoClient\Models\Organization;
+use Omnify\Core\Models\Branch;
+use Omnify\Core\Models\Organization;
 use Symfony\Component\HttpFoundation\Response;
 
 /**

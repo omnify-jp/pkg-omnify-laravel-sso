@@ -1,8 +1,5 @@
-import {
-    Button, Dialog, DialogContent, DialogDescription,
-    DialogHeader, DialogTitle, Input,
-} from '@omnifyjp/ui';
 import { router } from '@inertiajs/react';
+import { Avatar, Button, Card, Empty, Flex, Input, Modal, Steps, Typography } from 'antd';
 import { ArrowLeftRight, ArrowRight, Building2, Check, MapPin, Search } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,6 +39,38 @@ function getOrgInitials(name: string): string {
         return (parts[0][0] + parts[1][0]).toUpperCase();
     }
     return name.slice(0, 2).toUpperCase();
+}
+
+function SelectableItem({
+    avatar,
+    title,
+    description,
+    selected,
+    onClick,
+}: {
+    avatar: React.ReactNode;
+    title: string;
+    description?: string;
+    selected: boolean;
+    onClick: () => void;
+}) {
+    return (
+        <Card
+            hoverable
+            size="small"
+            onClick={onClick}
+            style={selected ? { borderColor: 'var(--ant-color-primary)', background: 'var(--ant-color-primary-bg)' } : undefined}
+        >
+            <Flex align="center" gap={12}>
+                {avatar}
+                <Flex vertical flex={1}>
+                    <Typography.Text strong>{title}</Typography.Text>
+                    {description && <Typography.Text type="secondary">{description}</Typography.Text>}
+                </Flex>
+                {selected && <Check size={16} color="var(--ant-color-primary)" />}
+            </Flex>
+        </Card>
+    );
 }
 
 export function OrganizationSwitcher({
@@ -111,7 +140,9 @@ export function OrganizationSwitcher({
 
     const availableBranches = tempOrgId ? getBranchesByOrg(tempOrgId) : [];
     const filteredBranches = availableBranches.filter(
-        (b) => b.name.toLowerCase().includes(branchSearch.toLowerCase()) || b.location?.toLowerCase().includes(branchSearch.toLowerCase()),
+        (b) =>
+            b.name.toLowerCase().includes(branchSearch.toLowerCase()) ||
+            b.location?.toLowerCase().includes(branchSearch.toLowerCase()),
     );
 
     if (organizations.length === 0) {
@@ -122,172 +153,160 @@ export function OrganizationSwitcher({
 
     return (
         <>
-            <Button variant="outline" onClick={handleOpen} className="gap-2 px-3">
-                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-primary text-[10px] font-bold text-primary-foreground">
-                    {current ? getOrgInitials(current.name) : <Building2 className="h-3 w-3" />}
-                </div>
-                <div className="flex min-w-0 items-center gap-1.5">
-                    <span className="max-w-[120px] truncate text-sm font-medium">{current?.name ?? t('sso.org.noOrgSelected', 'Select organization')}</span>
-                    {requireBranch && currentBranch && (
-                        <>
-                            <span className="text-muted-foreground">/</span>
-                            <span className="max-w-[100px] truncate text-sm text-muted-foreground">{currentBranch.name}</span>
-                        </>
-                    )}
-                </div>
-                {organizations.length > 1 && <ArrowLeftRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
+            {/* Trigger */}
+            <Button type="text" onClick={handleOpen} style={{ height: 'auto', padding: '4px 8px', justifyContent: 'flex-start' }}>
+                <Flex align="center" gap={8}>
+                    <Avatar size={26} shape="square">
+                        {current ? getOrgInitials(current.name) : <Building2 size={14} />}
+                    </Avatar>
+                    <Flex vertical style={{ textAlign: 'left' }}>
+                        <Typography.Text strong>
+                            {current?.name ?? t('sso.org.noOrgSelected', 'Select organization')}
+                        </Typography.Text>
+                        {requireBranch && currentBranch && (
+                            <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                                {currentBranch.name}
+                            </Typography.Text>
+                        )}
+                    </Flex>
+                    {organizations.length > 1 && <ArrowLeftRight size={14} />}
+                </Flex>
             </Button>
 
-            <Dialog open={showModal} onOpenChange={setShowModal}>
-                <DialogContent className="sm:max-w-[520px]">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-semibold">
-                            {step === 'organization' ? t('sso.org.selectOrg', 'Select organization') : t('sso.org.selectBranch', 'Select branch')}
-                        </DialogTitle>
-                        <DialogDescription className="text-sm">
-                            {step === 'organization'
-                                ? t('sso.org.selectOrgDesc', 'Choose the organization you want to work with')
-                                : t('sso.org.selectBranchDesc', 'Choose a branch within the organization')}
-                        </DialogDescription>
-                    </DialogHeader>
+            {/* Modal */}
+            <Modal
+                open={showModal}
+                onCancel={() => setShowModal(false)}
+                title={
+                    step === 'organization'
+                        ? t('sso.org.selectOrg', 'Select organization')
+                        : t('sso.org.selectBranch', 'Select branch')
+                }
+                footer={null}
+                width={520}
+            >
+                <Flex vertical gap={16}>
+                    <Typography.Text type="secondary">
+                        {step === 'organization'
+                            ? t('sso.org.selectOrgDesc', 'Choose the organization you want to work with')
+                            : t('sso.org.selectBranchDesc', 'Choose a branch within the organization')}
+                    </Typography.Text>
 
-                    <div className="mt-4">
-                        {requireBranch && (
-                            <div className="mb-6 flex items-center gap-2">
-                                <div
-                                    className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium ${
-                                        step === 'organization' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
-                                    }`}
-                                >
-                                    <Building2 className="h-4 w-4" />
-                                    {t('sso.org.orgStep', 'Organization')}
-                                </div>
-                                <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                                <div
-                                    className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium ${
-                                        step === 'branch' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
-                                    }`}
-                                >
-                                    <MapPin className="h-4 w-4" />
-                                    {t('sso.org.branchStep', 'Branch')}
-                                </div>
-                            </div>
-                        )}
+                    {/* Step indicator */}
+                    {requireBranch && (
+                        <Steps
+                            size="small"
+                            current={step === 'organization' ? 0 : 1}
+                            items={[
+                                { title: t('sso.org.orgStep', 'Organization'), icon: <Building2 size={16} /> },
+                                { title: t('sso.org.branchStep', 'Branch'), icon: <MapPin size={16} /> },
+                            ]}
+                        />
+                    )}
 
-                        {step === 'organization' && (
-                            <div>
-                                <div className="space-y-2">
-                                    {organizations.map((org) => (
-                                        <div
-                                            key={org.console_organization_id}
-                                            className={`relative flex cursor-pointer items-center gap-3 rounded-lg border-2 p-4 transition-all ${
-                                                tempOrgId === org.console_organization_id
-                                                    ? 'border-primary bg-primary/5'
-                                                    : 'border-border hover:border-muted-foreground/30 hover:bg-accent'
-                                            }`}
-                                            onClick={() => setTempOrgId(org.console_organization_id)}
-                                        >
-                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
-                                                {getOrgInitials(org.name)}
-                                            </div>
-                                            <div className="min-w-0 flex-1">
-                                                <div className="text-base font-semibold">{org.name}</div>
-                                                {requireBranch && (
-                                                    <div className="mt-1 text-xs text-muted-foreground">
-                                                        {t('sso.org.branchCount', { count: getBranchesByOrg(org.console_organization_id).length, defaultValue: '{{count}} branches' })}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            {tempOrgId === org.console_organization_id && (
-                                                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary">
-                                                    <Check className="h-4 w-4 text-primary-foreground" />
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <div className="mt-6 flex justify-end">
-                                    <Button onClick={handleOrganizationNext} disabled={!tempOrgId} size="lg" className="gap-2">
-                                        {requireBranch ? t('common.next', 'Next') : t('common.select', 'Select')}
-                                        <ArrowRight className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
-
-                        {step === 'branch' && selectedTempOrg && (
-                            <div>
-                                <div className="mb-4 rounded-lg border border-border bg-muted p-3">
-                                    <div className="mb-1.5 text-xs text-muted-foreground">{t('sso.org.selectedOrg', 'Selected organization')}</div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">
-                                            {getOrgInitials(selectedTempOrg.name)}
-                                        </div>
-                                        <span className="font-semibold">{selectedTempOrg.name}</span>
-                                    </div>
-                                </div>
-
-                                <div className="relative mb-3">
-                                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                                    <Input
-                                        placeholder={t('sso.org.searchBranch', 'Search branch...')}
-                                        value={branchSearch}
-                                        onChange={(e) => setBranchSearch(e.target.value)}
-                                        className="pl-9"
+                    {/* Organization step */}
+                    {step === 'organization' && (
+                        <>
+                            <Flex vertical gap={8}>
+                                {organizations.map((org) => (
+                                    <SelectableItem
+                                        key={org.console_organization_id}
+                                        avatar={<Avatar size={32} shape="square">{getOrgInitials(org.name)}</Avatar>}
+                                        title={org.name}
+                                        description={
+                                            requireBranch
+                                                ? t('sso.org.branchCount', {
+                                                      count: getBranchesByOrg(org.console_organization_id).length,
+                                                      defaultValue: '{{count}} branches',
+                                                  })
+                                                : undefined
+                                        }
+                                        selected={tempOrgId === org.console_organization_id}
+                                        onClick={() => setTempOrgId(org.console_organization_id)}
                                     />
-                                </div>
+                                ))}
+                            </Flex>
 
-                                <div className="max-h-[280px] space-y-2 overflow-y-auto">
-                                    {filteredBranches.length === 0 ? (
-                                        <div className="py-6 text-center text-sm text-muted-foreground">{t('sso.org.noBranchFound', 'No branch found')}</div>
-                                    ) : (
-                                        filteredBranches.map((branch) => (
-                                            <div
-                                                key={branch.console_branch_id}
-                                                className={`relative flex cursor-pointer items-center gap-3 rounded-lg border-2 p-4 transition-all ${
-                                                    tempBranchId === branch.console_branch_id
-                                                        ? 'border-primary bg-primary/5'
-                                                        : 'border-border hover:border-muted-foreground/30 hover:bg-accent'
-                                                }`}
-                                                onClick={() => setTempBranchId(branch.console_branch_id)}
-                                            >
-                                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-                                                    <MapPin className="h-5 w-5 text-muted-foreground" />
-                                                </div>
-                                                <div className="min-w-0 flex-1">
-                                                    <div className="text-base font-semibold">{branch.name}</div>
-                                                    {branch.location && <div className="text-sm text-muted-foreground">{branch.location}</div>}
-                                                </div>
-                                                {tempBranchId === branch.console_branch_id && (
-                                                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary">
-                                                        <Check className="h-4 w-4 text-primary-foreground" />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
+                            <Flex justify="end">
+                                <Button
+                                    type="primary"
+                                    onClick={handleOrganizationNext}
+                                    disabled={!tempOrgId}
+                                >
+                                    <Flex align="center" gap={4}>
+                                        {requireBranch ? t('common.next', 'Next') : t('common.select', 'Select')}
+                                        {requireBranch && <ArrowRight size={14} />}
+                                    </Flex>
+                                </Button>
+                            </Flex>
+                        </>
+                    )}
 
-                                <div className="mt-6 flex justify-between">
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => {
-                                            setStep('organization');
-                                        }}
-                                    >
-                                        {t('common.back', 'Back')}
-                                    </Button>
-                                    <Button onClick={handleBranchComplete} disabled={!tempBranchId} size="lg" className="gap-2">
-                                        {t('common.select', 'Select')}
-                                        <ArrowRight className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </DialogContent>
-            </Dialog>
+                    {/* Branch step */}
+                    {step === 'branch' && selectedTempOrg && (
+                        <>
+                            {/* Selected org summary */}
+                            <Flex align="center" gap={8}>
+                                <Avatar size={28} shape="square">
+                                    {getOrgInitials(selectedTempOrg.name)}
+                                </Avatar>
+                                <Flex vertical>
+                                    <Typography.Text type="secondary">
+                                        {t('sso.org.selectedOrg', 'Selected organization')}
+                                    </Typography.Text>
+                                    <Typography.Text strong>
+                                        {selectedTempOrg.name}
+                                    </Typography.Text>
+                                </Flex>
+                            </Flex>
+
+                            {/* Search */}
+                            <Input
+                                prefix={<Search size={14} />}
+                                placeholder={t('sso.org.searchBranch', 'Search branch...')}
+                                value={branchSearch}
+                                onChange={(e) => setBranchSearch(e.target.value)}
+                                allowClear
+                            />
+
+                            {/* Branch list */}
+                            {filteredBranches.length === 0 ? (
+                                <Empty
+                                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                    description={t('sso.org.noBranchFound', 'No branch found')}
+                                />
+                            ) : (
+                                <Flex vertical gap={8}>
+                                    {filteredBranches.map((branch) => (
+                                        <SelectableItem
+                                            key={branch.console_branch_id}
+                                            avatar={<Avatar size={32} shape="square" icon={<MapPin size={16} />} />}
+                                            title={branch.name}
+                                            description={branch.location}
+                                            selected={tempBranchId === branch.console_branch_id}
+                                            onClick={() => setTempBranchId(branch.console_branch_id)}
+                                        />
+                                    ))}
+                                </Flex>
+                            )}
+
+                            {/* Actions */}
+                            <Flex justify="space-between">
+                                <Button onClick={() => setStep('organization')}>
+                                    {t('common.back', 'Back')}
+                                </Button>
+                                <Button
+                                    type="primary"
+                                    onClick={handleBranchComplete}
+                                    disabled={!tempBranchId}
+                                >
+                                    {t('common.select', 'Select')}
+                                </Button>
+                            </Flex>
+                        </>
+                    )}
+                </Flex>
+            </Modal>
         </>
     );
 }

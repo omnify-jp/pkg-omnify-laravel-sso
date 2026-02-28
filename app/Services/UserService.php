@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Services;
+namespace Omnify\Core\Services;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-use Omnify\SsoClient\Enums\ScopeType;
-use Omnify\SsoClient\Models\Branch;
-use Omnify\SsoClient\Models\Organization;
-use Omnify\SsoClient\Models\Team;
-use Omnify\SsoClient\Models\User;
+use Omnify\Core\Enums\ScopeType;
+use Omnify\Core\Models\Branch;
+use Omnify\Core\Models\Organization;
+use Omnify\Core\Models\Team;
+use Omnify\Core\Models\User;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 

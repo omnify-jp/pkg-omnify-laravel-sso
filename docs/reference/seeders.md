@@ -17,10 +17,10 @@ Full demo dataset for standalone mode (email/password). Idempotent — safe to r
 
 ```bash
 # Run directly
-php artisan db:seed --class=\\Omnify\\SsoClient\\Database\\Seeders\\SsoStandaloneSeeder
+php artisan db:seed --class=\\Omnify\\Core\\Database\\Seeders\\SsoStandaloneSeeder
 
 # Or call from DatabaseSeeder.php
-$this->call(\Omnify\SsoClient\Database\Seeders\SsoStandaloneSeeder::class);
+$this->call(\Omnify\Core\Database\Seeders\SsoStandaloneSeeder::class);
 ```
 
 ### What it creates
@@ -145,15 +145,15 @@ To seed app-specific permissions on top of the package defaults:
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Omnify\SsoClient\Models\Permission;
-use Omnify\SsoClient\Models\Role;
+use Omnify\Core\Models\Permission;
+use Omnify\Core\Models\Role;
 
 class PermissionSeeder extends Seeder
 {
     public function run(): void
     {
         // 1. Run package seeder for users/roles/branches
-        $this->call(\Omnify\SsoClient\Database\Seeders\SsoStandaloneSeeder::class);
+        $this->call(\Omnify\Core\Database\Seeders\SsoStandaloneSeeder::class);
 
         // 2. Add app-specific permissions
         $permissions = [
@@ -187,7 +187,7 @@ class PermissionSeeder extends Seeder
 Available in the `Concerns` namespace for use in your own seeders:
 
 ```php
-use Omnify\SsoClient\Database\Seeders\Concerns\AssignsRoles;
+use Omnify\Core\Database\Seeders\Concerns\AssignsRoles;
 
 class MySeeder extends Seeder
 {

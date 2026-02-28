@@ -1,10 +1,10 @@
 <?php
 
-namespace Omnify\SsoClient\Models;
+namespace Omnify\Core\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Omnify\SsoClient\Database\Factories\RolePermissionFactory;
-use Omnify\SsoClient\Models\Base\RolePermissionBaseModel;
+use Omnify\Core\Database\Factories\RolePermissionFactory;
+use Omnify\Core\Models\Base\RolePermissionBaseModel;
 
 /**
  * RolePermission Model

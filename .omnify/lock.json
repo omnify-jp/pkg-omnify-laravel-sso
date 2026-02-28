@@ -1,26 +1,216 @@
 {
-  "version": 6,
-  "timestamp": "2026-02-26T11:18:21Z",
+  "version": 2,
+  "timestamp": "2026-02-28T03:42:10Z",
   "connections": {
     "default": "mysql"
   },
-  "changes": [],
+  "changes": [
+    {
+      "action": "option_changed",
+      "schema": "Admin"
+    },
+    {
+      "action": "property_added",
+      "schema": "Branch",
+      "property": "currency"
+    },
+    {
+      "action": "property_added",
+      "schema": "Branch",
+      "property": "metadata"
+    },
+    {
+      "action": "property_added",
+      "schema": "Branch",
+      "property": "phone"
+    },
+    {
+      "action": "property_added",
+      "schema": "Branch",
+      "property": "settings"
+    },
+    {
+      "action": "property_added",
+      "schema": "Branch",
+      "property": "address"
+    },
+    {
+      "action": "property_added",
+      "schema": "Branch",
+      "property": "code"
+    },
+    {
+      "action": "property_added",
+      "schema": "Branch",
+      "property": "email"
+    },
+    {
+      "action": "property_added",
+      "schema": "Branch",
+      "property": "locale"
+    },
+    {
+      "action": "property_added",
+      "schema": "Organization",
+      "property": "settings"
+    },
+    {
+      "action": "property_added",
+      "schema": "Organization",
+      "property": "allowed_ips"
+    },
+    {
+      "action": "property_added",
+      "schema": "Organization",
+      "property": "suspended_at"
+    },
+    {
+      "action": "property_added",
+      "schema": "Organization",
+      "property": "terminated_at"
+    },
+    {
+      "action": "property_added",
+      "schema": "User",
+      "property": "is_active"
+    },
+    {
+      "action": "property_added",
+      "schema": "User",
+      "property": "date_of_birth"
+    },
+    {
+      "action": "property_added",
+      "schema": "User",
+      "property": "bio"
+    },
+    {
+      "action": "property_added",
+      "schema": "User",
+      "property": "email_verified_at"
+    },
+    {
+      "action": "property_added",
+      "schema": "User",
+      "property": "phone"
+    },
+    {
+      "action": "property_added",
+      "schema": "User",
+      "property": "address"
+    },
+    {
+      "action": "property_added",
+      "schema": "User",
+      "property": "bank"
+    },
+    {
+      "action": "property_added",
+      "schema": "User",
+      "property": "is_default_password"
+    },
+    {
+      "action": "property_added",
+      "schema": "User",
+      "property": "avatar_url"
+    }
+  ],
   "snapshot": {
+    "Admin": {
+      "name": "Admin",
+      "kind": "object",
+      "displayName": "Admin",
+      "properties": {
+        "email": {
+          "type": "String",
+          "displayName": "Email"
+        },
+        "email_verified_at": {
+          "type": "Timestamp",
+          "displayName": "Email Verified At",
+          "nullable": true
+        },
+        "is_active": {
+          "type": "Boolean",
+          "displayName": "Active",
+          "default": true
+        },
+        "name": {
+          "type": "String",
+          "displayName": "Name"
+        },
+        "password": {
+          "type": "String",
+          "displayName": "Password",
+          "hidden": true
+        },
+        "remember_token": {
+          "type": "String",
+          "displayName": "Remember Token",
+          "nullable": true,
+          "length": 100,
+          "hidden": true
+        }
+      },
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "indexes": [
+          {
+            "columns": [
+              "email"
+            ],
+            "unique": true
+          }
+        ],
+        "authenticatable": true
+      }
+    },
     "Branch": {
       "name": "Branch",
       "kind": "object",
       "displayName": "Branch",
       "properties": {
+        "address": {
+          "type": "Text",
+          "displayName": "Address",
+          "nullable": true
+        },
+        "code": {
+          "type": "String",
+          "displayName": "Branch Code",
+          "description": "Unique code within organization (e.g., HQ, HCM-01, HN-MAIN)",
+          "nullable": true,
+          "length": 20
+        },
         "console_branch_id": {
           "type": "Uuid",
           "displayName": "Console Branch ID",
           "description": "Branch ID from Console",
           "unique": true
         },
+        "console_brand_id": {
+          "type": "Uuid",
+          "displayName": "Console Brand ID",
+          "description": "Brand ID from Console (nullable - not all branches have a brand)",
+          "nullable": true
+        },
         "console_organization_id": {
           "type": "Uuid",
           "displayName": "Console Organization ID",
           "description": "Organization ID from Console"
+        },
+        "currency": {
+          "type": "String",
+          "displayName": "Currency",
+          "description": "ISO 4217 currency code (e.g., VND, USD, JPY)",
+          "nullable": true,
+          "length": 3
+        },
+        "email": {
+          "type": "String",
+          "displayName": "Email",
+          "nullable": true
         },
         "is_active": {
           "type": "Boolean",
@@ -33,10 +223,40 @@
           "description": "Whether this is the main headquarters of the organization",
           "default": false
         },
+        "is_standalone": {
+          "type": "Boolean",
+          "displayName": "Standalone",
+          "description": "Whether this record was created in standalone mode",
+          "default": false
+        },
+        "locale": {
+          "type": "String",
+          "displayName": "Locale",
+          "description": "Locale code (e.g., vi-VN, en-US, ja-JP)",
+          "nullable": true,
+          "length": 10
+        },
+        "metadata": {
+          "type": "Json",
+          "displayName": "Metadata",
+          "description": "Additional data that can be used by external services",
+          "nullable": true
+        },
         "name": {
           "type": "String",
           "displayName": "Branch Name",
           "length": 100
+        },
+        "phone": {
+          "type": "String",
+          "displayName": "Phone",
+          "nullable": true,
+          "length": 20
+        },
+        "settings": {
+          "type": "Json",
+          "displayName": "Settings",
+          "nullable": true
         },
         "slug": {
           "type": "String",
@@ -79,6 +299,119 @@
             "columns": [
               "console_organization_id",
               "is_headquarters"
+            ]
+          },
+          {
+            "columns": [
+              "console_brand_id"
+            ]
+          },
+          {
+            "columns": [
+              "is_standalone"
+            ]
+          }
+        ]
+      }
+    },
+    "Brand": {
+      "name": "Brand",
+      "kind": "object",
+      "displayName": "Brand",
+      "properties": {
+        "console_brand_id": {
+          "type": "Uuid",
+          "displayName": "Console Brand ID",
+          "description": "Brand ID from Console",
+          "unique": true
+        },
+        "console_organization_id": {
+          "type": "Uuid",
+          "displayName": "Console Organization ID",
+          "description": "Owning organization ID from Console"
+        },
+        "cover_image_url": {
+          "type": "String",
+          "displayName": "Cover Image URL",
+          "nullable": true,
+          "length": 500
+        },
+        "description": {
+          "type": "Text",
+          "displayName": "Description",
+          "nullable": true
+        },
+        "is_active": {
+          "type": "Boolean",
+          "displayName": "Active",
+          "default": true
+        },
+        "is_standalone": {
+          "type": "Boolean",
+          "displayName": "Standalone",
+          "description": "Whether this record was created in standalone mode",
+          "default": false
+        },
+        "logo_url": {
+          "type": "String",
+          "displayName": "Logo URL",
+          "nullable": true,
+          "length": 500
+        },
+        "metadata": {
+          "type": "Json",
+          "displayName": "Metadata",
+          "nullable": true
+        },
+        "name": {
+          "type": "String",
+          "displayName": "Brand Name",
+          "length": 100
+        },
+        "settings": {
+          "type": "Json",
+          "displayName": "Settings",
+          "nullable": true
+        },
+        "slug": {
+          "type": "String",
+          "displayName": "Slug",
+          "description": "Unique identifier for the brand (e.g. starbucks, kfc)",
+          "length": 50
+        },
+        "website": {
+          "type": "String",
+          "displayName": "Website",
+          "nullable": true,
+          "length": 500
+        }
+      },
+      "options": {
+        "id": "Uuid",
+        "timestamps": true,
+        "softDelete": true,
+        "indexes": [
+          {
+            "columns": [
+              "console_brand_id"
+            ],
+            "unique": true
+          },
+          {
+            "columns": [
+              "slug"
+            ],
+            "unique": true
+          },
+          {
+            "columns": [
+              "console_organization_id",
+              "is_active"
+            ]
+          },
+          {
+            "columns": [
+              "is_standalone"
             ]
           }
         ]
@@ -145,6 +478,12 @@
           "type": "Boolean",
           "displayName": "Active",
           "default": true
+        },
+        "is_standalone": {
+          "type": "Boolean",
+          "displayName": "Standalone",
+          "description": "Whether this record was created in standalone mode",
+          "default": false
         },
         "latitude": {
           "type": "Decimal",
@@ -255,6 +594,11 @@
               "console_organization_id",
               "type"
             ]
+          },
+          {
+            "columns": [
+              "is_standalone"
+            ]
           }
         ]
       }
@@ -264,6 +608,11 @@
       "kind": "object",
       "displayName": "Organization",
       "properties": {
+        "allowed_ips": {
+          "type": "Json",
+          "displayName": "Allowed IPs",
+          "nullable": true
+        },
         "console_organization_id": {
           "type": "Uuid",
           "displayName": "Console Organization ID",
@@ -275,16 +624,39 @@
           "displayName": "Active",
           "default": true
         },
+        "is_standalone": {
+          "type": "Boolean",
+          "displayName": "Standalone",
+          "description": "Whether this record was created in standalone mode",
+          "default": false
+        },
         "name": {
           "type": "String",
           "displayName": "Organization Name",
           "length": 100
+        },
+        "settings": {
+          "type": "Json",
+          "displayName": "Settings",
+          "nullable": true
         },
         "slug": {
           "type": "String",
           "displayName": "Slug",
           "description": "URL-friendly unique identifier",
           "length": 100
+        },
+        "suspended_at": {
+          "type": "Timestamp",
+          "displayName": "Suspended At",
+          "description": "When organization was suspended (30-day grace period)",
+          "nullable": true
+        },
+        "terminated_at": {
+          "type": "Timestamp",
+          "displayName": "Terminated At",
+          "description": "When organization was terminated (operational data will be deleted after 90 days, but employment history preserved)",
+          "nullable": true
         }
       },
       "options": {
@@ -297,6 +669,11 @@
               "slug"
             ],
             "unique": true
+          },
+          {
+            "columns": [
+              "is_standalone"
+            ]
           }
         ]
       }
@@ -599,6 +976,28 @@
       "kind": "object",
       "displayName": "User",
       "properties": {
+        "address": {
+          "type": "Text",
+          "displayName": "Address",
+          "nullable": true
+        },
+        "avatar_url": {
+          "type": "String",
+          "displayName": "Avatar URL",
+          "nullable": true,
+          "length": 500
+        },
+        "bank": {
+          "type": "Json",
+          "displayName": "Bank Account",
+          "description": "Bank account information for salary payments (bank_code, branch_code, account_number, account_holder)",
+          "nullable": true
+        },
+        "bio": {
+          "type": "Text",
+          "displayName": "Bio",
+          "nullable": true
+        },
         "console_access_token": {
           "type": "Text",
           "displayName": "Console Access Token",
@@ -629,10 +1028,21 @@
           "description": "User ID from Console SSO",
           "nullable": true
         },
+        "date_of_birth": {
+          "type": "Date",
+          "displayName": "Date of Birth",
+          "description": "User's date of birth - portable across organizations",
+          "nullable": true
+        },
         "email": {
           "type": "String",
           "displayName": "Email",
           "description": "Unique within organization"
+        },
+        "email_verified_at": {
+          "type": "Timestamp",
+          "displayName": "Email Verified At",
+          "nullable": true
         },
         "google2fa_secret": {
           "type": "String",
@@ -641,6 +1051,23 @@
           "nullable": true,
           "length": 100,
           "hidden": true
+        },
+        "is_active": {
+          "type": "Boolean",
+          "displayName": "Active",
+          "default": true
+        },
+        "is_default_password": {
+          "type": "Boolean",
+          "displayName": "Is Default Password",
+          "description": "Whether this is a random password from social account login",
+          "default": false
+        },
+        "is_standalone": {
+          "type": "Boolean",
+          "displayName": "Standalone",
+          "description": "Whether this record was created in standalone mode",
+          "default": false
         },
         "name": {
           "type": "String",
@@ -652,6 +1079,12 @@
           "description": "Used in standalone auth mode. Null when using Console SSO.",
           "nullable": true,
           "hidden": true
+        },
+        "phone": {
+          "type": "String",
+          "displayName": "Phone Number",
+          "nullable": true,
+          "length": 20
         },
         "remember_token": {
           "type": "String",
@@ -706,6 +1139,11 @@
               "console_organization_id"
             ],
             "unique": true
+          },
+          {
+            "columns": [
+              "is_standalone"
+            ]
           }
         ],
         "authenticatable": true

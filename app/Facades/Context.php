@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Facades;
+namespace Omnify\Core\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Omnify\SsoClient\Services\ContextService;
+use Omnify\Core\Services\ContextService;
 
 /**
  * Context Facade for accessing current organization, branch, and team context.
@@ -25,7 +25,7 @@ use Omnify\SsoClient\Services\ContextService;
  * @method static bool canAccessTeam(string $teamId) Check if user can access a team
  * @method static array toArray() Get all context as array
  *
- * @see \Omnify\SsoClient\Services\ContextService
+ * @see \Omnify\Core\Services\ContextService
  */
 class Context extends Facade
 {

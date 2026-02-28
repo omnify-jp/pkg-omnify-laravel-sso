@@ -284,7 +284,7 @@ The package automatically verifies JWTs from Console:
 You typically don't need to interact with this directly, but if needed:
 
 ```php
-use Omnify\SsoClient\Services\JwtVerifier;
+use Omnify\Core\Services\JwtVerifier;
 
 $verifier = app(JwtVerifier::class);
 $claims = $verifier->verify($accessToken);

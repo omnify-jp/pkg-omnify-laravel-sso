@@ -11,7 +11,7 @@ namespace App\Http\Requests\OmnifyBase;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Omnify\SsoClient\Models\Base\Locales\OrganizationLocales;
+use Omnify\Core\Models\Base\Locales\OrganizationLocales;
 
 abstract class OrganizationUpdateRequestBase extends FormRequest
 {
@@ -55,7 +55,12 @@ abstract class OrganizationUpdateRequestBase extends FormRequest
             'console_organization_id' => ['sometimes', 'string', 'uuid', Rule::unique('organizations')->ignore($this->route('organization'))],
             'name' => ['sometimes', 'string', 'max:100'],
             'slug' => ['sometimes', 'string', 'max:100'],
+            'is_standalone' => ['sometimes', 'boolean'],
             'is_active' => ['sometimes', 'boolean'],
+            'settings' => ['nullable', 'array'],
+            'allowed_ips' => ['nullable', 'array'],
+            'suspended_at' => ['nullable', 'date'],
+            'terminated_at' => ['nullable', 'date'],
         ];
     }
 
@@ -76,7 +81,12 @@ abstract class OrganizationUpdateRequestBase extends FormRequest
             'console_organization_id',
             'name',
             'slug',
+            'is_standalone',
             'is_active',
+            'settings',
+            'allowed_ips',
+            'suspended_at',
+            'terminated_at',
         ];
 
         foreach ($keys as $key) {

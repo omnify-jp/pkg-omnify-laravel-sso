@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Http\Middleware;
+namespace Omnify\Core\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Omnify\SsoClient\Facades\Context;
+use Omnify\Core\Facades\Context;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -16,9 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
  * Returns 400 Bad Request if X-Branch-Id header is missing.
  *
  * Usage in routes:
- *   Route::get('/locations', ...)->middleware('sso.require-branch');
+ *   Route::get('/locations', ...)->middleware('core.require-branch');
  *
- * @see \Omnify\SsoClient\Http\Middleware\SsoOrganizationAccess
+ * @see \Omnify\Core\Http\Middleware\SsoOrganizationAccess
  */
 class RequireBranch
 {

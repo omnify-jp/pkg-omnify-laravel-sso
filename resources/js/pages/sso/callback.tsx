@@ -1,9 +1,9 @@
-import { Button } from '@omnifyjp/ui';
-import AuthLayout from '@/layouts/auth-layout';
 import { Head, router } from '@inertiajs/react';
-import { AlertCircle, CheckCircle2, LoaderCircle } from 'lucide-react';
+import { Alert, Button, Flex, Spin, Typography } from 'antd';
+import { CheckCircle2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuthLayout } from '@omnify-core/contexts/auth-layout-context';
 
 type SsoCallbackProps = {
     callbackApiUrl: string;
@@ -13,6 +13,7 @@ type CallbackState = 'processing' | 'success' | 'error';
 
 export default function SsoCallback({ callbackApiUrl }: SsoCallbackProps) {
     const { t } = useTranslation();
+    const AuthLayout = useAuthLayout();
     const [state, setState] = useState<CallbackState>('processing');
     const [errorMessage, setErrorMessage] = useState('');
     const processedRef = useRef(false);
@@ -76,56 +77,49 @@ export default function SsoCallback({ callbackApiUrl }: SsoCallbackProps) {
         <AuthLayout>
             <Head title={t('sso.callback.pageTitle', 'Authenticating...')} />
 
-            <div className="flex flex-col items-center space-y-6 text-center">
+            <Flex vertical align="center" gap={24}>
                 {state === 'processing' && (
-                    <>
-                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                            <LoaderCircle className="h-8 w-8 animate-spin text-primary" />
-                        </div>
-                        <div className="space-y-2">
-                            <h2 className="text-page-title font-semibold">
+                    <Flex vertical align="center" gap={16}>
+                        <Spin size="large" />
+                        <Flex vertical align="center" gap={8}>
+                            <Typography.Title level={4}>
                                 {t('sso.callback.processing', 'Authenticating...')}
-                            </h2>
-                            <p className="text-sm text-muted-foreground">
+                            </Typography.Title>
+                            <Typography.Text type="secondary">
                                 {t('sso.callback.processingDescription', 'Please wait while we verify your identity.')}
-                            </p>
-                        </div>
-                    </>
+                            </Typography.Text>
+                        </Flex>
+                    </Flex>
                 )}
 
                 {state === 'success' && (
-                    <>
-                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-50 dark:bg-green-500/15">
-                            <CheckCircle2 className="h-8 w-8 text-green-600 dark:text-green-400" />
-                        </div>
-                        <div className="space-y-2">
-                            <h2 className="text-page-title font-semibold">
+                    <Flex vertical align="center" gap={16}>
+                        <CheckCircle2 size={48} />
+                        <Flex vertical align="center" gap={8}>
+                            <Typography.Title level={4}>
                                 {t('sso.callback.success', 'Authentication successful')}
-                            </h2>
-                            <p className="text-sm text-muted-foreground">
+                            </Typography.Title>
+                            <Typography.Text type="secondary">
                                 {t('sso.callback.successDescription', 'Redirecting to dashboard...')}
-                            </p>
-                        </div>
-                    </>
+                            </Typography.Text>
+                        </Flex>
+                    </Flex>
                 )}
 
                 {state === 'error' && (
-                    <>
-                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
-                            <AlertCircle className="h-8 w-8 text-destructive" />
-                        </div>
-                        <div className="space-y-2">
-                            <h2 className="text-page-title font-semibold">
-                                {t('sso.callback.error', 'Authentication failed')}
-                            </h2>
-                            <p className="text-sm text-muted-foreground">{errorMessage}</p>
-                        </div>
-                        <Button variant="outline" size="lg" onClick={() => router.visit('/sso/login')}>
+                    <Flex vertical align="center" gap={16}>
+                        <Alert
+                            type="error"
+                            showIcon
+                            title={t('sso.callback.error', 'Authentication failed')}
+                            description={errorMessage}
+                        />
+                        <Button size="large" onClick={() => router.visit('/sso/login')}>
                             {t('sso.callback.tryAgain', 'Try again')}
                         </Button>
-                    </>
+                    </Flex>
                 )}
-            </div>
+            </Flex>
         </AuthLayout>
     );
 }

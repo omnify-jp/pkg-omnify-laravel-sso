@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Services;
+namespace Omnify\Core\Services;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
-use Omnify\SsoClient\Models\Organization;
+use Omnify\Core\Models\Organization;
 
 class OrganizationAccessService
 {

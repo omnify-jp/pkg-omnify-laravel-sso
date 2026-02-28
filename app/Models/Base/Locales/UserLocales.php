@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnify\SsoClient\Models\Base\Locales;
+namespace Omnify\Core\Models\Base\Locales;
 
 /**
  * Localized display names for User.
@@ -48,6 +48,56 @@ class UserLocales
             'en' => 'Remember Token',
             'ja' => 'Remember Token',
             'vi' => 'Remember Token',
+        ],
+        'email_verified_at' => [
+            'en' => 'Email Verified At',
+            'ja' => 'メール認証日時',
+            'vi' => 'Thời gian xác minh email',
+        ],
+        'is_default_password' => [
+            'en' => 'Is Default Password',
+            'ja' => 'デフォルトパスワード',
+            'vi' => 'Mật khẩu mặc định',
+        ],
+        'is_active' => [
+            'en' => 'Active',
+            'ja' => '有効',
+            'vi' => 'Hoạt động',
+        ],
+        'date_of_birth' => [
+            'en' => 'Date of Birth',
+            'ja' => '生年月日',
+            'vi' => 'Ngày sinh',
+        ],
+        'phone' => [
+            'en' => 'Phone Number',
+            'ja' => '電話番号',
+            'vi' => 'Số điện thoại',
+        ],
+        'address' => [
+            'en' => 'Address',
+            'ja' => '住所',
+            'vi' => 'Địa chỉ',
+        ],
+        'bank' => [
+            'en' => 'Bank Account',
+            'ja' => '銀行口座',
+            'vi' => 'Tài khoản ngân hàng',
+        ],
+        'avatar_url' => [
+            'en' => 'Avatar URL',
+            'ja' => 'アバターURL',
+            'vi' => 'URL ảnh đại diện',
+        ],
+        'bio' => [
+            'en' => 'Bio',
+            'ja' => '自己紹介',
+            'vi' => 'Giới thiệu bản thân',
+        ],
+        'is_standalone' => [
+            'en' => 'Standalone',
+            'ja' => 'スタンドアローン',
+            'vi' => 'Standalone',
         ],
         'console_user_id' => [
             'en' => 'Console User ID',

@@ -6,7 +6,7 @@
  * テスト設定ファイル
  */
 
-use Omnify\SsoClient\Tests\TestCase;
+use Omnify\Core\Tests\TestCase;
 
 uses(TestCase::class)->in('Feature');
 uses(TestCase::class)->in('Unit');

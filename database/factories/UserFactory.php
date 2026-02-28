@@ -1,11 +1,11 @@
 <?php
 
-namespace Omnify\SsoClient\Database\Factories;
+namespace Omnify\Core\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
-use Omnify\SsoClient\Models\Role;
-use Omnify\SsoClient\Models\User;
+use Omnify\Core\Models\Role;
+use Omnify\Core\Models\User;
 
 /**
  * User Factory
@@ -77,6 +77,20 @@ class UserFactory extends Factory
     public function unverified(): static
     {
         return $this->state([]);
+    }
+
+    public function standalone(): static
+    {
+        return $this->state([
+            'is_standalone' => true,
+        ]);
+    }
+
+    public function console(): static
+    {
+        return $this->state([
+            'is_standalone' => false,
+        ]);
     }
 
     public function withRole(string $slug): static

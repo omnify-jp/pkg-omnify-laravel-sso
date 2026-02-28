@@ -7,9 +7,9 @@
  * Kiểm thử các trường hợp biên cho Model Role
  */
 
-use Omnify\SsoClient\Models\Permission;
-use Omnify\SsoClient\Models\Role;
-use Omnify\SsoClient\Models\User;
+use Omnify\Core\Models\Permission;
+use Omnify\Core\Models\Role;
+use Omnify\Core\Models\User;
 
 beforeEach(function () {
     $this->artisan('migrate', ['--database' => 'testing']);

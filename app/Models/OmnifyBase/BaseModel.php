@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnify\SsoClient\Models\OmnifyBase;
+namespace Omnify\Core\Models\OmnifyBase;
 
 /**
  * Base model class for all Omnify-generated models.
@@ -21,14 +21,14 @@ abstract class BaseModel extends Model
      * Model class map for polymorphic relations.
      */
     protected static array $modelMap = [
-        'Branch' => \Omnify\SsoClient\Models\Branch::class,
-        'Organization' => \Omnify\SsoClient\Models\Organization::class,
-        'Permission' => \Omnify\SsoClient\Models\Permission::class,
-        'Role' => \Omnify\SsoClient\Models\Role::class,
-        'RolePermission' => \Omnify\SsoClient\Models\RolePermission::class,
-        'Team' => \Omnify\SsoClient\Models\Team::class,
-        'TeamPermission' => \Omnify\SsoClient\Models\TeamPermission::class,
-        'User' => \Omnify\SsoClient\Models\User::class,
+        'Branch' => \Omnify\Core\Models\Branch::class,
+        'Organization' => \Omnify\Core\Models\Organization::class,
+        'Permission' => \Omnify\Core\Models\Permission::class,
+        'Role' => \Omnify\Core\Models\Role::class,
+        'RolePermission' => \Omnify\Core\Models\RolePermission::class,
+        'Team' => \Omnify\Core\Models\Team::class,
+        'TeamPermission' => \Omnify\Core\Models\TeamPermission::class,
+        'User' => \Omnify\Core\Models\User::class,
     ];
 
     /**

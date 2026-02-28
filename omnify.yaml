@@ -22,13 +22,13 @@ codegen:
     enable: true
     model:
       path: app/Models
-      namespace: Omnify\SsoClient\Models
+      namespace: Omnify\Core\Models
     resource:
       path: app/Http/Resources
-      namespace: Omnify\SsoClient\Http\Resources
+      namespace: Omnify\Core\Http\Resources
     factory:
       path: database/factories
-      namespace: Omnify\SsoClient\Database\Factories
+      namespace: Omnify\Core\Database\Factories
     provider:
       path: app/Providers
-      namespace: Omnify\SsoClient\Providers
+      namespace: Omnify\Core\Providers

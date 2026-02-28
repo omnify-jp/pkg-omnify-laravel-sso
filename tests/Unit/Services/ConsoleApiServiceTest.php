@@ -7,7 +7,7 @@
  */
 
 use Illuminate\Support\Facades\Http;
-use Omnify\SsoClient\Services\ConsoleApiService;
+use Omnify\Core\Services\ConsoleApiService;
 
 // =============================================================================
 // Instantiation Tests - インスタンス化のテスト

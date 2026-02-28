@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Support;
+namespace Omnify\Core\Support;
 
 use Illuminate\Support\Facades\Log;
 use Psr\Log\LoggerInterface;

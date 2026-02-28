@@ -1,4 +1,4 @@
-# pkg-omnify-laravel-sso
+# pkg-omnify-laravel-core
 
 Laravel package for authentication and access control in Omnify services.
 
@@ -30,7 +30,7 @@ Supports two modes:
 ### 1. Install
 
 ```bash
-composer require omnifyjp/pkg-omnify-laravel-sso
+composer require omnifyjp/pkg-omnify-laravel-core
 ```
 
 ### 2. Publish & migrate
@@ -54,7 +54,7 @@ OMNIFY_AUTH_MODE=standalone
 **Standalone mode** — seed a demo org with users, roles, permissions, branches:
 
 ```bash
-php artisan db:seed --class=\\Omnify\\SsoClient\\Database\\Seeders\\SsoStandaloneSeeder
+php artisan db:seed --class=\\Omnify\\Core\\Database\\Seeders\\SsoStandaloneSeeder
 ```
 
 This creates a Vietnamese demo company with:
@@ -195,9 +195,9 @@ Register in `bootstrap/app.php`:
 ```php
 ->withMiddleware(function (Middleware $middleware) {
     $middleware->alias([
-        'sso.auth'         => \Omnify\SsoClient\Http\Middleware\SsoRoleCheck::class,
-        'sso.organization' => \Omnify\SsoClient\Http\Middleware\SsoOrganizationAccess::class,
-        'sso.role'         => \Omnify\SsoClient\Http\Middleware\SsoRoleCheck::class,
+        'sso.auth'         => \Omnify\Core\Http\Middleware\SsoRoleCheck::class,
+        'sso.organization' => \Omnify\Core\Http\Middleware\SsoOrganizationAccess::class,
+        'sso.role'         => \Omnify\Core\Http\Middleware\SsoRoleCheck::class,
     ]);
 })
 ```
@@ -238,7 +238,7 @@ IAM pages render inside whichever layout the host service provides. Set it once 
 
 ```tsx
 // resources/js/app.tsx (or providers)
-import { IamLayoutProvider } from '@omnify-sso/iam';
+import { IamLayoutProvider } from '@omnify-core/iam';
 import AppLayout from '@/layouts/app-layout';
 
 <IamLayoutProvider layout={AppLayout}>
@@ -251,7 +251,7 @@ import AppLayout from '@/layouts/app-layout';
 ## Package Structure
 
 ```
-pkg-omnify-laravel-sso/
+pkg-omnify-laravel-core/
 ├── app/
 │   ├── Console/Commands/
 │   │   └── SyncFromConsoleCommand.php   # php artisan sso:sync-from-console
@@ -275,7 +275,7 @@ pkg-omnify-laravel-sso/
 │   │   ├── ConsoleApiService.php        # Console API client (SSO + service-to-service)
 │   │   ├── ConsoleTokenService.php      # Token refresh
 │   │   └── OrganizationAccessService.php
-│   └── SsoClientServiceProvider.php
+│   └── CoreServiceProvider.php
 ├── config/
 │   └── omnify-auth.php                  # All configuration
 ├── database/
@@ -371,7 +371,7 @@ Full config: `config/omnify-auth.php`
 ## Testing
 
 ```bash
-cd packages/pkg-omnify-laravel-sso
+cd packages/pkg-omnify-laravel-core
 ../../../vendor/bin/pest
 ```
 

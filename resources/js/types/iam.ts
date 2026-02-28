@@ -88,7 +88,7 @@ export type IamScopeNode = {
     name: string;
     type: string;
     children: IamScopeNode[];
-    badges?: { label: string; className?: string }[];
+    badges?: { label: string }[];
 };
 
 /** Unified assignment with user + role data embedded */

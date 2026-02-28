@@ -10,7 +10,7 @@ namespace App\Http\Requests\OmnifyBase;
  */
 
 use Illuminate\Foundation\Http\FormRequest;
-use Omnify\SsoClient\Models\Base\Locales\TeamPermissionLocales;
+use Omnify\Core\Models\Base\Locales\TeamPermissionLocales;
 
 abstract class TeamPermissionStoreRequestBase extends FormRequest
 {

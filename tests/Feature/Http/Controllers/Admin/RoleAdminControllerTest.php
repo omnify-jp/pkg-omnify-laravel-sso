@@ -6,9 +6,9 @@
  * ロール管理コントローラーのテスト
  */
 
-use Omnify\SsoClient\Models\Permission;
-use Omnify\SsoClient\Models\Role;
-use Omnify\SsoClient\Tests\Fixtures\Models\User;
+use Omnify\Core\Models\Permission;
+use Omnify\Core\Models\Role;
+use Omnify\Core\Tests\Fixtures\Models\User;
 
 beforeEach(function () {
     // ロールとパーミッションのマイグレーションを実行
@@ -143,7 +143,7 @@ test('index includes organization info for org-specific roles', function () {
     $organizationId = \Illuminate\Support\Str::uuid()->toString();
 
     // Create organization cache
-    \Omnify\SsoClient\Models\Organization::create([
+    \Omnify\Core\Models\Organization::create([
         'console_organization_id' => $organizationId,
         'name' => 'Test Organization',
         'slug' => 'TEST-ORG',

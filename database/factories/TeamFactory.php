@@ -1,9 +1,9 @@
 <?php
 
-namespace Omnify\SsoClient\Database\Factories;
+namespace Omnify\Core\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Omnify\SsoClient\Models\Team;
+use Omnify\Core\Models\Team;
 
 /**
  * Team Factory

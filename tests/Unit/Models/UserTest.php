@@ -12,8 +12,8 @@
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Support\Str;
-use Omnify\SsoClient\Models\Role;
-use Omnify\SsoClient\Models\User;
+use Omnify\Core\Models\Role;
+use Omnify\Core\Models\User;
 
 beforeEach(function () {
     $this->artisan('migrate', ['--database' => 'testing']);
@@ -605,20 +605,21 @@ test('getRoleAssignments returns all assignments with pivot data', function () {
 });
 
 // =============================================================================
-// Multi-Scope Role Assignment Tests (New Schema)
-// Allows same role with different scopes
+// Multi-Scope Role Assignment Tests
+// Different roles can be assigned at different scopes
 // =============================================================================
 
-test('same role can be assigned to different branches', function () {
-    $role = Role::create(['name' => 'Manager', 'slug' => 'manager', 'level' => 50]);
+test('different roles can be assigned to different branches', function () {
+    $role1 = Role::create(['name' => 'Manager', 'slug' => 'manager', 'level' => 50]);
+    $role2 = Role::create(['name' => 'Staff', 'slug' => 'staff', 'level' => 10]);
 
     $user = User::create(['name' => 'Test User', 'email' => 'test@example.com']);
     $organizationId = (string) Str::uuid();
     $branch1 = (string) Str::uuid();
     $branch2 = (string) Str::uuid();
 
-    $user->assignRole($role, $organizationId, $branch1);
-    $user->assignRole($role, $organizationId, $branch2);
+    $user->assignRole($role1, $organizationId, $branch1);
+    $user->assignRole($role2, $organizationId, $branch2);
 
     $assignments = $user->getRoleAssignments();
     expect($assignments)->toHaveCount(2);
@@ -627,29 +628,32 @@ test('same role can be assigned to different branches', function () {
     expect($branches)->toContain($branch1, $branch2);
 });
 
-test('same role can be assigned as global and org-wide', function () {
-    $role = Role::create(['name' => 'Admin', 'slug' => 'admin', 'level' => 100]);
+test('different roles can be assigned as global and org-wide', function () {
+    $role1 = Role::create(['name' => 'Admin', 'slug' => 'admin', 'level' => 100]);
+    $role2 = Role::create(['name' => 'Manager', 'slug' => 'manager', 'level' => 50]);
 
     $user = User::create(['name' => 'Test User', 'email' => 'test@example.com']);
     $organizationId = (string) Str::uuid();
 
-    $user->assignRole($role, null, null); // Global
-    $user->assignRole($role, $organizationId, null); // Org-wide
+    $user->assignRole($role1, null, null); // Global
+    $user->assignRole($role2, $organizationId, null); // Org-wide
 
     $assignments = $user->getRoleAssignments();
     expect($assignments)->toHaveCount(2);
 });
 
-test('same role can be assigned as global, org-wide, and branch-specific', function () {
-    $role = Role::create(['name' => 'Viewer', 'slug' => 'viewer', 'level' => 10]);
+test('different roles can be assigned as global, org-wide, and branch-specific', function () {
+    $role1 = Role::create(['name' => 'Admin', 'slug' => 'admin', 'level' => 100]);
+    $role2 = Role::create(['name' => 'Manager', 'slug' => 'manager', 'level' => 50]);
+    $role3 = Role::create(['name' => 'Viewer', 'slug' => 'viewer', 'level' => 10]);
 
     $user = User::create(['name' => 'Test User', 'email' => 'test@example.com']);
     $organizationId = (string) Str::uuid();
     $branchId = (string) Str::uuid();
 
-    $user->assignRole($role, null, null);       // Global
-    $user->assignRole($role, $organizationId, null);     // Org-wide
-    $user->assignRole($role, $organizationId, $branchId); // Branch-specific
+    $user->assignRole($role1, null, null);                 // Global
+    $user->assignRole($role2, $organizationId, null);      // Org-wide
+    $user->assignRole($role3, $organizationId, $branchId); // Branch-specific
 
     $assignments = $user->getRoleAssignments();
     expect($assignments)->toHaveCount(3);
@@ -701,43 +705,47 @@ test('different roles can be assigned to same branch', function () {
 });
 
 test('removeRole only removes specific scope assignment', function () {
-    $role = Role::create(['name' => 'Manager', 'slug' => 'manager', 'level' => 50]);
+    $role1 = Role::create(['name' => 'Manager', 'slug' => 'manager', 'level' => 50]);
+    $role2 = Role::create(['name' => 'Staff', 'slug' => 'staff', 'level' => 10]);
 
     $user = User::create(['name' => 'Test User', 'email' => 'test@example.com']);
     $organizationId = (string) Str::uuid();
     $branch1 = (string) Str::uuid();
     $branch2 = (string) Str::uuid();
 
-    $user->assignRole($role, $organizationId, $branch1);
-    $user->assignRole($role, $organizationId, $branch2);
+    $user->assignRole($role1, $organizationId, $branch1);
+    $user->assignRole($role2, $organizationId, $branch2);
     expect($user->getRoleAssignments())->toHaveCount(2);
 
     // Remove only branch1 assignment
-    $user->removeRole($role, $organizationId, $branch1);
+    $user->removeRole($role1, $organizationId, $branch1);
     $user->refresh();
 
     $assignments = $user->getRoleAssignments();
     expect($assignments)->toHaveCount(1);
     expect($assignments->first()->pivot->console_branch_id)->toBe($branch2);
+    expect($assignments->first()->slug)->toBe('staff');
 });
 
 test('removeRole with null scope removes global assignment only', function () {
-    $role = Role::create(['name' => 'Admin', 'slug' => 'admin', 'level' => 100]);
+    $role1 = Role::create(['name' => 'Admin', 'slug' => 'admin', 'level' => 100]);
+    $role2 = Role::create(['name' => 'Manager', 'slug' => 'manager', 'level' => 50]);
 
     $user = User::create(['name' => 'Test User', 'email' => 'test@example.com']);
     $organizationId = (string) Str::uuid();
 
-    $user->assignRole($role, null, null); // Global
-    $user->assignRole($role, $organizationId, null); // Org-wide
+    $user->assignRole($role1, null, null); // Global
+    $user->assignRole($role2, $organizationId, null); // Org-wide
     expect($user->getRoleAssignments())->toHaveCount(2);
 
     // Remove global assignment only
-    $user->removeRole($role, null, null);
+    $user->removeRole($role1, null, null);
     $user->refresh();
 
     $assignments = $user->getRoleAssignments();
     expect($assignments)->toHaveCount(1);
     expect($assignments->first()->pivot->console_organization_id)->toBe($organizationId);
+    expect($assignments->first()->slug)->toBe('manager');
 });
 
 // =============================================================================
@@ -898,12 +906,13 @@ test('role assignment with empty string orgId is treated as null', function () {
 
 test('deleting user removes all role assignments (cascade)', function () {
     // Note: SQLite may not enforce FK cascade by default, so we test via model
-    $role = Role::create(['name' => 'Admin', 'slug' => 'admin', 'level' => 100]);
+    $role1 = Role::create(['name' => 'Admin', 'slug' => 'admin', 'level' => 100]);
+    $role2 = Role::create(['name' => 'Manager', 'slug' => 'manager', 'level' => 50]);
     $user = User::create(['name' => 'Test User', 'email' => 'test@example.com']);
     $organizationId = (string) Str::uuid();
 
-    $user->assignRole($role, null, null);
-    $user->assignRole($role, $organizationId, null);
+    $user->assignRole($role1, null, null);
+    $user->assignRole($role2, $organizationId, null);
 
     expect($user->getRoleAssignments())->toHaveCount(2);
 

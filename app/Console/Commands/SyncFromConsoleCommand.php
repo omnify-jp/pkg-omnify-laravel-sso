@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Console\Commands;
+namespace Omnify\Core\Console\Commands;
 
 use Illuminate\Console\Command;
-use Omnify\SsoClient\Models\Branch;
-use Omnify\SsoClient\Models\User;
-use Omnify\SsoClient\Services\ConsoleApiService;
+use Omnify\Core\Models\Branch;
+use Omnify\Core\Models\User;
+use Omnify\Core\Services\ConsoleApiService;
 
 /**
  * Đồng bộ dữ liệu từ Omnify Console về service database.
@@ -164,6 +164,7 @@ class SyncFromConsoleCommand extends Command
                         'name' => $branch['name'] ?? $slug,
                         'is_headquarters' => (bool) ($branch['is_headquarters'] ?? false),
                         'is_active' => (bool) ($branch['is_active'] ?? true),
+                        'is_standalone' => false,
                         'deleted_at' => null,
                     ]
                 );
@@ -233,6 +234,7 @@ class SyncFromConsoleCommand extends Command
                             'console_organization_id' => $userData['organization_id'] ?? null,
                             'email' => $email,
                             'name' => $userData['name'] ?? $email,
+                            'is_standalone' => false,
                             // Không set password — user sẽ đăng nhập qua SSO
                             // Không set access/refresh tokens — sẽ được set khi login
                             'deleted_at' => null,

@@ -1,11 +1,11 @@
 <?php
 
-namespace Omnify\SsoClient\Console\Commands;
+namespace Omnify\Core\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Omnify\SsoClient\Models\Admin;
+use Omnify\Core\Models\Admin;
 
 class AdminCreateCommand extends Command
 {

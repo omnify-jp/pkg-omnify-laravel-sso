@@ -8,9 +8,9 @@
  */
 
 use Illuminate\Support\Str;
-use Omnify\SsoClient\Models\Permission;
-use Omnify\SsoClient\Models\Team;
-use Omnify\SsoClient\Models\TeamPermission;
+use Omnify\Core\Models\Permission;
+use Omnify\Core\Models\Team;
+use Omnify\Core\Models\TeamPermission;
 
 beforeEach(function () {
     $this->artisan('migrate', ['--database' => 'testing']);

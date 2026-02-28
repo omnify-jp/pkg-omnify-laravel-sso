@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Exceptions;
+namespace Omnify\Core\Exceptions;
 
 class ConsoleServerException extends ConsoleApiException
 {

@@ -9,12 +9,12 @@ packages/laravel/omnify-client-laravel-sso/
 │   │   ├── Traits/           # ✅ HasOrganizationScope, HasBranchScope, HasTeamScope
 │   │   └── *.php             # User, Branch, Role, Permission, etc.
 │   ├── Services/             # ✅ ContextService, PermissionService, etc.
-│   ├── Facades/              # ✅ Context, SsoClient
+│   ├── Facades/              # ✅ Context, Core
 │   ├── Http/
 │   │   ├── Middleware/       # ✅ RequireOrganization, RequireBranch, WithBranch
 │   │   ├── Controllers/
 │   │   └── Resources/
-│   └── Providers/            # ✅ SsoClientServiceProvider
+│   └── Providers/            # ✅ CoreServiceProvider
 │
 ├── database/
 │   ├── migrations/
@@ -68,8 +68,8 @@ docs/architecture/
 ### Import Traits
 
 ```php
-use Omnify\SsoClient\Models\Traits\HasOrganizationScope;
-use Omnify\SsoClient\Models\Traits\HasBranchScope;
+use Omnify\Core\Models\Traits\HasOrganizationScope;
+use Omnify\Core\Models\Traits\HasBranchScope;
 
 class Department extends Model
 {
@@ -80,7 +80,7 @@ class Department extends Model
 ### Use Context Facade
 
 ```php
-use Omnify\SsoClient\Facades\Context;
+use Omnify\Core\Facades\Context;
 
 // Get current organization
 $organizationId = Context::organizationId();
@@ -109,4 +109,4 @@ Route::middleware(['sso.require-branch'])->group(function () {
 
 - `omnify.config.ts` points to `app/`, NOT `src/`
 - All code is in `app/` folder (following Laravel package conventions)
-- Composer autoload: `"Omnify\\SsoClient\\": "app/"`
+- Composer autoload: `"Omnify\\Core\\": "app/"`

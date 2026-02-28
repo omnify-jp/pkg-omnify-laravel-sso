@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnify\SsoClient\Models\Base\Locales;
+namespace Omnify\Core\Models\Base\Locales;
 
 /**
  * Localized display names for Organization.
@@ -44,10 +44,35 @@ class OrganizationLocales
             'ja' => 'スラッグ',
             'vi' => 'Slug',
         ],
+        'is_standalone' => [
+            'en' => 'Standalone',
+            'ja' => 'スタンドアローン',
+            'vi' => 'Standalone',
+        ],
         'is_active' => [
             'en' => 'Active',
             'ja' => '有効',
             'vi' => 'Hoạt động',
+        ],
+        'settings' => [
+            'en' => 'Settings',
+            'ja' => '設定',
+            'vi' => 'Cài đặt',
+        ],
+        'allowed_ips' => [
+            'en' => 'Allowed IPs',
+            'ja' => '許可IPアドレス',
+            'vi' => 'IP được phép',
+        ],
+        'suspended_at' => [
+            'en' => 'Suspended At',
+            'ja' => '停止日時',
+            'vi' => 'Thời gian tạm ngừng',
+        ],
+        'terminated_at' => [
+            'en' => 'Terminated At',
+            'ja' => '終了日時',
+            'vi' => 'Thời gian chấm dứt',
         ],
     ];
 }

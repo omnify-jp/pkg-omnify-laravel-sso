@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Support;
+namespace Omnify\Core\Support;
 
 /**
  * Validates redirect URLs to prevent Open Redirect vulnerabilities.

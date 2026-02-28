@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Omnify\SsoClient\Support\SsoLogger;
+use Omnify\Core\Support\SsoLogger;
 
 if (! function_exists('sso_log')) {
     /**

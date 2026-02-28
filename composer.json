@@ -1,11 +1,11 @@
 {
-    "name": "omnifyjp/pkg-omnify-laravel-sso",
-    "description": "SSO Client Package for Laravel - Provides Role, Permission and RolePermission models with Omnify schema-driven development",
+    "name": "omnifyjp/pkg-omnify-laravel-core",
+    "description": "Core Package for Laravel - Organizations, branches, brands, locations, IAM, auth, and admin CRUD with Omnify schema-driven development",
     "type": "library",
     "license": "MIT",
     "keywords": [
         "laravel",
-        "sso",
+        "core",
         "authentication",
         "authorization",
         "roles",
@@ -20,7 +20,7 @@
             "email": "dev@omnify.jp"
         }
     ],
-    "homepage": "https://github.com/omnify-jp/pkg-omnify-laravel-sso",
+    "homepage": "https://github.com/omnify-jp/pkg-omnify-laravel-core",
     "require": {
         "php": "^8.2",
         "illuminate/support": "^11.0|^12.0",
@@ -38,9 +38,9 @@
     },
     "autoload": {
         "psr-4": {
-            "Omnify\\SsoClient\\": "app/",
-            "Omnify\\SsoClient\\Database\\Factories\\": "database/factories/",
-            "Omnify\\SsoClient\\Database\\Seeders\\": "database/seeders/"
+            "Omnify\\Core\\": "app/",
+            "Omnify\\Core\\Database\\Factories\\": "database/factories/",
+            "Omnify\\Core\\Database\\Seeders\\": "database/seeders/"
         },
         "files": [
             "app/helpers.php"
@@ -48,7 +48,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Omnify\\SsoClient\\Tests\\": "tests/"
+            "Omnify\\Core\\Tests\\": "tests/"
         }
     },
     "extra": {
@@ -59,14 +59,14 @@
             "options": {
                 "generateMigrations": true,
                 "generateModels": true,
-                "modelNamespace": "Omnify\\SsoClient\\Models",
+                "modelNamespace": "Omnify\\Core\\Models",
                 "migrationsPath": "database/migrations/omnify",
                 "factoriesPath": "database/factories"
             }
         },
         "laravel": {
             "providers": [
-                "Omnify\\SsoClient\\SsoClientServiceProvider"
+                "Omnify\\Core\\CoreServiceProvider"
             ]
         }
     },

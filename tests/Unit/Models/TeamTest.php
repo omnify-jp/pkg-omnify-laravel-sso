@@ -8,7 +8,7 @@
  */
 
 use Illuminate\Support\Str;
-use Omnify\SsoClient\Models\Team;
+use Omnify\Core\Models\Team;
 
 beforeEach(function () {
     $this->artisan('migrate', ['--database' => 'testing']);

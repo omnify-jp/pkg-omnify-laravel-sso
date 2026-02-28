@@ -8,7 +8,7 @@
  */
 
 use Illuminate\Support\Str;
-use Omnify\SsoClient\Models\Branch;
+use Omnify\Core\Models\Branch;
 
 beforeEach(function () {
     $this->artisan('migrate', ['--database' => 'testing']);

@@ -1,0 +1,195 @@
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | バリデーション言語行
+    |--------------------------------------------------------------------------
+    */
+
+    'accepted' => ':attributeを承認してください。',
+    'accepted_if' => ':otherが:valueの場合、:attributeを承認してください。',
+    'active_url' => ':attributeは有効なURLではありません。',
+    'after' => ':attributeには:dateより後の日付を指定してください。',
+    'after_or_equal' => ':attributeには:date以降の日付を指定してください。',
+    'alpha' => ':attributeには英字のみ使用できます。',
+    'alpha_dash' => ':attributeには英数字、ハイフン、アンダースコアのみ使用できます。',
+    'alpha_num' => ':attributeには英数字のみ使用できます。',
+    'any_of' => ':attributeが無効です。',
+    'array' => ':attributeには配列を指定してください。',
+    'ascii' => ':attributeには半角英数字と記号のみ使用できます。',
+    'before' => ':attributeには:dateより前の日付を指定してください。',
+    'before_or_equal' => ':attributeには:date以前の日付を指定してください。',
+    'between' => [
+        'array' => ':attributeの項目数は:min〜:max個にしてください。',
+        'file' => ':attributeには:min〜:maxキロバイトのファイルを指定してください。',
+        'numeric' => ':attributeには:min〜:maxの数値を指定してください。',
+        'string' => ':attributeは:min〜:max文字にしてください。',
+    ],
+    'boolean' => ':attributeにはtrueまたはfalseを指定してください。',
+    'can' => ':attributeに許可されていない値が含まれています。',
+    'confirmed' => ':attributeの確認が一致しません。',
+    'contains' => ':attributeに必要な値が含まれていません。',
+    'current_password' => 'パスワードが正しくありません。',
+    'date' => ':attributeは有効な日付ではありません。',
+    'date_equals' => ':attributeには:dateと同じ日付を指定してください。',
+    'date_format' => ':attributeは:formatの形式と一致しません。',
+    'decimal' => ':attributeは小数点以下:decimal桁にしてください。',
+    'declined' => ':attributeを拒否してください。',
+    'declined_if' => ':otherが:valueの場合、:attributeを拒否してください。',
+    'different' => ':attributeと:otherは異なる値にしてください。',
+    'digits' => ':attributeは:digits桁にしてください。',
+    'digits_between' => ':attributeは:min〜:max桁にしてください。',
+    'dimensions' => ':attributeの画像サイズが無効です。',
+    'distinct' => ':attributeに重複した値があります。',
+    'doesnt_contain' => ':attributeに次の値を含めることはできません: :values',
+    'doesnt_end_with' => ':attributeは次のいずれかで終わることはできません: :values',
+    'doesnt_start_with' => ':attributeは次のいずれかで始まることはできません: :values',
+    'email' => ':attributeは有効なメールアドレスにしてください。',
+    'encoding' => ':attributeは:encodingエンコーディングである必要があります。',
+    'ends_with' => ':attributeは次のいずれかで終わる必要があります: :values',
+    'enum' => '選択された:attributeは無効です。',
+    'exists' => '選択された:attributeは無効です。',
+    'extensions' => ':attributeは次の拡張子のファイルにしてください: :values',
+    'file' => ':attributeにはファイルを指定してください。',
+    'filled' => ':attributeは必須です。',
+    'gt' => [
+        'array' => ':attributeの項目数は:value個より多くしてください。',
+        'file' => ':attributeには:valueキロバイトより大きいファイルを指定してください。',
+        'numeric' => ':attributeには:valueより大きい数値を指定してください。',
+        'string' => ':attributeは:value文字より多くしてください。',
+    ],
+    'gte' => [
+        'array' => ':attributeの項目数は:value個以上にしてください。',
+        'file' => ':attributeには:valueキロバイト以上のファイルを指定してください。',
+        'numeric' => ':attributeには:value以上の数値を指定してください。',
+        'string' => ':attributeは:value文字以上にしてください。',
+    ],
+    'hex_color' => ':attributeは有効な16進カラーコードにしてください。',
+    'image' => ':attributeには画像ファイルを指定してください。',
+    'in' => '選択された:attributeは無効です。',
+    'in_array' => ':attributeは:otherに存在する必要があります。',
+    'in_array_keys' => ':attributeには次のキーを含めてください: :values',
+    'integer' => ':attributeには整数を指定してください。',
+    'ip' => ':attributeは有効なIPアドレスにしてください。',
+    'ipv4' => ':attributeは有効なIPv4アドレスにしてください。',
+    'ipv6' => ':attributeは有効なIPv6アドレスにしてください。',
+    'json' => ':attributeは有効なJSON文字列にしてください。',
+    'list' => ':attributeはリストにしてください。',
+    'lowercase' => ':attributeは小文字にしてください。',
+    'lt' => [
+        'array' => ':attributeの項目数は:value個より少なくしてください。',
+        'file' => ':attributeには:valueキロバイトより小さいファイルを指定してください。',
+        'numeric' => ':attributeには:valueより小さい数値を指定してください。',
+        'string' => ':attributeは:value文字より少なくしてください。',
+    ],
+    'lte' => [
+        'array' => ':attributeの項目数は:value個以下にしてください。',
+        'file' => ':attributeには:valueキロバイト以下のファイルを指定してください。',
+        'numeric' => ':attributeには:value以下の数値を指定してください。',
+        'string' => ':attributeは:value文字以下にしてください。',
+    ],
+    'mac_address' => ':attributeは有効なMACアドレスにしてください。',
+    'max' => [
+        'array' => ':attributeの項目数は:max個以下にしてください。',
+        'file' => ':attributeには:maxキロバイト以下のファイルを指定してください。',
+        'numeric' => ':attributeには:max以下の数値を指定してください。',
+        'string' => ':attributeは:max文字以下にしてください。',
+    ],
+    'max_digits' => ':attributeは:max桁以下にしてください。',
+    'mimes' => ':attributeは次のファイルタイプにしてください: :values',
+    'mimetypes' => ':attributeは次のファイルタイプにしてください: :values',
+    'min' => [
+        'array' => ':attributeの項目数は:min個以上にしてください。',
+        'file' => ':attributeには:minキロバイト以上のファイルを指定してください。',
+        'numeric' => ':attributeには:min以上の数値を指定してください。',
+        'string' => ':attributeは:min文字以上にしてください。',
+    ],
+    'min_digits' => ':attributeは:min桁以上にしてください。',
+    'missing' => ':attributeは存在してはいけません。',
+    'missing_if' => ':otherが:valueの場合、:attributeは存在してはいけません。',
+    'missing_unless' => ':otherが:valueでない限り、:attributeは存在してはいけません。',
+    'missing_with' => ':valuesが存在する場合、:attributeは存在してはいけません。',
+    'missing_with_all' => ':valuesがすべて存在する場合、:attributeは存在してはいけません。',
+    'multiple_of' => ':attributeは:valueの倍数にしてください。',
+    'not_in' => '選択された:attributeは無効です。',
+    'not_regex' => ':attributeの形式が無効です。',
+    'numeric' => ':attributeには数値を指定してください。',
+    'password' => [
+        'letters' => ':attributeには英字を1文字以上含めてください。',
+        'mixed' => ':attributeには大文字と小文字を1文字以上含めてください。',
+        'numbers' => ':attributeには数字を1文字以上含めてください。',
+        'symbols' => ':attributeには記号を1文字以上含めてください。',
+        'uncompromised' => ':attributeは情報漏洩で見つかったものです。別の:attributeを選択してください。',
+    ],
+    'present' => ':attributeが存在する必要があります。',
+    'present_if' => ':otherが:valueの場合、:attributeが存在する必要があります。',
+    'present_unless' => ':otherが:valueでない限り、:attributeが存在する必要があります。',
+    'present_with' => ':valuesが存在する場合、:attributeが存在する必要があります。',
+    'present_with_all' => ':valuesがすべて存在する場合、:attributeが存在する必要があります。',
+    'prohibited' => ':attributeは使用できません。',
+    'prohibited_if' => ':otherが:valueの場合、:attributeは使用できません。',
+    'prohibited_if_accepted' => ':otherが承認されている場合、:attributeは使用できません。',
+    'prohibited_if_declined' => ':otherが拒否されている場合、:attributeは使用できません。',
+    'prohibited_unless' => ':otherが:valuesに含まれていない限り、:attributeは使用できません。',
+    'prohibits' => ':attributeは:otherの存在を禁止しています。',
+    'regex' => ':attributeの形式が無効です。',
+    'required' => ':attributeは必須です。',
+    'required_array_keys' => ':attributeには次のエントリが必要です: :values',
+    'required_if' => ':otherが:valueの場合、:attributeは必須です。',
+    'required_if_accepted' => ':otherが承認されている場合、:attributeは必須です。',
+    'required_if_declined' => ':otherが拒否されている場合、:attributeは必須です。',
+    'required_unless' => ':otherが:valuesに含まれていない限り、:attributeは必須です。',
+    'required_with' => ':valuesが存在する場合、:attributeは必須です。',
+    'required_with_all' => ':valuesがすべて存在する場合、:attributeは必須です。',
+    'required_without' => ':valuesが存在しない場合、:attributeは必須です。',
+    'required_without_all' => ':valuesがすべて存在しない場合、:attributeは必須です。',
+    'same' => ':attributeと:otherは一致する必要があります。',
+    'size' => [
+        'array' => ':attributeの項目数は:size個にしてください。',
+        'file' => ':attributeは:sizeキロバイトにしてください。',
+        'numeric' => ':attributeは:sizeにしてください。',
+        'string' => ':attributeは:size文字にしてください。',
+    ],
+    'starts_with' => ':attributeは次のいずれかで始まる必要があります: :values',
+    'string' => ':attributeには文字列を指定してください。',
+    'timezone' => ':attributeは有効なタイムゾーンにしてください。',
+    'unique' => ':attributeは既に使用されています。',
+    'uploaded' => ':attributeのアップロードに失敗しました。',
+    'uppercase' => ':attributeは大文字にしてください。',
+    'url' => ':attributeは有効なURLにしてください。',
+    'ulid' => ':attributeは有効なULIDにしてください。',
+    'uuid' => ':attributeは有効なUUIDにしてください。',
+
+    /*
+    |--------------------------------------------------------------------------
+    | カスタムバリデーションメッセージ
+    |--------------------------------------------------------------------------
+    */
+
+    'custom' => [
+        'attribute-name' => [
+            'rule-name' => 'custom-message',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | カスタムバリデーション属性名
+    |--------------------------------------------------------------------------
+    */
+
+    'attributes' => [
+        'name' => '名前',
+        'email' => 'メールアドレス',
+        'password' => 'パスワード',
+        'password_confirmation' => 'パスワード（確認）',
+        'slug' => 'スラッグ',
+        'organization_id' => '組織',
+        'role_id' => 'ロール',
+        'is_active' => '有効',
+        'is_headquarters' => '本社',
+    ],
+
+];

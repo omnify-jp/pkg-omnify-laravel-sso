@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnify\SsoClient\Providers;
+namespace Omnify\Core\Providers;
 
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -36,16 +36,18 @@ class OmnifyServiceProvider extends ServiceProvider
 
         // Register morph map for polymorphic relationships
         Relation::enforceMorphMap([
-            'Branch' => \Omnify\SsoClient\Models\Branch::class,
-            'Location' => \Omnify\SsoClient\Models\Location::class,
-            'Organization' => \Omnify\SsoClient\Models\Organization::class,
-            'Permission' => \Omnify\SsoClient\Models\Permission::class,
-            'RefreshToken' => \Omnify\SsoClient\Models\RefreshToken::class,
-            'Role' => \Omnify\SsoClient\Models\Role::class,
-            'RolePermission' => \Omnify\SsoClient\Models\RolePermission::class,
-            'Team' => \Omnify\SsoClient\Models\Team::class,
-            'TeamPermission' => \Omnify\SsoClient\Models\TeamPermission::class,
-            'User' => \Omnify\SsoClient\Models\User::class,
+            'Admin' => \Omnify\Core\Models\Admin::class,
+            'Branch' => \Omnify\Core\Models\Branch::class,
+            'Brand' => \Omnify\Core\Models\Brand::class,
+            'Location' => \Omnify\Core\Models\Location::class,
+            'Organization' => \Omnify\Core\Models\Organization::class,
+            'Permission' => \Omnify\Core\Models\Permission::class,
+            'RefreshToken' => \Omnify\Core\Models\RefreshToken::class,
+            'Role' => \Omnify\Core\Models\Role::class,
+            'RolePermission' => \Omnify\Core\Models\RolePermission::class,
+            'Team' => \Omnify\Core\Models\Team::class,
+            'TeamPermission' => \Omnify\Core\Models\TeamPermission::class,
+            'User' => \Omnify\Core\Models\User::class,
         ]);
     }
 }

@@ -28,7 +28,7 @@ https://yourapp.com/logout?redirect_uri=https://evil.com/phishing
 The package validates all redirect URLs:
 
 ```php
-use Omnify\SsoClient\Support\RedirectUrlValidator;
+use Omnify\Core\Support\RedirectUrlValidator;
 
 $validator = new RedirectUrlValidator();
 $safeUrl = $validator->validate($userProvidedUrl, '/fallback');

@@ -10,11 +10,11 @@
  */
 
 use Illuminate\Support\Facades\Auth;
-use Omnify\SsoClient\Services\ConsoleApiService;
-use Omnify\SsoClient\Services\ConsoleTokenService;
-use Omnify\SsoClient\Services\JwtVerifier;
-use Omnify\SsoClient\Services\OrganizationAccessService;
-use Omnify\SsoClient\Tests\Fixtures\Models\User;
+use Omnify\Core\Services\ConsoleApiService;
+use Omnify\Core\Services\ConsoleTokenService;
+use Omnify\Core\Services\JwtVerifier;
+use Omnify\Core\Services\OrganizationAccessService;
+use Omnify\Core\Tests\Fixtures\Models\User;
 
 // =============================================================================
 // Callback Tests - コールバックのテスト

@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnify\SsoClient\Models\Base\Locales;
+namespace Omnify\Core\Models\Base\Locales;
 
 /**
  * Localized display names for Branch.
@@ -39,6 +39,11 @@ class BranchLocales
             'ja' => 'Console Organization ID',
             'vi' => 'Console Organization ID',
         ],
+        'code' => [
+            'en' => 'Branch Code',
+            'ja' => '支店コード',
+            'vi' => 'Mã chi nhánh',
+        ],
         'slug' => [
             'en' => 'Slug',
             'ja' => 'スラッグ',
@@ -59,10 +64,55 @@ class BranchLocales
             'ja' => '有効',
             'vi' => 'Hoạt động',
         ],
+        'console_brand_id' => [
+            'en' => 'Console Brand ID',
+            'ja' => 'Console Brand ID',
+            'vi' => 'Console Brand ID',
+        ],
+        'is_standalone' => [
+            'en' => 'Standalone',
+            'ja' => 'スタンドアローン',
+            'vi' => 'Standalone',
+        ],
+        'address' => [
+            'en' => 'Address',
+            'ja' => '住所',
+            'vi' => 'Địa chỉ',
+        ],
+        'phone' => [
+            'en' => 'Phone',
+            'ja' => '電話番号',
+            'vi' => 'Số điện thoại',
+        ],
+        'email' => [
+            'en' => 'Email',
+            'ja' => 'メール',
+            'vi' => 'Email',
+        ],
         'timezone' => [
             'en' => 'Timezone',
             'ja' => 'タイムゾーン',
             'vi' => 'Múi giờ',
+        ],
+        'currency' => [
+            'en' => 'Currency',
+            'ja' => '通貨',
+            'vi' => 'Tiền tệ',
+        ],
+        'locale' => [
+            'en' => 'Locale',
+            'ja' => 'ロケール',
+            'vi' => 'Ngôn ngữ',
+        ],
+        'settings' => [
+            'en' => 'Settings',
+            'ja' => '設定',
+            'vi' => 'Cài đặt',
+        ],
+        'metadata' => [
+            'en' => 'Metadata',
+            'ja' => 'メタデータ',
+            'vi' => 'Metadata',
         ],
     ];
 }

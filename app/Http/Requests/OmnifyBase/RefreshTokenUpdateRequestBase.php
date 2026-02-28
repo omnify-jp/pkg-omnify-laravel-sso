@@ -10,7 +10,7 @@ namespace App\Http\Requests\OmnifyBase;
  */
 
 use Illuminate\Foundation\Http\FormRequest;
-use Omnify\SsoClient\Models\Base\Locales\RefreshTokenLocales;
+use Omnify\Core\Models\Base\Locales\RefreshTokenLocales;
 
 abstract class RefreshTokenUpdateRequestBase extends FormRequest
 {

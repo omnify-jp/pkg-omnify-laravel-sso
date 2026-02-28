@@ -1,9 +1,4 @@
-import {
-    Avatar, AvatarFallback, Button, Dialog,
-    DialogContent, DialogDescription, DialogHeader, DialogTitle,
-    Label, Select, SelectContent, SelectItem,
-    SelectTrigger, SelectValue,
-} from '@omnifyjp/ui';
+import { Avatar, Button, Card, Flex, Form, Modal, Select, Typography } from 'antd';
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -64,86 +59,80 @@ export function AssignRoleDialog({
         );
     };
 
-    const handleClose = (open: boolean) => {
-        if (!open) {
-            setUserId('');
-            setRoleId('');
-        }
-        onOpenChange(open);
+    const handleClose = () => {
+        setUserId('');
+        setRoleId('');
+        onOpenChange(false);
     };
 
     return (
-        <Dialog open={open} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-[480px]">
-                <DialogHeader>
-                    <DialogTitle>{t('iam.assignRole', 'Assign Role')}</DialogTitle>
-                    <DialogDescription>
-                        {t('iam.assignRoleDesc', 'Assign a role to a user at {{scope}}', {
-                            scope: scopeLabel,
-                        })}
-                    </DialogDescription>
-                </DialogHeader>
-
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Label>{t('iam.selectUser', 'Select User')}</Label>
-                        <Select value={userId} onValueChange={setUserId}>
-                            <SelectTrigger>
-                                <SelectValue placeholder={t('iam.selectUser', 'Select user')} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {users.map((user) => (
-                                    <SelectItem key={user.id} value={user.id}>
-                                        <div className="flex items-center gap-2">
-                                            <Avatar className="h-5 w-5">
-                                                <AvatarFallback className="text-[10px]">
-                                                    {user.name.slice(0, 2).toUpperCase()}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <span>{user.name}</span>
-                                        </div>
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label>{t('iam.selectRole', 'Select Role')}</Label>
-                        <Select value={roleId} onValueChange={setRoleId}>
-                            <SelectTrigger>
-                                <SelectValue placeholder={t('iam.selectRole', 'Select role')} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {roles.map((role) => (
-                                    <SelectItem key={role.id} value={role.id}>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xs text-muted-foreground">Lv.{role.level}</span>
-                                            <span>{role.name}</span>
-                                        </div>
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="rounded-lg border border-border bg-muted/50 p-3 text-sm">
-                        <span className="text-muted-foreground">{t('iam.scope', 'Scope')}: </span>
-                        <span className="font-medium">
-                            {getScopeLabel(scopeType)} — {scopeLabel}
-                        </span>
-                    </div>
-                </div>
-
-                <div className="mt-4 flex justify-end gap-2">
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <Modal
+            open={open}
+            onCancel={handleClose}
+            title={t('iam.assignRole', 'Assign Role')}
+            width={480}
+            footer={
+                <Flex justify="flex-end" gap={8}>
+                    <Button onClick={handleClose}>
                         {t('common.cancel', 'Cancel')}
                     </Button>
-                    <Button onClick={handleSubmit} disabled={!userId || !roleId || submitting}>
+                    <Button type="primary" onClick={handleSubmit} disabled={!userId || !roleId} loading={submitting}>
                         {t('common.assign', 'Assign')}
                     </Button>
-                </div>
-            </DialogContent>
-        </Dialog>
+                </Flex>
+            }
+        >
+            <Typography.Text type="secondary">
+                {t('iam.assignRoleDesc', 'Assign a role to a user at {{scope}}', {
+                    scope: scopeLabel,
+                })}
+            </Typography.Text>
+
+            {/* eslint-disable-next-line antd/require-form-prop -- layout-only Form, state managed by useState */}
+            <Form layout="vertical">
+                <Form.Item label={t('iam.selectUser', 'Select User')}>
+                    <Select
+                        value={userId || undefined}
+                        onChange={setUserId}
+                        placeholder={t('iam.selectUser', 'Select user')}
+                        options={users.map((user) => ({
+                            value: user.id,
+                            label: (
+                                <Flex align="center" gap={8}>
+                                    <Avatar size={20}>
+                                        {user.name.slice(0, 2).toUpperCase()}
+                                    </Avatar>
+                                    <span>{user.name}</span>
+                                </Flex>
+                            ),
+                        }))}
+                    />
+                </Form.Item>
+
+                <Form.Item label={t('iam.selectRole', 'Select Role')}>
+                    <Select
+                        value={roleId || undefined}
+                        onChange={setRoleId}
+                        placeholder={t('iam.selectRole', 'Select role')}
+                        options={roles.map((role) => ({
+                            value: role.id,
+                            label: (
+                                <Flex align="center" gap={8}>
+                                    <Typography.Text type="secondary">Lv.{role.level}</Typography.Text>
+                                    <span>{role.name}</span>
+                                </Flex>
+                            ),
+                        }))}
+                    />
+                </Form.Item>
+            </Form>
+
+            <Card size="small">
+                <Typography.Text type="secondary">{t('iam.scope', 'Scope')}: </Typography.Text>
+                <Typography.Text strong>
+                    {getScopeLabel(scopeType)} — {scopeLabel}
+                </Typography.Text>
+            </Card>
+        </Modal>
     );
 }

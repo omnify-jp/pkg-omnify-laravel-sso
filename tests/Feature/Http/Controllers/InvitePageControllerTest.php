@@ -13,12 +13,12 @@
  * beforeEach (same pattern used by StandaloneLoginControllerTest).
  */
 
-use Omnify\SsoClient\Http\Controllers\InvitePageController;
-use Omnify\SsoClient\Models\Branch;
-use Omnify\SsoClient\Models\Organization;
-use Omnify\SsoClient\Models\User;
-use Omnify\SsoClient\Services\ConsoleApiService;
-use Omnify\SsoClient\Services\ConsoleTokenService;
+use Omnify\Core\Http\Controllers\Console\InvitePageController;
+use Omnify\Core\Models\Branch;
+use Omnify\Core\Models\Organization;
+use Omnify\Core\Models\User;
+use Omnify\Core\Services\ConsoleApiService;
+use Omnify\Core\Services\ConsoleTokenService;
 
 // Register console-mode invite routes for all tests in this file
 // (TestCase defaults to standalone mode — routes aren't auto-loaded)

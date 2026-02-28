@@ -1,10 +1,10 @@
 <?php
 
-namespace Omnify\SsoClient\Tests\Fixtures\Models;
+namespace Omnify\Core\Tests\Fixtures\Models;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use Omnify\SsoClient\Models\User;
+use Omnify\Core\Models\User;
 
 /**
  * テスト用Userファクトリー

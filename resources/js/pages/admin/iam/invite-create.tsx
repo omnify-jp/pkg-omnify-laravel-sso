@@ -1,12 +1,12 @@
-import {
-    Button, Card, CardContent, CardHeader,
-    CardTitle, Label, Select, SelectContent,
-    SelectItem, SelectTrigger, SelectValue, Textarea,
-} from '@omnifyjp/ui';
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import { useIamLayout } from '@omnify-core/contexts/iam-layout-context';
+import { useFormMutation } from '@omnify-core/hooks';
+import { api } from '@omnify-core/services/api';
+import { Button, Card, Col, Flex, Form, Input, Row, Select, Typography } from 'antd';
+import { isAxiosError } from 'axios';
 import { Mail, Send } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useIamLayout } from '@omnify-sso/contexts/iam-layout-context';
 
 import { IamBreadcrumb } from '../../../components/access/iam-breadcrumb';
 
@@ -33,6 +33,12 @@ type Props = {
     available_roles: string[];
 };
 
+type InviteFormData = {
+    branch_id: string;
+    emails_raw: string;
+    role: string;
+};
+
 export default function IamInviteCreate({
     branches,
     invite_org,
@@ -41,23 +47,23 @@ export default function IamInviteCreate({
 }: Props) {
     const Layout = useIamLayout();
     const { t } = useTranslation();
+    const [form] = Form.useForm<InviteFormData>();
+    const [nonFieldErrors, setNonFieldErrors] = useState<Record<string, string>>({});
 
-    const { data, setData, post, processing, errors } = useForm<{
-        org_slug: string;
-        branch_id: string;
-        emails_raw: string;
-        role: string;
-    }>({
-        org_slug: org_slug ?? '',
-        branch_id: '',
-        emails_raw: '',
-        role: 'member',
+    const mutation = useFormMutation({
+        form,
+        mutationFn: (data: InviteFormData) => api.post('/admin/iam/invite', { ...data, org_slug: org_slug ?? '' }),
+        redirectTo: '/admin/iam',
+        onError: (error) => {
+            if (isAxiosError(error) && error.response?.status === 422) {
+                const errors = error.response.data.errors as Record<string, string[]>;
+                const extra: Record<string, string> = {};
+                if (errors.invite) extra.invite = errors.invite[0];
+                if (errors.session) extra.session = errors.session[0];
+                setNonFieldErrors(extra);
+            }
+        },
     });
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post('/admin/iam/invite');
-    };
 
     return (
         <Layout
@@ -68,13 +74,13 @@ export default function IamInviteCreate({
         >
             <Head title={t('iam.inviteMembers', 'Invite Members')} />
 
-            <div className="space-y-section">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-page-title font-semibold">
+            <Flex vertical gap={24}>
+                <Flex justify="space-between" align="center">
+                    <Flex vertical>
+                        <Typography.Title level={4}>
                             {t('iam.inviteMembers', 'Invite Members')}
-                        </h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
+                        </Typography.Title>
+                        <Typography.Text type="secondary">
                             {invite_org
                                 ? t(
                                       'iam.inviteSubtitleOrg',
@@ -85,152 +91,116 @@ export default function IamInviteCreate({
                                       'iam.inviteSubtitle',
                                       'Send email invitations to new members.',
                                   )}
-                        </p>
-                    </div>
+                        </Typography.Text>
+                    </Flex>
                     <IamBreadcrumb
                         segments={[
                             { label: t('iam.invite', 'Invite') },
                         ]}
                     />
-                </div>
+                </Flex>
 
-                <form onSubmit={handleSubmit} className="max-w-2xl space-y-section">
-                    {/* Branch selection */}
-                    <Card>
-                        <CardHeader className="px-card pb-3 pt-card">
-                            <CardTitle className="text-base">
-                                {t('iam.inviteBranch', 'Branch')}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4 px-card pb-card">
-                            {branches.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">
-                                    {t(
-                                        'iam.noBranchesAvailable',
-                                        'No branches available. Make sure you are logged in with an organization selected.',
-                                    )}
-                                </p>
-                            ) : (
-                                <div className="space-y-2">
-                                    <Label>{t('iam.selectBranch', 'Select Branch')}</Label>
-                                    <Select
-                                        value={data.branch_id}
-                                        onValueChange={(v) => setData('branch_id', v)}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue
-                                                placeholder={t(
-                                                    'iam.selectBranch',
-                                                    'Select Branch',
+                <Form
+                    form={form}
+                    layout="vertical"
+                    initialValues={{ branch_id: undefined, emails_raw: '', role: 'member' }}
+                    onFinish={(values) => mutation.mutate(values)}
+                >
+                    <Row>
+                        <Col xs={24} lg={16}>
+                            <Flex vertical gap={24}>
+                                <Card title={t('iam.inviteBranch', 'Branch')}>
+                                    <Flex vertical gap={16}>
+                                        {branches.length === 0 ? (
+                                            <Typography.Text type="secondary">
+                                                {t(
+                                                    'iam.noBranchesAvailable',
+                                                    'No branches available. Make sure you are logged in with an organization selected.',
                                                 )}
-                                            />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {branches.map((branch) => (
-                                                <SelectItem key={branch.id} value={branch.id}>
-                                                    <span className="flex items-center gap-2">
-                                                        {branch.name}
-                                                        {branch.is_headquarters && (
-                                                            <span className="text-xs text-muted-foreground">
-                                                                (HQ)
-                                                            </span>
-                                                        )}
-                                                    </span>
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.branch_id && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.branch_id}
-                                        </p>
-                                    )}
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
+                                            </Typography.Text>
+                                        ) : (
+                                            <Form.Item
+                                                name="branch_id"
+                                                label={t('iam.selectBranch', 'Select Branch')}
+                                            >
+                                                <Select
+                                                    placeholder={t('iam.selectBranch', 'Select Branch')}
+                                                    options={branches.map((branch) => ({
+                                                        value: branch.id,
+                                                        label: `${branch.name}${branch.is_headquarters ? ' (HQ)' : ''}`,
+                                                    }))}
+                                                />
+                                            </Form.Item>
+                                        )}
+                                    </Flex>
+                                </Card>
 
-                    {/* Emails + Role */}
-                    <Card>
-                        <CardHeader className="px-card pb-3 pt-card">
-                            <CardTitle className="flex items-center gap-2 text-base">
-                                <Mail className="h-4 w-4" />
-                                {t('iam.inviteEmails', 'Email Addresses')}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4 px-card pb-card">
-                            <div className="space-y-2">
-                                <Label htmlFor="emails_raw">
-                                    {t('iam.inviteEmailsLabel', 'Emails (one per line or comma-separated)')}
-                                </Label>
-                                <Textarea
-                                    id="emails_raw"
-                                    value={data.emails_raw}
-                                    onChange={(e) => setData('emails_raw', e.target.value)}
-                                    placeholder={t(
-                                        'iam.inviteEmailsPlaceholder',
-                                        'alice@example.com\nbob@example.com',
-                                    )}
-                                    rows={5}
-                                    className="font-mono text-sm"
-                                />
-                                {errors.emails_raw && (
-                                    <p className="text-sm text-destructive">{errors.emails_raw}</p>
-                                )}
-                                <p className="text-xs text-muted-foreground">
-                                    {t('iam.inviteMaxEmails', 'Maximum 50 invitations per send.')}
-                                </p>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label>{t('iam.inviteRole', 'Role')}</Label>
-                                <Select
-                                    value={data.role}
-                                    onValueChange={(v) => setData('role', v)}
+                                <Card
+                                    title={
+                                        <Flex align="center" gap={8}>
+                                            <Mail size={16} />
+                                            <span>{t('iam.inviteEmails', 'Email Addresses')}</span>
+                                        </Flex>
+                                    }
                                 >
-                                    <SelectTrigger>
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {available_roles.map((role) => (
-                                            <SelectItem key={role} value={role}>
-                                                {role.charAt(0).toUpperCase() + role.slice(1)}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {errors.role && (
-                                    <p className="text-sm text-destructive">{errors.role}</p>
-                                )}
-                            </div>
+                                    <Flex vertical gap={16}>
+                                        <Form.Item
+                                            name="emails_raw"
+                                            label={t('iam.inviteEmailsLabel', 'Emails (one per line or comma-separated)')}
+                                            extra={t('iam.inviteMaxEmails', 'Maximum 50 invitations per send.')}
+                                        >
+                                            <Input.TextArea
+                                                placeholder={t(
+                                                    'iam.inviteEmailsPlaceholder',
+                                                    'alice@example.com\nbob@example.com',
+                                                )}
+                                                rows={5}
+                                            />
+                                        </Form.Item>
 
-                            {errors.invite && (
-                                <p className="text-sm text-destructive">{errors.invite}</p>
-                            )}
-                            {errors.session && (
-                                <p className="text-sm text-destructive">{errors.session}</p>
-                            )}
-                        </CardContent>
-                    </Card>
+                                        <Form.Item
+                                            name="role"
+                                            label={t('iam.inviteRole', 'Role')}
+                                        >
+                                            <Select
+                                                options={available_roles.map((role) => ({
+                                                    value: role,
+                                                    label: role.charAt(0).toUpperCase() + role.slice(1),
+                                                }))}
+                                            />
+                                        </Form.Item>
 
-                    <div className="flex justify-end gap-2">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => window.history.back()}
-                        >
-                            {t('iam.cancel', 'Cancel')}
-                        </Button>
-                        <Button
-                            type="submit"
-                            disabled={processing || branches.length === 0}
-                        >
-                            <Send className="mr-2 h-4 w-4" />
-                            {t('iam.sendInvitations', 'Send Invitations')}
-                        </Button>
-                    </div>
-                </form>
-            </div>
+                                        {nonFieldErrors.invite && (
+                                            <Typography.Text type="danger">{nonFieldErrors.invite}</Typography.Text>
+                                        )}
+                                        {nonFieldErrors.session && (
+                                            <Typography.Text type="danger">{nonFieldErrors.session}</Typography.Text>
+                                        )}
+                                    </Flex>
+                                </Card>
+
+                                <Flex justify="end" gap={8}>
+                                    <Button
+                                        type="default"
+                                        onClick={() => window.history.back()}
+                                    >
+                                        {t('iam.cancel', 'Cancel')}
+                                    </Button>
+                                    <Button
+                                        type="primary"
+                                        htmlType="submit"
+                                        disabled={branches.length === 0}
+                                        loading={mutation.isPending}
+                                        icon={<Send size={16} />}
+                                    >
+                                        {t('iam.sendInvitations', 'Send Invitations')}
+                                    </Button>
+                                </Flex>
+                            </Flex>
+                        </Col>
+                    </Row>
+                </Form>
+            </Flex>
         </Layout>
     );
 }

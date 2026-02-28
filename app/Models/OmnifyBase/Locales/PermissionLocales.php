@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnify\SsoClient\Models\OmnifyBase\Locales;
+namespace Omnify\Core\Models\OmnifyBase\Locales;
 
 /**
  * Localized display names for Permission.

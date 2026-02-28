@@ -1,0 +1,155 @@
+# ==============================================================================
+# Brand (ブランド / Thương hiệu)
+# ==============================================================================
+#
+# Mục đích (Purpose):
+#   Quản lý thương hiệu trong hệ thống đa thương hiệu (franchise).
+#   Mỗi Organization có thể sở hữu nhiều Brands.
+#   Branches có thể tùy chọn thuộc về một Brand.
+#
+# Relationships:
+#   Brand ──── Organization (N:1, via console_organization_id)
+#   Brand ──── Branch (1:N, via console_brand_id)
+#
+# ==============================================================================
+
+kind: object
+
+displayName:
+  ja: ブランド
+  en: Brand
+  vi: Thương hiệu
+
+options:
+  timestamps: true
+  softDelete: true
+  id: Uuid
+  indexes:
+    - columns: [console_brand_id]
+      unique: true
+    - columns: [slug]
+      unique: true
+    - columns: [console_organization_id, is_active]
+    - columns: [is_standalone]
+
+properties:
+  # Console reference - Primary identifier from Console
+  console_brand_id:
+    type: Uuid
+    unique: true
+    displayName:
+      ja: Console Brand ID
+      en: Console Brand ID
+      vi: Console Brand ID
+    description:
+      ja: Console側のブランドID
+      en: Brand ID from Console
+      vi: ID thương hiệu từ Console
+
+  # Organization reference (owner)
+  console_organization_id:
+    type: Uuid
+    displayName:
+      ja: Console Organization ID
+      en: Console Organization ID
+      vi: Console Organization ID
+    description:
+      ja: Console側のオーナー組織ID
+      en: Owning organization ID from Console
+      vi: ID tổ chức sở hữu từ Console
+
+  # Basic info
+  slug:
+    type: String
+    length: 50
+    displayName:
+      ja: スラッグ
+      en: Slug
+      vi: Slug
+    description:
+      ja: "ブランドのユニーク識別子（例: starbucks, kfc）"
+      en: "Unique identifier for the brand (e.g. starbucks, kfc)"
+      vi: "Mã định danh duy nhất cho thương hiệu (VD: starbucks, kfc)"
+
+  name:
+    type: String
+    length: 100
+    displayName:
+      ja: ブランド名
+      en: Brand Name
+      vi: Tên thương hiệu
+
+  description:
+    type: Text
+    nullable: true
+    displayName:
+      ja: 説明
+      en: Description
+      vi: Mô tả
+
+  # Visual identity
+  logo_url:
+    type: String
+    length: 500
+    nullable: true
+    displayName:
+      ja: ロゴURL
+      en: Logo URL
+      vi: URL logo
+
+  cover_image_url:
+    type: String
+    length: 500
+    nullable: true
+    displayName:
+      ja: カバー画像URL
+      en: Cover Image URL
+      vi: URL ảnh bìa
+
+  website:
+    type: String
+    length: 500
+    nullable: true
+    displayName:
+      ja: ウェブサイト
+      en: Website
+      vi: Website
+
+  # Status
+  is_active:
+    type: Boolean
+    default: true
+    displayName:
+      ja: 有効
+      en: Active
+      vi: Hoạt động
+
+  # Data origin flag
+  is_standalone:
+    type: Boolean
+    default: false
+    displayName:
+      ja: スタンドアローン
+      en: Standalone
+      vi: Standalone
+    description:
+      ja: スタンドアローンモードで作成されたデータかどうか
+      en: Whether this record was created in standalone mode
+      vi: Bản ghi được tạo ở chế độ standalone hay không
+
+  # Flexible storage
+  settings:
+    type: Json
+    nullable: true
+    displayName:
+      ja: 設定
+      en: Settings
+      vi: Cài đặt
+
+  metadata:
+    type: Json
+    nullable: true
+    displayName:
+      ja: メタデータ
+      en: Metadata
+      vi: Metadata

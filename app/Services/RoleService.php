@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Services;
+namespace Omnify\Core\Services;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Omnify\SsoClient\Models\Organization;
-use Omnify\SsoClient\Models\Permission;
-use Omnify\SsoClient\Models\Role;
+use Omnify\Core\Models\Organization;
+use Omnify\Core\Models\Permission;
+use Omnify\Core\Models\Role;
 
 class RoleService
 {

@@ -1,6 +1,6 @@
 # Injectable Layout — Hướng dẫn tích hợp cho nhiều service
 
-> **Vấn đề:** Package `pkg-omnify-laravel-sso` cung cấp các IAM pages (roles, users,
+> **Vấn đề:** Package `pkg-omnify-laravel-core` cung cấp các IAM pages (roles, users,
 > assignments, ...) dùng chung cho nhiều service Laravel. Mỗi service có layout riêng
 > (`AppLayout`, `AdminLayout`, ...). Nếu hardcode layout trong package, khi deploy sang
 > service khác sẽ bị vỡ.
@@ -34,7 +34,7 @@ Host App (Service A, B, C...)
 │
 └── layouts/app-layout.tsx  ←── inject vào đây
         ↕
-Package (@omnify-sso)
+Package (@omnify-core)
 ├── contexts/iam-layout-context.tsx   ← context definition
 └── pages/admin/iam/*.tsx             ← dùng useIamLayout()
         const Layout = useIamLayout()
@@ -56,7 +56,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import AppLayout from '@/layouts/app-layout';                           // layout của service
-import { IamLayoutContext } from '@omnify-sso/contexts/iam-layout-context'; // từ package
+import { IamLayoutContext } from '@omnify-core/contexts/iam-layout-context'; // từ package
 
 createInertiaApp({
     resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, allPages),
@@ -73,7 +73,7 @@ createInertiaApp({
 });
 ```
 
-### 2. Đảm bảo `vite.config.ts` có alias `@omnify-sso`
+### 2. Đảm bảo `vite.config.ts` có alias `@omnify-core`
 
 ```ts
 // vite.config.ts
@@ -82,7 +82,7 @@ import path from 'node:path';
 export default defineConfig({
     resolve: {
         alias: {
-            '@omnify-sso': path.resolve(__dirname, 'packages/pkg-omnify-laravel-sso/resources/js'),
+            '@omnify-core': path.resolve(__dirname, 'packages/pkg-omnify-laravel-core/resources/js'),
         },
     },
 });
@@ -93,12 +93,12 @@ export default defineConfig({
 ```ts
 // app.tsx — remapping package pages về namespace của host
 const packagePages = import.meta.glob(
-    '../../packages/pkg-omnify-laravel-sso/resources/js/pages/**/*.tsx',
+    '../../packages/pkg-omnify-laravel-core/resources/js/pages/**/*.tsx',
 );
 const remappedPackagePages: typeof hostPages = {};
 for (const [key, value] of Object.entries(packagePages)) {
     const remapped = key.replace(
-        '../../packages/pkg-omnify-laravel-sso/resources/js/pages/',
+        '../../packages/pkg-omnify-laravel-core/resources/js/pages/',
         './pages/',
     );
     remappedPackagePages[remapped] = value;
@@ -113,7 +113,7 @@ const allPages = { ...remappedPackagePages, ...hostPages };
 ### `IamLayoutContext`
 
 ```ts
-import { IamLayoutContext } from '@omnify-sso/contexts/iam-layout-context';
+import { IamLayoutContext } from '@omnify-core/contexts/iam-layout-context';
 ```
 
 React context chứa layout component. Default value là `PassthroughLayout` (xem
@@ -122,7 +122,7 @@ React context chứa layout component. Default value là `PassthroughLayout` (xe
 ### `useIamLayout()`
 
 ```ts
-import { useIamLayout } from '@omnify-sso/contexts/iam-layout-context';
+import { useIamLayout } from '@omnify-core/contexts/iam-layout-context';
 
 // Trong React component:
 const Layout = useIamLayout();
@@ -135,7 +135,7 @@ Hook trả về layout component hiện tại từ context. Luôn trả về m�
 ### `IamLayoutComponent` type
 
 ```ts
-import type { IamLayoutComponent } from '@omnify-sso/contexts/iam-layout-context';
+import type { IamLayoutComponent } from '@omnify-core/contexts/iam-layout-context';
 ```
 
 Type của layout component mà package pages yêu cầu:
@@ -150,7 +150,7 @@ type IamLayoutComponent = ComponentType<{
 ### `IamBreadcrumbItem` type
 
 ```ts
-import type { IamBreadcrumbItem } from '@omnify-sso/contexts/iam-layout-context';
+import type { IamBreadcrumbItem } from '@omnify-core/contexts/iam-layout-context';
 
 // Shape:
 type IamBreadcrumbItem = {
@@ -168,7 +168,7 @@ type IamBreadcrumbItem = {
 ```tsx
 // resources/js/app.tsx
 import AppLayout from '@/layouts/app-layout';           // sidebar + header layout
-import { IamLayoutContext } from '@omnify-sso/contexts/iam-layout-context';
+import { IamLayoutContext } from '@omnify-core/contexts/iam-layout-context';
 
 root.render(
     <StrictMode>
@@ -184,7 +184,7 @@ root.render(
 ```tsx
 // resources/js/app.tsx
 import AdminLayout from '@/layouts/admin-layout';       // layout khác tên
-import { IamLayoutContext } from '@omnify-sso/contexts/iam-layout-context';
+import { IamLayoutContext } from '@omnify-core/contexts/iam-layout-context';
 
 root.render(
     <StrictMode>
@@ -271,7 +271,7 @@ Tạo một `IamLayout` wrapper riêng và inject vào:
 ```tsx
 // layouts/iam-layout.tsx
 import AppLayout from '@/layouts/app-layout';
-import type { IamBreadcrumbItem } from '@omnify-sso/contexts/iam-layout-context';
+import type { IamBreadcrumbItem } from '@omnify-core/contexts/iam-layout-context';
 
 export default function IamLayout({
     children,
@@ -317,6 +317,6 @@ một mock layout.
 
 | File | Mô tả |
 |------|-------|
-| `packages/pkg-omnify-laravel-sso/resources/js/contexts/iam-layout-context.tsx` | Context, hook, và type definitions |
-| `packages/pkg-omnify-laravel-sso/resources/js/pages/admin/iam/*.tsx` | 12 IAM pages dùng `useIamLayout()` |
+| `packages/pkg-omnify-laravel-core/resources/js/contexts/iam-layout-context.tsx` | Context, hook, và type definitions |
+| `packages/pkg-omnify-laravel-core/resources/js/pages/admin/iam/*.tsx` | 12 IAM pages dùng `useIamLayout()` |
 | `resources/js/app.tsx` | Host app inject `AppLayout` vào context |

@@ -10,7 +10,7 @@ namespace App\Http\Requests\OmnifyBase;
  */
 
 use Illuminate\Foundation\Http\FormRequest;
-use Omnify\SsoClient\Models\Base\Locales\OrganizationLocales;
+use Omnify\Core\Models\Base\Locales\OrganizationLocales;
 
 abstract class OrganizationStoreRequestBase extends FormRequest
 {
@@ -54,7 +54,12 @@ abstract class OrganizationStoreRequestBase extends FormRequest
             'console_organization_id' => ['required', 'string', 'uuid', 'unique:organizations'],
             'name' => ['required', 'string', 'max:100'],
             'slug' => ['required', 'string', 'max:100'],
+            'is_standalone' => ['required', 'boolean'],
             'is_active' => ['required', 'boolean'],
+            'settings' => ['nullable', 'array'],
+            'allowed_ips' => ['nullable', 'array'],
+            'suspended_at' => ['nullable', 'date'],
+            'terminated_at' => ['nullable', 'date'],
         ];
     }
 
@@ -75,7 +80,12 @@ abstract class OrganizationStoreRequestBase extends FormRequest
             'console_organization_id',
             'name',
             'slug',
+            'is_standalone',
             'is_active',
+            'settings',
+            'allowed_ips',
+            'suspended_at',
+            'terminated_at',
         ];
 
         foreach ($keys as $key) {

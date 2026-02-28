@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Models\Traits;
+namespace Omnify\Core\Models\Traits;
 
 use Illuminate\Support\Facades\Cache;
-use Omnify\SsoClient\Models\Role;
-use Omnify\SsoClient\Models\TeamPermission;
-use Omnify\SsoClient\Services\OrganizationAccessService;
+use Omnify\Core\Models\Role;
+use Omnify\Core\Models\TeamPermission;
+use Omnify\Core\Services\OrganizationAccessService;
 
 /**
  * Trait for checking permissions from both Role and Teams.

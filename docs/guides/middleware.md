@@ -198,7 +198,7 @@ Extend the base middleware:
 
 namespace App\Http\Middleware;
 
-use Omnify\SsoClient\Http\Middleware\SsoAuthenticate;
+use Omnify\Core\Http\Middleware\SsoAuthenticate;
 
 class CustomSsoAuth extends SsoAuthenticate
 {
@@ -230,9 +230,9 @@ protected $middlewareAliases = [
 
 ```php
 // In tests
-use Omnify\SsoClient\Models\User;
-use Omnify\SsoClient\Models\Role;
-use Omnify\SsoClient\Models\Permission;
+use Omnify\Core\Models\User;
+use Omnify\Core\Models\Role;
+use Omnify\Core\Models\Permission;
 
 test('admin can access admin routes', function () {
     $role = Role::factory()->create(['slug' => 'admin', 'level' => 100]);

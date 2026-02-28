@@ -1,17 +1,13 @@
-import {
-    Badge, Button, Card, CardContent,
-    Input, Select, SelectContent, SelectItem,
-    SelectTrigger, SelectValue, ScopeTypeBadge, Table,
-    TableBody, TableCell, TableHead, TableHeader,
-    TableRow,
-} from '@omnifyjp/ui';
+import { Button, Card, Flex, Input, Select, Table, Tag, Typography } from 'antd';
+import type { TableColumnsType } from 'antd';
 import { Head, Link, router } from '@inertiajs/react';
 import { Eye, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useIamLayout } from '@omnify-sso/contexts/iam-layout-context';
+import { useIamLayout } from '@omnify-core/contexts/iam-layout-context';
 
 import { IamBreadcrumb } from '../../../components/access/iam-breadcrumb';
+import { ScopeTypeBadge } from '../../../components/access/scope-type-badge';
 import type { IamAssignment, ScopeType } from '../../../types/iam';
 import { formatScopeLocation, getScopeLabel, toScopeBadgeType } from '../../../utils/scope-utils';
 
@@ -44,6 +40,77 @@ export default function IamAssignments({ assignments }: Props) {
         );
     };
 
+    const columns: TableColumnsType<IamAssignment> = [
+        {
+            title: t('iam.user', 'User'),
+            key: 'user',
+            render: (_: unknown, assignment: IamAssignment) => (
+                <Flex vertical>
+                    <Typography.Text strong>{assignment.user.name}</Typography.Text>
+                    <Typography.Text type="secondary">{assignment.user.email}</Typography.Text>
+                </Flex>
+            ),
+        },
+        {
+            title: t('iam.role', 'Role'),
+            key: 'role',
+            render: (_: unknown, assignment: IamAssignment) => (
+                <Tag>
+                    <Typography.Text type="secondary">
+                        Lv.{assignment.role.level}
+                    </Typography.Text>
+                    {' '}{assignment.role.name}
+                </Tag>
+            ),
+        },
+        {
+            title: t('iam.scopeType', 'Scope Type'),
+            key: 'scope_type',
+            render: (_: unknown, assignment: IamAssignment) => (
+                <ScopeTypeBadge
+                    type={toScopeBadgeType(assignment.scope_type as ScopeType)}
+                    label={getScopeLabel(assignment.scope_type as ScopeType)}
+                />
+            ),
+        },
+        {
+            title: t('iam.scopeEntity', 'Scope'),
+            key: 'scope_entity',
+            render: (_: unknown, assignment: IamAssignment) => (
+                <Typography.Text>{formatScopeLocation(assignment)}</Typography.Text>
+            ),
+        },
+        {
+            title: t('iam.assignedAt', 'Assigned'),
+            dataIndex: 'created_at',
+            key: 'assigned_at',
+            render: (createdAt: string | null) => (
+                <Typography.Text type="secondary">
+                    {createdAt ? new Date(createdAt).toLocaleDateString() : '\u2014'}
+                </Typography.Text>
+            ),
+        },
+        {
+            title: t('iam.actions', 'Actions'),
+            key: 'actions',
+            width: 96,
+            render: (_: unknown, assignment: IamAssignment) => (
+                <Flex align="center" gap={4}>
+                    <Link href={`/admin/iam/users/${assignment.user.id}`}>
+                        <Button type="text" size="small" icon={<Eye size={16} />} />
+                    </Link>
+                    <Button
+                        type="text"
+                        size="small"
+                        danger
+                        icon={<Trash2 size={16} />}
+                        onClick={() => handleDelete(assignment)}
+                    />
+                </Flex>
+            ),
+        },
+    ];
+
     return (
         <Layout
             breadcrumbs={[
@@ -53,171 +120,67 @@ export default function IamAssignments({ assignments }: Props) {
         >
             <Head title={t('iam.assignments', 'Assignments')} />
 
-            <div className="space-y-section">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-page-title font-semibold">
+            <Flex vertical gap={24}>
+                <Flex justify="space-between" align="center">
+                    <Flex vertical>
+                        <Typography.Title level={4}>
                             {t('iam.assignments', 'Assignments')}
-                        </h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
+                        </Typography.Title>
+                        <Typography.Text type="secondary">
                             {t(
                                 'iam.assignmentsSubtitle',
                                 'All scoped role assignments across users.',
                             )}
-                        </p>
-                    </div>
+                        </Typography.Text>
+                    </Flex>
                     <IamBreadcrumb
                         segments={[{ label: t('iam.assignments', 'Assignments') }]}
                     />
-                </div>
+                </Flex>
 
-                {/* Toolbar */}
-                <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-                    <div className="flex w-full flex-1 gap-3 sm:w-auto">
+                <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
+                    <Flex gap={12} wrap="wrap">
                         <Input
-                            placeholder={t('iam.searchAssignments', 'Search by user or role…')}
+                            placeholder={t('iam.searchAssignments', 'Search by user or role\u2026')}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="max-w-xs"
                         />
-                        <Select value={scopeFilter} onValueChange={setScopeFilter}>
-                            <SelectTrigger className="w-40">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">
-                                    {t('iam.allScopes', 'All Scopes')}
-                                </SelectItem>
-                                <SelectItem value="global">
-                                    {t('iam.global', 'Global')}
-                                </SelectItem>
-                                <SelectItem value="org-wide">
-                                    {t('iam.orgWide', 'Organization')}
-                                </SelectItem>
-                                <SelectItem value="branch">
-                                    {t('iam.branch', 'Branch')}
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <Button asChild>
-                        <Link href="/admin/iam/assignments/create">
-                            <Plus className="h-4 w-4" />
+                        <Select
+                            value={scopeFilter}
+                            onChange={setScopeFilter}
+                            popupMatchSelectWidth={false}
+                            options={[
+                                { value: 'all', label: t('iam.allScopes', 'All Scopes') },
+                                { value: 'global', label: t('iam.global', 'Global') },
+                                { value: 'org-wide', label: t('iam.orgWide', 'Organization') },
+                                { value: 'branch', label: t('iam.branch', 'Branch') },
+                            ]}
+                        />
+                    </Flex>
+                    <Link href="/admin/iam/assignments/create">
+                        <Button type="primary" icon={<Plus size={16} />}>
                             {t('iam.createAssignment', 'Create Assignment')}
-                        </Link>
-                    </Button>
-                </div>
+                        </Button>
+                    </Link>
+                </Flex>
 
-                {/* Table */}
-                <Card>
-                    <CardContent className="p-0">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>{t('iam.user', 'User')}</TableHead>
-                                    <TableHead>{t('iam.role', 'Role')}</TableHead>
-                                    <TableHead>{t('iam.scopeType', 'Scope Type')}</TableHead>
-                                    <TableHead>{t('iam.scopeEntity', 'Scope')}</TableHead>
-                                    <TableHead>{t('iam.assignedAt', 'Assigned')}</TableHead>
-                                    <TableHead className="w-24">
-                                        {t('iam.actions', 'Actions')}
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {filtered.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={6}
-                                            className="py-8 text-center text-sm text-muted-foreground"
-                                        >
-                                            {t('iam.noAssignments', 'No assignments found.')}
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    filtered.map((assignment) => (
-                                        <TableRow key={assignment.id}>
-                                            <TableCell>
-                                                <div>
-                                                    <p className="text-sm font-medium">
-                                                        {assignment.user.name}
-                                                    </p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        {assignment.user.email}
-                                                    </p>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge variant="outline">
-                                                    <span className="mr-1 text-xs text-muted-foreground">
-                                                        Lv.{assignment.role.level}
-                                                    </span>
-                                                    {assignment.role.name}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell>
-                                                <ScopeTypeBadge
-                                                    type={toScopeBadgeType(
-                                                        assignment.scope_type as ScopeType,
-                                                    )}
-                                                    label={getScopeLabel(
-                                                        assignment.scope_type as ScopeType,
-                                                    )}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <span className="text-sm">
-                                                    {formatScopeLocation(assignment)}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell>
-                                                <span className="text-sm text-muted-foreground">
-                                                    {assignment.created_at
-                                                        ? new Date(
-                                                              assignment.created_at,
-                                                          ).toLocaleDateString()
-                                                        : '—'}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-1">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-8 w-8"
-                                                        asChild
-                                                    >
-                                                        <Link
-                                                            href={`/admin/iam/users/${assignment.user.id}`}
-                                                        >
-                                                            <Eye className="h-4 w-4" />
-                                                        </Link>
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-8 w-8 text-destructive hover:text-destructive"
-                                                        onClick={() => handleDelete(assignment)}
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
+                <Card styles={{ body: { padding: 0 } }}>
+                    <Table
+                        columns={columns}
+                        dataSource={filtered}
+                        rowKey="id"
+                        pagination={false}
+                        locale={{ emptyText: t('iam.noAssignments', 'No assignments found.') }}
+                    />
                 </Card>
 
-                <p className="text-sm text-muted-foreground">
+                <Typography.Text type="secondary">
                     {t('iam.showingCount', 'Showing {{filtered}} of {{total}}', {
                         filtered: filtered.length,
                         total: assignments.length,
                     })}
-                </p>
-            </div>
+                </Typography.Text>
+            </Flex>
         </Layout>
     );
 }

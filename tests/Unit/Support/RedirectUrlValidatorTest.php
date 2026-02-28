@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Omnify\SsoClient\Support\RedirectUrlValidator;
+use Omnify\Core\Support\RedirectUrlValidator;
 
 beforeEach(function () {
     // Set app URL for testing

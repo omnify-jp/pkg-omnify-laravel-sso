@@ -10,7 +10,7 @@ namespace App\Http\Requests\OmnifyBase;
  */
 
 use Illuminate\Foundation\Http\FormRequest;
-use Omnify\SsoClient\Models\Base\Locales\RoleLocales;
+use Omnify\Core\Models\Base\Locales\RoleLocales;
 
 abstract class RoleUpdateRequestBase extends FormRequest
 {

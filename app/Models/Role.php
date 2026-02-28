@@ -1,10 +1,10 @@
 <?php
 
-namespace Omnify\SsoClient\Models;
+namespace Omnify\Core\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Omnify\SsoClient\Database\Factories\RoleFactory;
-use Omnify\SsoClient\Models\Base\RoleBaseModel;
+use Omnify\Core\Database\Factories\RoleFactory;
+use Omnify\Core\Models\Base\RoleBaseModel;
 
 /**
  * Role Model

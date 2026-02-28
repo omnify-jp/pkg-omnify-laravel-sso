@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Services;
+namespace Omnify\Core\Services;
 
 use Illuminate\Support\Collection;
-use Omnify\SsoClient\Enums\ScopeType;
-use Omnify\SsoClient\Models\Branch;
-use Omnify\SsoClient\Models\Organization;
-use Omnify\SsoClient\Models\Role;
-use Omnify\SsoClient\Models\User;
+use Omnify\Core\Enums\ScopeType;
+use Omnify\Core\Models\Branch;
+use Omnify\Core\Models\Organization;
+use Omnify\Core\Models\Role;
+use Omnify\Core\Models\User;
 
 class UserRoleService
 {
@@ -23,8 +23,8 @@ class UserRoleService
         // If org context, filter to global + org roles
         if ($organizationId) {
             $query->where(function ($q) use ($organizationId) {
-                $q->whereNull('user_roles.console_organization_id')
-                    ->orWhere('user_roles.console_organization_id', $organizationId);
+                $q->whereNull('role_user_pivot.console_organization_id')
+                    ->orWhere('role_user_pivot.console_organization_id', $organizationId);
             });
         }
 

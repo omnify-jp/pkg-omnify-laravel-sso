@@ -11,7 +11,7 @@ namespace App\Http\Requests\OmnifyBase;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Omnify\SsoClient\Models\Base\Locales\LocationLocales;
+use Omnify\Core\Models\Base\Locales\LocationLocales;
 
 abstract class LocationUpdateRequestBase extends FormRequest
 {
@@ -59,6 +59,7 @@ abstract class LocationUpdateRequestBase extends FormRequest
             'name' => ['sometimes', 'string', 'max:150'],
             'type' => ['sometimes', 'string', Rule::in(['office', 'warehouse', 'factory', 'store', 'clinic', 'restaurant', 'other'])],
             'is_active' => ['sometimes', 'boolean'],
+            'is_standalone' => ['sometimes', 'boolean'],
             'address' => ['nullable', 'string'],
             'city' => ['nullable', 'string', 'max:100'],
             'state_province' => ['nullable', 'string', 'max:100'],
@@ -98,6 +99,7 @@ abstract class LocationUpdateRequestBase extends FormRequest
             'name',
             'type',
             'is_active',
+            'is_standalone',
             'address',
             'city',
             'state_province',

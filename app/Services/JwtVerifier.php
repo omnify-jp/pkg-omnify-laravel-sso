@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Services;
+namespace Omnify\Core\Services;
 
 use DateTimeImmutable;
 use DateTimeZone;
@@ -15,7 +15,7 @@ use Lcobucci\JWT\Token\Plain;
 use Lcobucci\JWT\Validation\Constraint\LooseValidAt;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
 use Lcobucci\JWT\Validation\Validator;
-use Omnify\SsoClient\Exceptions\ConsoleAuthException;
+use Omnify\Core\Exceptions\ConsoleAuthException;
 use Psr\Clock\ClockInterface;
 
 /**

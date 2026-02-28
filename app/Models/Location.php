@@ -1,10 +1,12 @@
 <?php
 
-namespace Omnify\SsoClient\Models;
+namespace Omnify\Core\Models;
 
-use Omnify\SsoClient\Models\Base\LocationBaseModel;
-use Omnify\SsoClient\Database\Factories\LocationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Omnify\Core\Database\Factories\LocationFactory;
+use Omnify\Core\Models\Base\LocationBaseModel;
+use Omnify\Core\Models\Traits\HasStandaloneScope;
 
 /**
  * Location Model
@@ -15,6 +17,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Location extends LocationBaseModel
 {
     use HasFactory;
+    use HasStandaloneScope;
 
     /**
      * Create a new model instance.
@@ -32,5 +35,19 @@ class Location extends LocationBaseModel
         return LocationFactory::new();
     }
 
-    // Add your custom methods here
+    /**
+     * Get the branch this location belongs to.
+     */
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'console_branch_id', 'console_branch_id');
+    }
+
+    /**
+     * Get the organization this location belongs to.
+     */
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class, 'console_organization_id', 'console_organization_id');
+    }
 }

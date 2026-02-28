@@ -1,12 +1,12 @@
-# Omnify SSO Package (`pkg-omnify-laravel-sso`)
+# Omnify Core Package (`pkg-omnify-laravel-core`)
 
 ## What This Is
 
-A **self-contained Laravel package** (like Telescope/Horizon) providing SSO authentication, IAM (roles/permissions), and multi-tenant management (organizations, branches, locations, users). Install via Composer and get full functionality — the host app only provides a layout.
+A **self-contained Laravel package** (like Telescope/Horizon) providing authentication, IAM (roles/permissions), and multi-tenant management (organizations, branches, brands, locations, users). Install via Composer and get full functionality — the host app only provides a layout.
 
 ## Namespace
 
-`Omnify\SsoClient` — all classes live under this namespace.
+`Omnify\Core` — all classes live under this namespace.
 
 ## Dual-Mode Architecture
 
@@ -30,7 +30,7 @@ Controlled by `OMNIFY_AUTH_MODE` env var (config: `omnify-auth.mode`):
 | Path | Purpose |
 |------|---------|
 | `config/omnify-auth.php` | All config (mode, routes, layout, cache, security) |
-| `app/SsoClientServiceProvider.php` | Boot: routes, middleware, commands, migrations, publishing |
+| `app/CoreServiceProvider.php` | Boot: routes, middleware, commands, migrations, publishing |
 | `routes/sso.php` | API routes (auth, admin API) |
 | `routes/access.php` | IAM pages (Inertia) — both modes |
 | `routes/auth-standalone.php` | Standalone login/password pages |
@@ -48,13 +48,13 @@ Controlled by `OMNIFY_AUTH_MODE` env var (config: `omnify-auth.mode`):
 
 | Alias | Class | Purpose |
 |-------|-------|---------|
-| `sso.auth` | SsoAuthenticate | Console SSO JWT auth |
-| `sso.organization` | SsoOrganizationAccess | Org access check |
-| `sso.role` | SsoRoleCheck | Role-based access (e.g., `sso.role:admin`) |
-| `sso.permission` | SsoPermissionCheck | Permission-based access |
-| `sso.branch` | SetBranchFromHeader | Branch context from header |
-| `sso.share` | ShareSsoData | Share SSO data with Inertia |
-| `sso.standalone.org` | StandaloneOrganizationContext | Set org context (standalone) |
+| `core.auth` | SsoAuthenticate | Console SSO JWT auth |
+| `core.organization` | SsoOrganizationAccess | Org access check |
+| `core.role` | SsoRoleCheck | Role-based access (e.g., `core.role:admin`) |
+| `core.permission` | SsoPermissionCheck | Permission-based access |
+| `core.branch` | SetBranchFromHeader | Branch context from header |
+| `core.share` | ShareSsoData | Share SSO data with Inertia |
+| `core.standalone.org` | StandaloneOrganizationContext | Set org context (standalone) |
 
 ## Config Layout Pattern
 
@@ -80,7 +80,7 @@ Package renders Inertia pages using this layout. Pages path is also configurable
 
 ## Multi-Tenant Entities
 
-SSO package manages the full tenant hierarchy:
+Core package manages the full tenant hierarchy:
 - **Organization** — top-level tenant
 - **Branch** — belongs to Organization
 - **Location** — belongs to Branch

@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnify\SsoClient\Models;
+namespace Omnify\Core\Models;
 
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
@@ -11,10 +11,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Omnify\SsoClient\Database\Factories\UserFactory;
-use Omnify\SsoClient\Models\Base\UserBaseModel;
-use Omnify\SsoClient\Models\Traits\HasConsoleSso;
-use Omnify\SsoClient\Models\Traits\HasTeamPermissions;
+use Omnify\Core\Database\Factories\UserFactory;
+use Omnify\Core\Models\Base\UserBaseModel;
+use Omnify\Core\Models\Traits\HasConsoleSso;
+use Omnify\Core\Models\Traits\HasStandaloneScope;
+use Omnify\Core\Models\Traits\HasTeamPermissions;
 
 /**
  * User Model
@@ -29,6 +30,7 @@ class User extends UserBaseModel implements AuthenticatableContract, Authorizabl
     use HasApiTokens;
     use HasConsoleSso;
     use HasFactory;
+    use HasStandaloneScope;
     use HasTeamPermissions;
     use Notifiable;
 
@@ -122,22 +124,22 @@ class User extends UserBaseModel implements AuthenticatableContract, Authorizabl
 
         if ($branchId === null) {
             return $query->where(function ($q) use ($organizationId) {
-                $q->whereRaw('(role_user.console_organization_id IS NULL AND role_user.console_branch_id IS NULL)')
+                $q->whereRaw('(role_user_pivot.console_organization_id IS NULL AND role_user_pivot.console_branch_id IS NULL)')
                     ->orWhereRaw(
-                        '(role_user.console_organization_id = ? AND role_user.console_branch_id IS NULL)',
+                        '(role_user_pivot.console_organization_id = ? AND role_user_pivot.console_branch_id IS NULL)',
                         [$organizationId]
                     );
             })->get();
         }
 
         return $query->where(function ($q) use ($organizationId, $branchId) {
-            $q->whereRaw('(role_user.console_organization_id IS NULL AND role_user.console_branch_id IS NULL)')
+            $q->whereRaw('(role_user_pivot.console_organization_id IS NULL AND role_user_pivot.console_branch_id IS NULL)')
                 ->orWhereRaw(
-                    '(role_user.console_organization_id = ? AND role_user.console_branch_id IS NULL)',
+                    '(role_user_pivot.console_organization_id = ? AND role_user_pivot.console_branch_id IS NULL)',
                     [$organizationId]
                 )
                 ->orWhereRaw(
-                    '(role_user.console_organization_id = ? AND role_user.console_branch_id = ?)',
+                    '(role_user_pivot.console_organization_id = ? AND role_user_pivot.console_branch_id = ?)',
                     [$organizationId, $branchId]
                 );
         })->get();

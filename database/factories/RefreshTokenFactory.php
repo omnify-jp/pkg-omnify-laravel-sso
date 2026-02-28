@@ -1,11 +1,11 @@
 <?php
 
-namespace Omnify\SsoClient\Database\Factories;
+namespace Omnify\Core\Database\Factories;
 
-use Omnify\SsoClient\Models\RefreshToken;
+use Omnify\Core\Models\RefreshToken;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-use Omnify\SsoClient\Models\User;
+use Omnify\Core\Models\User;
 
 /**
  * RefreshToken Factory

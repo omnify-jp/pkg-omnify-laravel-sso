@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Omnify\SsoClient\Services;
+namespace Omnify\Core\Services;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
-use Omnify\SsoClient\Exceptions\ConsoleServerException;
+use Omnify\Core\Exceptions\ConsoleServerException;
 
 class JwksService
 {
