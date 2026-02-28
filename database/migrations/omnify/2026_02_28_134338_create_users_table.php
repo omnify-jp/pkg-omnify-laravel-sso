@@ -30,6 +30,15 @@ return new class extends Migration
             $table->string('email')->comment('Email');
             $table->string('password')->nullable()->comment('Password');
             $table->string('remember_token', 100)->nullable()->comment('Remember Token');
+            $table->timestamp('email_verified_at')->nullable()->comment('Email Verified At');
+            $table->boolean('is_default_password')->default(false)->comment('Is Default Password');
+            $table->boolean('is_active')->default(true)->comment('Active');
+            $table->date('date_of_birth')->nullable()->comment('Date of Birth');
+            $table->string('phone', 20)->nullable()->comment('Phone Number');
+            $table->text('address')->nullable()->comment('Address');
+            $table->json('bank')->nullable()->comment('Bank Account');
+            $table->string('avatar_url', 500)->nullable()->comment('Avatar URL');
+            $table->text('bio')->nullable()->comment('Bio');
             $table->boolean('is_standalone')->default(false)->comment('Standalone');
             $table->uuid('console_user_id')->nullable()->comment('Console User ID');
             $table->uuid('console_organization_id')->nullable()->comment('Organization ID');

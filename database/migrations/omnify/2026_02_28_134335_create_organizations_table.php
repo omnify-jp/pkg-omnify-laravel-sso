@@ -31,6 +31,10 @@ return new class extends Migration
             $table->string('slug', 100)->comment('Slug');
             $table->boolean('is_standalone')->default(false)->comment('Standalone');
             $table->boolean('is_active')->default(true)->comment('Active');
+            $table->json('settings')->nullable()->comment('Settings');
+            $table->json('allowed_ips')->nullable()->comment('Allowed IPs');
+            $table->timestamp('suspended_at')->nullable()->comment('Suspended At');
+            $table->timestamp('terminated_at')->nullable()->comment('Terminated At');
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
             $table->timestamp('deleted_at')->nullable();

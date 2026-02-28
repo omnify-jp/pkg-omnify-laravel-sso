@@ -217,7 +217,7 @@ export const darkTheme: ThemeConfig = {
     },
 };
 
-// ─── Branding Theme (Auth Pages) ──────────────────────────────────────────────
+// ─── Branding Theme (Auth Pages — Left Panel) ────────────────────────────────
 
 /** 認証ページ左パネル用ダークテーマ（ブランディング表示） */
 export const brandingTheme: ThemeConfig = {
@@ -231,6 +231,30 @@ export const brandingTheme: ThemeConfig = {
     components: {
         Layout: {
             bodyBg: '#141414',
+        },
+    },
+};
+
+// ─── Auth Theme (Auth Pages — Form Panel) ─────────────────────────────────────
+//
+// 認証ページ（ログイン・登録・パスワードリセット）専用テーマ。
+// OmnifyProvider のグローバルテーマを継承し、Form 間隔のみオーバーライド。
+//
+// Admin ページは itemMarginBottom: 0（Flex gap で制御）だが、
+// Auth ページは children として Form を受け取るため、テーマトークンで間隔を確保。
+//
+//  Token                   │ Admin │ Auth │ Derivation
+// ─────────────────────────┼───────┼──────┼────────────────────
+//  Form.itemMarginBottom   │   0   │  24  │ 14 × φ ≈ 23 → 24
+//  Form.verticalLabelPadding│ 4px  │ 8px  │ label-input 間のゆとり
+// ─────────────────────────┴───────┴──────┴────────────────────
+
+/** 認証ページ専用テーマ — フォーム間隔を広げてゆったりした認証 UI を実現 */
+export const authTheme: ThemeConfig = {
+    components: {
+        Form: {
+            itemMarginBottom: 24,              // 14 × φ ≈ 23 → 24 (admin: 0)
+            verticalLabelPadding: '0 0 8px',   // ラベルと入力の間にゆとり (admin: 4px)
         },
     },
 };
