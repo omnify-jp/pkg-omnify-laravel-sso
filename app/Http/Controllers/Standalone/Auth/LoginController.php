@@ -17,7 +17,14 @@ class LoginController extends Controller
     {
         $pagePath = config('omnify-auth.standalone.pages.login', 'auth/login');
 
-        return Inertia::render($pagePath);
+        $socialiteProviders = [];
+        if (config('omnify-auth.socialite.enabled', false)) {
+            $socialiteProviders = array_keys(config('omnify-auth.socialite.providers', []));
+        }
+
+        return Inertia::render($pagePath, [
+            'socialite_providers' => $socialiteProviders,
+        ]);
     }
 
     public function login(Request $request): RedirectResponse

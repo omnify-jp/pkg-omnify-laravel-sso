@@ -222,6 +222,32 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Socialite (Social Login)
+    |--------------------------------------------------------------------------
+    |
+    | Enable social login via Laravel Socialite.
+    | Only available in standalone mode. Each provider requires
+    | client_id, client_secret, and redirect URL.
+    |
+    */
+    'socialite' => [
+        'enabled' => env('OMNIFY_SOCIALITE_ENABLED', false),
+        'providers' => [
+            // 'google' => [
+            //     'client_id' => env('GOOGLE_CLIENT_ID'),
+            //     'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+            //     'redirect' => env('GOOGLE_REDIRECT_URL', '/auth/google/callback'),
+            // ],
+            // 'github' => [
+            //     'client_id' => env('GITHUB_CLIENT_ID'),
+            //     'client_secret' => env('GITHUB_CLIENT_SECRET'),
+            //     'redirect' => env('GITHUB_REDIRECT_URL', '/auth/github/callback'),
+            // ],
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Security
     |--------------------------------------------------------------------------
     */

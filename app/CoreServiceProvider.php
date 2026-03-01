@@ -109,6 +109,7 @@ class CoreServiceProvider extends ServiceProvider
     {
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'omnify');
         $this->configureLogging();
+        $this->configureSocialite();
         $this->registerMorphMap();
         $this->registerPublishing();
         $this->registerMigrations();
@@ -132,6 +133,25 @@ class CoreServiceProvider extends ServiceProvider
                 'level' => config('omnify-auth.logging.level', 'debug'),
                 'days' => 14,
             ]]);
+        }
+    }
+
+    /**
+     * Configure Socialite providers from omnify-auth config.
+     *
+     * Merges provider credentials into Laravel's services config
+     * so Socialite can read them via config('services.{provider}').
+     */
+    protected function configureSocialite(): void
+    {
+        if (! config('omnify-auth.socialite.enabled', false)) {
+            return;
+        }
+
+        $providers = config('omnify-auth.socialite.providers', []);
+
+        foreach ($providers as $name => $providerConfig) {
+            config(["services.{$name}" => $providerConfig]);
         }
     }
 
@@ -283,6 +303,11 @@ class CoreServiceProvider extends ServiceProvider
         // Auth routes — never org-prefixed (login/register/2fa)
         if (config('omnify-auth.routes.auth_enabled', true)) {
             $this->loadRoutesFrom(__DIR__.'/../routes/standalone/auth.php');
+        }
+
+        // Socialite routes — social login (Google, GitHub, etc.)
+        if (config('omnify-auth.socialite.enabled', false)) {
+            $this->loadRoutesFrom(__DIR__.'/../routes/standalone/socialite.php');
         }
 
         if (config('omnify-auth.standalone.admin_enabled', true)) {

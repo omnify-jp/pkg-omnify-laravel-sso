@@ -14,6 +14,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Omnify\Core\Database\Factories\UserFactory;
 use Omnify\Core\Models\Base\UserBaseModel;
 use Omnify\Core\Models\Traits\HasConsoleSso;
+use Omnify\Core\Models\Traits\HasSocialAccounts;
 use Omnify\Core\Models\Traits\HasStandaloneScope;
 use Omnify\Core\Models\Traits\HasTeamPermissions;
 
@@ -30,6 +31,7 @@ class User extends UserBaseModel implements AuthenticatableContract, Authorizabl
     use HasApiTokens;
     use HasConsoleSso;
     use HasFactory;
+    use HasSocialAccounts;
     use HasStandaloneScope;
     use HasTeamPermissions;
     use Notifiable;
