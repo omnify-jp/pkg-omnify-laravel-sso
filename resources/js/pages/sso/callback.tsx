@@ -7,11 +7,12 @@ import { useAuthLayout } from '@omnify-core/contexts/auth-layout-context';
 
 type SsoCallbackProps = {
     callbackApiUrl: string;
+    redirectUrl: string;
 };
 
 type CallbackState = 'processing' | 'success' | 'error';
 
-export default function SsoCallback({ callbackApiUrl }: SsoCallbackProps) {
+export default function SsoCallback({ callbackApiUrl, redirectUrl }: SsoCallbackProps) {
     const { t } = useTranslation();
     const AuthLayout = useAuthLayout();
     const [state, setState] = useState<CallbackState>('processing');
@@ -56,9 +57,9 @@ export default function SsoCallback({ callbackApiUrl }: SsoCallbackProps) {
 
             setState('success');
 
-            // Redirect to dashboard after successful auth
+            // Redirect after successful auth
             setTimeout(() => {
-                router.visit('/dashboard');
+                router.visit(redirectUrl);
             }, 500);
         } catch (error) {
             setState('error');

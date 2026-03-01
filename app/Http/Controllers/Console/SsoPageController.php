@@ -62,8 +62,11 @@ class SsoPageController extends Controller
      */
     public function callback(): Response
     {
+        $redirectRoute = config('omnify-auth.console.redirect_after_login', 'dashboard');
+
         return Inertia::render($this->getPagePath('callback'), [
             'callbackApiUrl' => url(config('omnify-auth.routes.prefix', 'api/sso').'/callback'),
+            'redirectUrl' => route($redirectRoute),
         ]);
     }
 }

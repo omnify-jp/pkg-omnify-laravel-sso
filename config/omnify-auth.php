@@ -54,6 +54,7 @@ return [
         'service_slug' => env('SSO_SERVICE_SLUG', ''),
         'callback_url' => env('SSO_CALLBACK_URL', '/sso/callback'),
         'route_prefix' => env('SSO_AUTH_PREFIX', 'sso'),
+        'redirect_after_login' => env('OMNIFY_AUTH_REDIRECT_AFTER_LOGIN', 'dashboard'),
         'pages' => [
             'login' => env('OMNIFY_SSO_PAGE_LOGIN', 'sso/login'),
             'callback' => env('OMNIFY_SSO_PAGE_CALLBACK', 'sso/callback'),
