@@ -333,7 +333,8 @@ class CoreServiceProvider extends ServiceProvider
                 ->middleware(['core.org.url'])
                 ->group($callback);
         } else {
-            $callback();
+            Route::middleware(['core.standalone.org'])
+                ->group($callback);
         }
     }
 

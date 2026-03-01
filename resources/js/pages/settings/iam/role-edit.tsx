@@ -1,4 +1,5 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
+import { useOrgRoute } from '@omnify-core/hooks/use-org-route';
 import { PageContainer } from '@omnify-core/components/page-container';
 import { useFormMutation } from '@omnify-core/hooks';
 import { api } from '@omnify-core/services/api';
@@ -30,8 +31,8 @@ type RolePayload = RoleFormValues & {
 
 export default function IamRoleEdit({ role, permissions, all_permissions }: Props) {
     const { t } = useTranslation();
-    const { url } = usePage();
-    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
+    const orgRoute = useOrgRoute();
+    const iamBase = orgRoute('/settings/iam');
     const [form] = Form.useForm<RoleFormValues>();
 
     const currentPermissionIds = permissions.map((p) => p.id);

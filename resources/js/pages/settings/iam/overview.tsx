@@ -1,5 +1,6 @@
 import { Avatar, Button, Card, Col, Empty, Flex, Row, Statistic, Typography, theme } from 'antd';
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
+import { useOrgRoute } from '@omnify-core/hooks/use-org-route';
 import { ArrowRight, Globe, Network, Shield, ShieldCheck, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageContainer } from '@omnify-core/components/page-container';
@@ -32,8 +33,8 @@ type Props = {
 export default function IamOverview({ stats, recent_assignments }: Props) {
     const { t } = useTranslation();
     const { token } = theme.useToken();
-    const { url } = usePage();
-    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
+    const orgRoute = useOrgRoute();
+    const iamBase = orgRoute('/settings/iam');
 
     const statCards = [
         {

@@ -30,6 +30,9 @@ class CoreHandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth_mode' => config('omnify-auth.mode', 'standalone'),
+            // true when org slug is in URL (/@acme/dashboard), false for cookie-only (/dashboard).
+            // Frontend uses this to decide: navigate to /@{slug}/... or reload page after org switch.
+            'org_url_mode' => config('omnify-auth.routes.org_route_prefix', '') !== '',
             'locale' => app()->getLocale(),
             'auth' => [
                 'user' => $request->user(),

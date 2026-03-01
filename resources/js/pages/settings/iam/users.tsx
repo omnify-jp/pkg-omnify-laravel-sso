@@ -1,6 +1,7 @@
 import { Avatar, Button, Card, Flex, Table, Tag, Typography } from 'antd';
 import type { TableColumnsType } from 'antd';
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
+import { useOrgRoute } from '@omnify-core/hooks/use-org-route';
 import { Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageContainer } from '@omnify-core/components/page-container';
@@ -17,8 +18,8 @@ type Props = {
 
 export default function IamUsers({ users, filters }: Props) {
     const { t } = useTranslation();
-    const { url } = usePage();
-    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
+    const orgRoute = useOrgRoute();
+    const iamBase = orgRoute('/settings/iam');
 
     const breadcrumbs = [
         { title: t('iam.users', 'Users'), href: `${iamBase}/users` },

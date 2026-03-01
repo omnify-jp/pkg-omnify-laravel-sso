@@ -1,5 +1,6 @@
 import { router, usePage } from '@inertiajs/react';
 import { useAppLayout } from '@omnify-core/contexts/app-layout-context';
+import { useOrgRoute } from '@omnify-core/hooks/use-org-route';
 import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
 import { useMemo } from 'react';
@@ -31,27 +32,24 @@ type Props = {
 export default function OrgSettingsLayout({ children, breadcrumbs, title, subtitle, extra }: Props) {
     const { t } = useTranslation();
     const { url, props } = usePage<{
-        organization: { slug?: string };
         org_settings_sections?: SectionConfig[];
     }>();
 
     const AppLayout = useAppLayout();
-
-    const slug = props.organization?.slug ?? '';
-    const orgPrefix = slug ? `/@${slug}` : '';
+    const orgRoute = useOrgRoute();
 
     const sections: SectionConfig[] = props.org_settings_sections ?? [];
 
     // Find matching section based on current URL
     const matchedSection = useMemo(() => {
         for (const section of sections) {
-            const sectionPath = `${orgPrefix}/${section.path_prefix}`;
+            const sectionPath = orgRoute(`/${section.path_prefix}`);
             if (url.startsWith(sectionPath)) {
                 return { section, basePath: sectionPath };
             }
         }
         return null;
-    }, [url, orgPrefix, sections]);
+    }, [url, orgRoute, sections]);
 
     const tabItems: TabsProps['items'] = useMemo(() => {
         if (!matchedSection) return [];
@@ -82,7 +80,7 @@ export default function OrgSettingsLayout({ children, breadcrumbs, title, subtit
     return (
         <AppLayout
             breadcrumbs={[
-                { title: t('orgSettings.title', 'Organization Settings'), href: `${orgPrefix}/settings` },
+                { title: t('orgSettings.title', 'Organization Settings'), href: orgRoute('/settings') },
                 ...(sectionLabel ? [{ title: sectionLabel, href: sectionHref }] : []),
                 ...(breadcrumbs ?? []),
             ]}

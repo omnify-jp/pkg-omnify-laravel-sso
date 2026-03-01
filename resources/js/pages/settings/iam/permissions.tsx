@@ -2,7 +2,7 @@ import { Card, Col, Empty, Flex, Row, Tag, Typography, theme } from 'antd';
 import { ShieldCheck } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePage } from '@inertiajs/react';
+import { useOrgRoute } from '@omnify-core/hooks/use-org-route';
 import { PageContainer } from '@omnify-core/components/page-container';
 
 import type { IamPermission } from '@omnify-core/types/iam';
@@ -14,8 +14,8 @@ type Props = {
 export default function IamPermissions({ permissions }: Props) {
     const { t } = useTranslation();
     const { token } = theme.useToken();
-    const { url } = usePage();
-    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
+    const orgRoute = useOrgRoute();
+    const iamBase = orgRoute('/settings/iam');
 
     const breadcrumbs = [
         { title: t('iam.permissions', 'Permissions'), href: `${iamBase}/permissions` },

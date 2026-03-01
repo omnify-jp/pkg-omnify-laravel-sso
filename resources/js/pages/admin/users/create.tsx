@@ -1,5 +1,6 @@
 import { PageContainer } from '@omnify-core/components/page-container';
 import { useFormMutation } from '@omnify-core/hooks';
+import { useOrgRoute } from '@omnify-core/hooks/use-org-route';
 import { api } from '@omnify-core/services/api';
 import { Button, Card, Col, Flex, Form, Grid, Input, Row, Select } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +26,7 @@ type UserCreateForm = {
 
 export default function AdminUserCreate({ roles }: Props) {
     const { t } = useTranslation();
+    const orgRoute = useOrgRoute();
     const screens = Grid.useBreakpoint();
     const isWide = screens.lg ?? false;
     const [form] = Form.useForm<UserCreateForm>();
@@ -32,12 +34,12 @@ export default function AdminUserCreate({ roles }: Props) {
     const mutation = useFormMutation({
         form,
         mutationFn: (data: UserCreateForm) => api.post('/admin/users', data),
-        redirectTo: '/settings/iam',
+        redirectTo: orgRoute('/settings/iam'),
     });
 
     const breadcrumbs = [
-        { title: t('nav.dashboard', 'Dashboard'), href: '/dashboard' },
-        { title: t('nav.iam', 'IAM'), href: '/settings/iam' },
+        { title: t('nav.dashboard', 'Dashboard'), href: orgRoute('/dashboard') },
+        { title: t('nav.iam', 'IAM'), href: orgRoute('/settings/iam') },
         { title: t('admin.users.create', 'Create User'), href: '/admin/users/create' },
     ];
 

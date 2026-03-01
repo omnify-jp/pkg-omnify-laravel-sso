@@ -3,7 +3,7 @@ import { useFormMutation } from '@omnify-core/hooks';
 import { api } from '@omnify-core/services/api';
 import { Button, Card, Col, Flex, Form, Radio, Row, Select } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { usePage } from '@inertiajs/react';
+import { useOrgRoute } from '@omnify-core/hooks/use-org-route';
 
 import type { IamBranch, IamOrganization, IamRole, IamUser, ScopeType } from '@omnify-core/types/iam';
 
@@ -39,8 +39,8 @@ export default function IamAssignmentCreate({
     default_scope_id = null,
 }: Props) {
     const { t } = useTranslation();
-    const { url } = usePage();
-    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
+    const orgRoute = useOrgRoute();
+    const iamBase = orgRoute('/settings/iam');
     const [form] = Form.useForm<AssignmentFormData>();
     const scopeType = Form.useWatch('scope_type', form);
 

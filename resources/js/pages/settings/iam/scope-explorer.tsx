@@ -2,7 +2,7 @@ import { Card, Col, Row } from 'antd';
 import { ScopeTree } from '@omnify-core/components/access/scope-tree';
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePage } from '@inertiajs/react';
+import { useOrgRoute } from '@omnify-core/hooks/use-org-route';
 import { PageContainer } from '@omnify-core/components/page-container';
 
 import { ScopeDetailPanel } from '@omnify-core/components/access/scope-detail-panel';
@@ -17,8 +17,8 @@ type Props = {
 
 export default function IamScopeExplorer({ organizations, branches, assignments }: Props) {
     const { t } = useTranslation();
-    const { url } = usePage();
-    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
+    const orgRoute = useOrgRoute();
+    const iamBase = orgRoute('/settings/iam');
 
     const [selectedScope, setSelectedScope] = useState<{ type: ScopeType; id: string | null }>({
         type: 'global',

@@ -9,17 +9,29 @@ use Illuminate\Http\Request;
 use Omnify\Core\Models\Organization;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Cookie-only mode middleware for organization context resolution.
+ *
+ * Used when OMNIFY_ORG_ROUTE_PREFIX is empty (no org slug in URL).
+ * Registered as middleware alias 'core.standalone.org'.
+ *
+ * Resolution priority:
+ *   1. Cookie `current_organization_id` — set by org switcher frontend
+ *   2. User's default org — `$user->console_organization_id`
+ *   3. First active org — fallback when user has no default
+ *
+ * Sets `organizationId` on request attributes (camelCase, required by ContextService).
+ * Does nothing when user is not authenticated.
+ *
+ * Counterpart: ResolveOrganizationFromUrl (URL mode, alias 'core.org.url')
+ *
+ * @see \Omnify\Core\Http\Middleware\ResolveOrganizationFromUrl  URL mode equivalent
+ * @see config('omnify-auth.routes.org_route_prefix')            Mode switch
+ */
 class StandaloneOrganizationContext
 {
     /**
      * Handle an incoming request.
-     *
-     * Sets the organizationId request attribute so HasOrganizationScope models
-     * can resolve org context without a RuntimeException.
-     *
-     * Only sets the attribute when a user is authenticated and an active
-     * organization can be found. Falls back gracefully (ContextService will
-     * then try the session fallback path).
      *
      * @param  \Closure(Request): Response  $next
      */
@@ -30,13 +42,24 @@ class StandaloneOrganizationContext
         if ($user) {
             $organization = null;
 
-            if ($user->console_organization_id) {
+            // Priority 1: Cookie (set by org switcher or ResolveOrganizationFromUrl)
+            $cookieOrgId = $request->cookie('current_organization_id');
+            if ($cookieOrgId) {
+                $organization = Organization::where('is_active', true)
+                    ->currentMode()
+                    ->where('console_organization_id', $cookieOrgId)
+                    ->first();
+            }
+
+            // Priority 2: User's default org
+            if (! $organization && $user->console_organization_id) {
                 $organization = Organization::where('is_active', true)
                     ->currentMode()
                     ->where('console_organization_id', $user->console_organization_id)
                     ->first();
             }
 
+            // Priority 3: First active org
             $organization ??= Organization::where('is_active', true)->currentMode()->first();
 
             if ($organization) {

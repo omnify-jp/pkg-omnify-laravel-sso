@@ -1,6 +1,7 @@
 import { Button, Card, Flex, Input, Select, Table, Tag, Typography, theme } from 'antd';
 import type { TableColumnsType } from 'antd';
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
+import { useOrgRoute } from '@omnify-core/hooks/use-org-route';
 import { Eye, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,8 +18,8 @@ type Props = {
 export default function IamAssignments({ assignments }: Props) {
     const { t } = useTranslation();
     const { token } = theme.useToken();
-    const { url } = usePage();
-    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
+    const orgRoute = useOrgRoute();
+    const iamBase = orgRoute('/settings/iam');
     const [search, setSearch] = useState('');
     const [scopeFilter, setScopeFilter] = useState<string>('all');
 

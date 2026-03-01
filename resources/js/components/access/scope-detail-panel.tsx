@@ -1,5 +1,6 @@
 import { Avatar, Button, Card, Empty, Flex, List, Tag, Typography } from 'antd';
 import { Link } from '@inertiajs/react';
+import { useOrgRoute } from '@omnify-core/hooks/use-org-route';
 import { Plus } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,6 +25,7 @@ type Props = {
 
 export function ScopeDetailPanel({ scope, scopeId, assignments, organizations, branches }: Props) {
     const { t } = useTranslation();
+    const orgRoute = useOrgRoute();
 
     const name = getScopeNodeName(scope, scopeId, organizations, branches);
 
@@ -37,7 +39,7 @@ export function ScopeDetailPanel({ scope, scopeId, assignments, organizations, b
         [scope, scopeId, assignments, organizations, branches],
     );
 
-    const createUrl = `/settings/iam/assignments/create?scope=${scope}&scopeId=${scopeId ?? ''}`;
+    const createUrl = orgRoute(`/settings/iam/assignments/create?scope=${scope}&scopeId=${scopeId ?? ''}`);
 
     return (
         <Flex vertical gap={24}>
@@ -65,7 +67,7 @@ export function ScopeDetailPanel({ scope, scopeId, assignments, organizations, b
                     <List
                         dataSource={directAssignments}
                         renderItem={(assignment) => (
-                            <Link href={`/settings/iam/users/${assignment.user.id}`}>
+                            <Link href={orgRoute(`/settings/iam/users/${assignment.user.id}`)}>
                                 <List.Item
                                     extra={
                                         <Tag>

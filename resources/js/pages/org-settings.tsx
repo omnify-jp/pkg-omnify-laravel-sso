@@ -1,5 +1,6 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { PageContainer } from '@omnify-core/components/page-container';
+import { useOrgRoute } from '@omnify-core/hooks/use-org-route';
 import { Card, Col, Flex, Row, Typography, theme } from 'antd';
 import { GitPullRequest, Shield } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -27,9 +28,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
 export default function OrgSettings({ sections }: Props) {
     const { t } = useTranslation();
     const { token } = theme.useToken();
-    const { props } = usePage<{ organization: { slug?: string } }>();
-    const slug = props.organization?.slug ?? '';
-    const orgPrefix = slug ? `/@${slug}` : '';
+    const orgRoute = useOrgRoute();
 
     return (
         <PageContainer
@@ -41,7 +40,7 @@ export default function OrgSettings({ sections }: Props) {
                     const Icon = ICON_MAP[section.icon] ?? Shield;
                     return (
                         <Col key={section.key} xs={24} sm={12} lg={8}>
-                            <Link href={`${orgPrefix}/${section.path_suffix}`}>
+                            <Link href={orgRoute(`/${section.path_suffix}`)}>
                                 <Card hoverable size="small" style={{ height: '100%' }}>
                                     <Flex align="center" gap="small">
                                         <Flex

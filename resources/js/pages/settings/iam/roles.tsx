@@ -1,7 +1,8 @@
 import { Button, Card, Dropdown, Flex, Input, Table, Tag, Typography } from 'antd';
 import { SEARCH_MAX_WIDTH } from '@omnify-core/components/filters';
 import type { TableColumnsType } from 'antd';
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
+import { useOrgRoute } from '@omnify-core/hooks/use-org-route';
 import { Ellipsis, Eye } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,8 +16,8 @@ type Props = {
 
 export default function IamRoles({ roles }: Props) {
     const { t } = useTranslation();
-    const { url } = usePage();
-    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
+    const orgRoute = useOrgRoute();
+    const iamBase = orgRoute('/settings/iam');
     const [search, setSearch] = useState('');
 
     const breadcrumbs = [

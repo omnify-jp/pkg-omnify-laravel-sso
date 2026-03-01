@@ -1,5 +1,6 @@
 import { PageContainer } from '@omnify-core/components/page-container';
 import { useFormMutation } from '@omnify-core/hooks';
+import { useOrgRoute } from '@omnify-core/hooks/use-org-route';
 import { api } from '@omnify-core/services/api';
 import { Alert, Button, Card, Col, Flex, Form, Input, Row, Select, Typography } from 'antd';
 import { isAxiosError } from 'axios';
@@ -43,13 +44,14 @@ export default function IamInviteCreate({
     available_roles,
 }: Props) {
     const { t } = useTranslation();
+    const orgRoute = useOrgRoute();
     const [form] = Form.useForm<InviteFormData>();
     const [nonFieldErrors, setNonFieldErrors] = useState<Record<string, string>>({});
 
     const mutation = useFormMutation({
         form,
-        mutationFn: (data: InviteFormData) => api.post('/settings/iam/invite', { ...data, org_slug: org_slug ?? '' }),
-        redirectTo: '/settings/iam',
+        mutationFn: (data: InviteFormData) => api.post(orgRoute('/settings/iam/invite'), { ...data, org_slug: org_slug ?? '' }),
+        redirectTo: orgRoute('/settings/iam'),
         onError: (error) => {
             if (isAxiosError(error) && error.response?.status === 422) {
                 const errors = error.response.data.errors as Record<string, string[]>;
@@ -70,7 +72,7 @@ export default function IamInviteCreate({
                     : t('iam.inviteSubtitle', 'Send email invitations to new members.')
             }
             breadcrumbs={[
-                { title: t('iam.invite', 'Invite'), href: '/settings/iam/invite/create' },
+                { title: t('iam.invite', 'Invite'), href: orgRoute('/settings/iam/invite/create') },
             ]}
         >
             <Form

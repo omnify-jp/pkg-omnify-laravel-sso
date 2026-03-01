@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { PageContainer } from '@omnify-core/components/page-container';
+import { useOrgRoute } from '@omnify-core/hooks/use-org-route';
 import { Avatar, Card, Col, Flex, Row, Typography } from 'antd';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -38,6 +39,7 @@ export default function AdminIndex({ stats }: AdminIndexProps) {
     const { t } = useTranslation();
     const { auth_mode } = usePage<{ auth_mode: 'standalone' | 'console' }>().props;
     const isStandalone = auth_mode === 'standalone';
+    const orgRoute = useOrgRoute();
 
     const sections = useMemo<Section[]>(() => {
         const items: Section[] = [];
@@ -82,7 +84,7 @@ export default function AdminIndex({ stats }: AdminIndexProps) {
         items.push({
             title: t('admin.hub.iam', 'Users & Roles'),
             description: t('admin.hub.iamDesc', 'Manage users, roles, and permissions'),
-            href: '/settings/iam',
+            href: orgRoute('/settings/iam'),
             icon: ShieldCheck,
             stat: stats.userCount,
             statLabel: t('admin.hub.users', 'users'),
@@ -98,7 +100,7 @@ export default function AdminIndex({ stats }: AdminIndexProps) {
         }
 
         return items;
-    }, [t, isStandalone, stats]);
+    }, [t, isStandalone, stats, orgRoute]);
 
     return (
         <PageContainer

@@ -103,10 +103,23 @@ return [
     |--------------------------------------------------------------------------
     */
     'routes' => [
-        // URL-based organization prefix for authenticated routes.
-        // When set (e.g. '@{organization}'), routes like /dashboard become /@{slug}/dashboard.
-        // Auth routes (login/register) stay unprefixed. API routes stay unprefixed.
-        // Set to empty string to disable (cookie-only org context).
+        // Organization Context Mode — determines how org context is resolved.
+        //
+        // URL mode ('@{organization}'):
+        //   - Org-scoped routes get prefix: /@{slug}/dashboard, /@{slug}/settings/iam
+        //   - Middleware: ResolveOrganizationFromUrl reads slug from URL → sets cookie + request attribute
+        //   - Org switcher navigates to /@{new-slug}/dashboard
+        //   - Auth routes (login/register) and API routes stay unprefixed
+        //
+        // Cookie-only mode (''):
+        //   - Org-scoped routes have no prefix: /dashboard, /settings/iam
+        //   - Middleware: StandaloneOrganizationContext reads cookie → sets request attribute
+        //   - Resolution priority: 1) cookie current_organization_id, 2) user default org, 3) first active org
+        //   - Org switcher sets cookie + reloads page (URL stays the same)
+        //
+        // Both modes use cookies for org state. URL mode auto-sets cookie when user visits URL.
+        // Shared Inertia prop `org_url_mode` (boolean) lets frontend adapt behavior.
+        // Switch modes by changing this env var only — no code changes needed.
         'org_route_prefix' => env('OMNIFY_ORG_ROUTE_PREFIX', ''),
 
         'prefix' => 'api/sso',

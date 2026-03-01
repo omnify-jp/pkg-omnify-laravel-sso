@@ -1,6 +1,7 @@
 import { Avatar, Button, Card, Col, Descriptions, Divider, Empty, Flex, Row, Tag, Typography, theme } from 'antd';
 import { PermissionGrid } from '@omnify-core/components/access/permission-grid';
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
+import { useOrgRoute } from '@omnify-core/hooks/use-org-route';
 import { ArrowLeft, Pencil } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,8 +23,8 @@ const SCOPE_ORDER: ScopeType[] = ['global', 'org-wide', 'branch'];
 export default function IamRoleDetail({ role, permissions, all_permissions, assignments }: Props) {
     const { t } = useTranslation();
     const { token } = theme.useToken();
-    const { url } = usePage();
-    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
+    const orgRoute = useOrgRoute();
+    const iamBase = orgRoute('/settings/iam');
 
     const permissionModules = useMemo(() => buildPermissionModules(all_permissions), [all_permissions]);
     const selectedGridIds = useMemo(
