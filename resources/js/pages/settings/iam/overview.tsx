@@ -1,13 +1,12 @@
-import { Avatar, Button, Card, Col, Flex, Row, Typography } from 'antd';
-import { Head, Link } from '@inertiajs/react';
+import { Avatar, Button, Card, Col, Empty, Flex, Row, Statistic, Typography, theme } from 'antd';
+import { Link, usePage } from '@inertiajs/react';
 import { ArrowRight, Globe, Network, Shield, ShieldCheck, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useIamLayout } from '@omnify-core/contexts/iam-layout-context';
+import { PageContainer } from '@omnify-core/components/page-container';
 
-import { IamBreadcrumb } from '../../../components/access/iam-breadcrumb';
-import { ScopeTypeBadge } from '../../../components/access/scope-type-badge';
-import { formatScopeLocation, toScopeBadgeType } from '../../../utils/scope-utils';
-import type { IamRoleAssignment } from '../../../types/iam';
+import { ScopeTypeBadge } from '@omnify-core/components/access/scope-type-badge';
+import { formatScopeLocation, toScopeBadgeType } from '@omnify-core/utils/scope-utils';
+import type { IamRoleAssignment } from '@omnify-core/types/iam';
 
 type OverviewStats = {
     total_users: number;
@@ -31,8 +30,10 @@ type Props = {
 };
 
 export default function IamOverview({ stats, recent_assignments }: Props) {
-    const Layout = useIamLayout();
     const { t } = useTranslation();
+    const { token } = theme.useToken();
+    const { url } = usePage();
+    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
 
     const statCards = [
         {
@@ -58,47 +59,30 @@ export default function IamOverview({ stats, recent_assignments }: Props) {
     ];
 
     const quickLinks = [
-        { href: '/admin/iam/users', label: t('iam.manageUsers', 'Manage Users'), icon: Users },
-        { href: '/admin/iam/roles', label: t('iam.manageRoles', 'Manage Roles'), icon: Shield },
-        { href: '/admin/iam/assignments', label: t('iam.manageAssignments', 'Assignments'), icon: ShieldCheck },
-        { href: '/admin/iam/scope-explorer', label: t('iam.scopeExplorer', 'Scope Explorer'), icon: Network },
-        { href: '/admin/iam/permissions', label: t('iam.managePermissions', 'Permissions'), icon: ShieldCheck },
+        { href: `${iamBase}/users`, label: t('iam.manageUsers', 'Manage Users'), icon: Users },
+        { href: `${iamBase}/roles`, label: t('iam.manageRoles', 'Manage Roles'), icon: Shield },
+        { href: `${iamBase}/assignments`, label: t('iam.manageAssignments', 'Assignments'), icon: ShieldCheck },
+        { href: `${iamBase}/scope-explorer`, label: t('iam.scopeExplorer', 'Scope Explorer'), icon: Network },
+        { href: `${iamBase}/permissions`, label: t('iam.managePermissions', 'Permissions'), icon: ShieldCheck },
     ];
 
     return (
-        <Layout
-            breadcrumbs={[
-                { title: t('iam.title', 'IAM'), href: '/admin/iam' },
-            ]}
+        <PageContainer
+            title={t('iam.title', 'Identity & Access Management')}
+            subtitle={t('iam.subtitle', 'Manage users, roles, and permissions across your organization.')}
         >
-            <Head title={t('iam.title', 'IAM')} />
-
-            <Flex vertical gap={16}>
-                <Flex justify="space-between" align="start">
-                    <Flex vertical gap={2}>
-                        <Typography.Title level={4}>
-                            {t('iam.title', 'Identity & Access Management')}
-                        </Typography.Title>
-                        <Typography.Text type="secondary">
-                            {t('iam.subtitle', 'Manage users, roles, and permissions across your organization.')}
-                        </Typography.Text>
-                    </Flex>
-                    <IamBreadcrumb segments={[]} />
-                </Flex>
-
+            <Flex vertical gap={token.padding}>
                 <Row gutter={[16, 16]}>
                     {statCards.map((stat) => {
                         const Icon = stat.icon;
                         return (
                             <Col key={stat.label} xs={24} sm={12} lg={6}>
                                 <Card>
-                                    <Flex align="center" gap={8}>
-                                        <Icon size={16} />
-                                        <Flex vertical>
-                                            <Typography.Text type="secondary">{stat.label}</Typography.Text>
-                                            <Typography.Title level={4} style={{ margin: 0 }}>{stat.value}</Typography.Title>
-                                        </Flex>
-                                    </Flex>
+                                    <Statistic
+                                        title={stat.label}
+                                        value={stat.value}
+                                        prefix={<Icon size={16} />}
+                                    />
                                 </Card>
                             </Col>
                         );
@@ -108,15 +92,17 @@ export default function IamOverview({ stats, recent_assignments }: Props) {
                 <Row gutter={[16, 16]}>
                     <Col xs={24} lg={12}>
                         <Card title={t('iam.quickLinks', 'Quick Links')}>
-                            <Flex vertical gap={4}>
+                            <Flex vertical gap={token.paddingXXS}>
                                 {quickLinks.map((link) => {
                                     const Icon = link.icon;
                                     return (
                                         <Link key={link.href} href={link.href}>
-                                            <Button type="text" block style={{ height: 'auto', padding: '8px 12px', justifyContent: 'flex-start' }}>
-                                                <Flex align="center" gap={8} style={{ width: '100%' }}>
-                                                    <Icon size={16} />
-                                                    <Typography.Text style={{ flex: 1, textAlign: 'left' }}>{link.label}</Typography.Text>
+                                            <Button type="text" block>
+                                                <Flex align="center" gap="small" flex={1} justify="space-between">
+                                                    <Flex align="center" gap="small">
+                                                        <Icon size={16} />
+                                                        <Typography.Text>{link.label}</Typography.Text>
+                                                    </Flex>
                                                     <ArrowRight size={14} />
                                                 </Flex>
                                             </Button>
@@ -130,22 +116,20 @@ export default function IamOverview({ stats, recent_assignments }: Props) {
                     <Col xs={24} lg={12}>
                         <Card title={t('iam.recentAssignments', 'Recent Assignments')}>
                             {recent_assignments.length === 0 ? (
-                                <Typography.Text type="secondary">
-                                    {t('iam.noAssignments', 'No assignments yet.')}
-                                </Typography.Text>
+                                <Empty description={t('iam.noAssignments', 'No assignments yet.')} />
                             ) : (
-                                <Flex vertical gap={4}>
+                                <Flex vertical gap={token.paddingXXS}>
                                     {recent_assignments.map((assignment, index) => (
                                         <Link
                                             key={index}
-                                            href={`/admin/iam/users/${assignment.user.id}`}
+                                            href={`${iamBase}/users/${assignment.user.id}`}
                                         >
-                                            <Button type="text" block style={{ height: 'auto', padding: '8px 12px', justifyContent: 'flex-start' }}>
-                                                <Flex align="center" gap={8} style={{ width: '100%' }}>
+                                            <Button type="text" block>
+                                                <Flex align="center" gap="small" flex={1}>
                                                     <Avatar size={28}>
                                                         {assignment.user.name.slice(0, 2).toUpperCase()}
                                                     </Avatar>
-                                                    <Flex vertical style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
+                                                    <Flex vertical flex={1} align="start" style={{ minWidth: 0 }}>
                                                         <Typography.Text strong ellipsis>
                                                             {assignment.user.name}
                                                         </Typography.Text>
@@ -167,6 +151,6 @@ export default function IamOverview({ stats, recent_assignments }: Props) {
                     </Col>
                 </Row>
             </Flex>
-        </Layout>
+        </PageContainer>
     );
 }

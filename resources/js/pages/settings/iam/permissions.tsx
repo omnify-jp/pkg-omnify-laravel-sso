@@ -1,11 +1,11 @@
-import { Card, Col, Empty, Flex, Row, Tag, Typography } from 'antd';
+import { Card, Col, Empty, Flex, Row, Tag, Typography, theme } from 'antd';
 import { ShieldCheck } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { usePage } from '@inertiajs/react';
 import { PageContainer } from '@omnify-core/components/page-container';
 
-import { IamBreadcrumb } from '../../../components/access/iam-breadcrumb';
-import type { IamPermission } from '../../../types/iam';
+import type { IamPermission } from '@omnify-core/types/iam';
 
 type Props = {
     permissions: IamPermission[];
@@ -13,10 +13,12 @@ type Props = {
 
 export default function IamPermissions({ permissions }: Props) {
     const { t } = useTranslation();
+    const { token } = theme.useToken();
+    const { url } = usePage();
+    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
 
     const breadcrumbs = [
-        { title: t('iam.title', 'IAM'), href: '/admin/iam' },
-        { title: t('iam.permissions', 'Permissions'), href: '/admin/iam/permissions' },
+        { title: t('iam.permissions', 'Permissions'), href: `${iamBase}/permissions` },
     ];
 
     const grouped = useMemo(() => {
@@ -36,7 +38,6 @@ export default function IamPermissions({ permissions }: Props) {
             title={t('iam.permissions', 'Permissions')}
             subtitle={t('iam.permissionsSubtitle', 'All permissions registered in this application.')}
             breadcrumbs={breadcrumbs}
-            extra={<IamBreadcrumb segments={[{ label: t('iam.permissions', 'Permissions') }]} />}
         >
             {grouped.length === 0 ? (
                 <Empty
@@ -44,12 +45,12 @@ export default function IamPermissions({ permissions }: Props) {
                     description={t('iam.noPermissions', 'No permissions found.')}
                 />
             ) : (
-                <Flex vertical gap={16}>
+                <Flex vertical gap={token.padding}>
                     {grouped.map(({ group, perms }) => (
                         <Card
                             key={group}
                             title={
-                                <Flex align="center" gap={8}>
+                                <Flex align="center" gap="small">
                                     <Typography.Text strong>{group}</Typography.Text>
                                     <Tag>{perms.length}</Tag>
                                 </Flex>

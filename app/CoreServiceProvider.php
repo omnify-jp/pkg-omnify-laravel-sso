@@ -10,10 +10,13 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Omnify\Core\Http\Middleware\AdminAuthenticate;
 use Omnify\Core\Http\Middleware\AdminRedirectIfAuthenticated;
+use Omnify\Core\Http\Middleware\HandleAppearance;
 use Omnify\Core\Http\Middleware\ResolveOrganizationFromUrl;
 use Omnify\Core\Http\Middleware\SetBranchFromHeader;
+use Omnify\Core\Http\Middleware\SetLocale;
 use Omnify\Core\Http\Middleware\ShareSsoData;
 use Omnify\Core\Http\Middleware\SsoAuthenticate;
+use Omnify\Core\Http\Middleware\ThrottleByTier;
 use Omnify\Core\Http\Middleware\SsoOrganizationAccess;
 use Omnify\Core\Http\Middleware\SsoPermissionCheck;
 use Omnify\Core\Http\Middleware\SsoRoleCheck;
@@ -327,6 +330,9 @@ class CoreServiceProvider extends ServiceProvider
         $router->aliasMiddleware('core.org.url', ResolveOrganizationFromUrl::class);
         $router->aliasMiddleware('core.admin', AdminAuthenticate::class);
         $router->aliasMiddleware('core.admin.guest', AdminRedirectIfAuthenticated::class);
+        $router->aliasMiddleware('core.locale', SetLocale::class);
+        $router->aliasMiddleware('core.appearance', HandleAppearance::class);
+        $router->aliasMiddleware('core.throttle.tier', ThrottleByTier::class);
     }
 
     /**

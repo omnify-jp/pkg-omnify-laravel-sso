@@ -1,6 +1,6 @@
 import { Building2, GitBranch, Globe, type LucideIcon } from 'lucide-react';
 
-import type { IamAssignment, IamBranch, IamOrganization, IamPermission, IamScopeNode, ScopeType } from '../types/iam';
+import type { IamAssignment, IamBranch, IamOrganization, IamPermission, IamScopeNode, ScopeType } from '@omnify-core/types/iam';
 
 // ─── Scope helpers ────────────────────────────────────────────────────────────
 

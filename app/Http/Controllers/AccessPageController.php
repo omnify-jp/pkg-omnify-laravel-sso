@@ -27,7 +27,7 @@ class AccessPageController extends Controller
      */
     protected function getPagePath(string $page): string
     {
-        $basePath = config('omnify-auth.routes.access_pages_path', 'admin/iam');
+        $basePath = config('omnify-auth.routes.access_pages_path', 'settings/iam');
 
         return "{$basePath}/{$page}";
     }
@@ -122,6 +122,32 @@ class AccessPageController extends Controller
                 'is_headquarters' => (bool) $branch->is_headquarters,
                 'is_active' => (bool) $branch->is_active,
             ]);
+    }
+
+    /**
+     * Org Settings hub page — shows registered sections (IAM + extras from config).
+     */
+    public function orgSettingsIndex(): Response
+    {
+        $sections = [
+            [
+                'key' => 'iam',
+                'icon' => 'shield',
+                'title_key' => 'iam.title',
+                'title_default' => 'Identity & Access Management',
+                'description_key' => 'iam.subtitle',
+                'description_default' => 'Manage users, roles, and permissions across your organization.',
+                'path_suffix' => config('omnify-auth.routes.access_prefix', 'settings/iam'),
+            ],
+        ];
+
+        // Merge extra sections registered by other packages (e.g. workflow)
+        $extraSections = config('omnify-auth.org_settings.extra_sections', []);
+        $sections = array_merge($sections, $extraSections);
+
+        return Inertia::render('org-settings', [
+            'sections' => $sections,
+        ]);
     }
 
     /**

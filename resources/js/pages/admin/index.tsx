@@ -82,7 +82,7 @@ export default function AdminIndex({ stats }: AdminIndexProps) {
         items.push({
             title: t('admin.hub.iam', 'Users & Roles'),
             description: t('admin.hub.iamDesc', 'Manage users, roles, and permissions'),
-            href: '/admin/iam',
+            href: '/settings/iam',
             icon: ShieldCheck,
             stat: stats.userCount,
             statLabel: t('admin.hub.users', 'users'),

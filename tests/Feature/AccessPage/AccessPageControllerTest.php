@@ -17,7 +17,7 @@ use Omnify\Core\Models\Role;
 use Omnify\Core\Models\User;
 
 // =============================================================================
-// Overview — GET /admin/iam/
+// Overview — GET /settings/iam/
 // =============================================================================
 
 describe('overview', function () {
@@ -25,10 +25,10 @@ describe('overview', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get('/admin/iam/')
+            ->get('/settings/iam/')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/overview')
+                ->component('settings/iam/overview')
             );
     });
 
@@ -42,10 +42,10 @@ describe('overview', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get('/admin/iam/')
+            ->get('/settings/iam/')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/overview')
+                ->component('settings/iam/overview')
                 ->has('stats')
                 ->where('stats.total_users', 4) // 3 + acting user
                 ->where('stats.total_roles', 2)
@@ -65,10 +65,10 @@ describe('overview', function () {
         ]);
 
         $this->actingAs($user)
-            ->get('/admin/iam/')
+            ->get('/settings/iam/')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/overview')
+                ->component('settings/iam/overview')
                 ->has('recent_assignments', 1)
                 ->where('recent_assignments.0.user.id', $user->id)
                 ->where('recent_assignments.0.role.id', $role->id)
@@ -78,7 +78,7 @@ describe('overview', function () {
 });
 
 // =============================================================================
-// Scope Explorer — GET /admin/iam/scope-explorer
+// Scope Explorer — GET /settings/iam/scope-explorer
 // =============================================================================
 
 describe('scope explorer', function () {
@@ -86,10 +86,10 @@ describe('scope explorer', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get('/admin/iam/scope-explorer')
+            ->get('/settings/iam/scope-explorer')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/scope-explorer')
+                ->component('settings/iam/scope-explorer')
             );
     });
 
@@ -102,10 +102,10 @@ describe('scope explorer', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get('/admin/iam/scope-explorer')
+            ->get('/settings/iam/scope-explorer')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/scope-explorer')
+                ->component('settings/iam/scope-explorer')
                 ->has('organizations') // at least 1 (other tests may create orgs)
                 ->has('branches')
                 ->has('assignments')
@@ -114,7 +114,7 @@ describe('scope explorer', function () {
 });
 
 // =============================================================================
-// Users — GET /admin/iam/users
+// Users — GET /settings/iam/users
 // =============================================================================
 
 describe('users', function () {
@@ -122,10 +122,10 @@ describe('users', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get('/admin/iam/users')
+            ->get('/settings/iam/users')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/users')
+                ->component('settings/iam/users')
                 ->has('users.data')
                 ->has('users.meta')
                 ->where('users.meta.per_page', 20)
@@ -137,10 +137,10 @@ describe('users', function () {
         $bob = User::factory()->standalone()->create(['name' => 'Bob Jones', 'email' => 'bob@example.com']);
 
         $this->actingAs($alice)
-            ->get('/admin/iam/users?search=Alice')
+            ->get('/settings/iam/users?search=Alice')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/users')
+                ->component('settings/iam/users')
                 ->where('filters.search', 'Alice')
                 ->has('users.data', 1)
                 ->where('users.data.0.name', 'Alice Smith')
@@ -154,17 +154,17 @@ describe('users', function () {
         $user->roles()->attach([$role1->id, $role2->id]);
 
         $this->actingAs($user)
-            ->get('/admin/iam/users')
+            ->get('/settings/iam/users')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/users')
+                ->component('settings/iam/users')
                 ->where('users.data.0.roles_count', 2)
             );
     });
 });
 
 // =============================================================================
-// User Show — GET /admin/iam/users/{userId}
+// User Show — GET /settings/iam/users/{userId}
 // =============================================================================
 
 describe('user show', function () {
@@ -177,10 +177,10 @@ describe('user show', function () {
         ]);
 
         $this->actingAs($user)
-            ->get("/admin/iam/users/{$user->id}")
+            ->get("/settings/iam/users/{$user->id}")
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/user-detail')
+                ->component('settings/iam/user-detail')
                 ->where('user.id', $user->id)
                 ->has('assignments', 1)
                 ->where('assignments.0.role.id', $role->id)
@@ -193,10 +193,10 @@ describe('user show', function () {
         Permission::factory()->count(3)->create();
 
         $this->actingAs($user)
-            ->get("/admin/iam/users/{$user->id}")
+            ->get("/settings/iam/users/{$user->id}")
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/user-detail')
+                ->component('settings/iam/user-detail')
                 ->has('all_permissions', 3)
             );
     });
@@ -205,13 +205,13 @@ describe('user show', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get('/admin/iam/users/non-existent-uuid')
+            ->get('/settings/iam/users/non-existent-uuid')
             ->assertNotFound();
     });
 });
 
 // =============================================================================
-// Roles — GET /admin/iam/roles
+// Roles — GET /settings/iam/roles
 // =============================================================================
 
 describe('roles', function () {
@@ -219,10 +219,10 @@ describe('roles', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get('/admin/iam/roles')
+            ->get('/settings/iam/roles')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/roles')
+                ->component('settings/iam/roles')
                 ->has('roles')
             );
     });
@@ -235,17 +235,17 @@ describe('roles', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get('/admin/iam/roles')
+            ->get('/settings/iam/roles')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/roles')
+                ->component('settings/iam/roles')
                 ->where('roles.0.permissions_count', 3)
             );
     });
 });
 
 // =============================================================================
-// Role Show — GET /admin/iam/roles/{roleId}
+// Role Show — GET /settings/iam/roles/{roleId}
 // =============================================================================
 
 describe('role show', function () {
@@ -257,10 +257,10 @@ describe('role show', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get("/admin/iam/roles/{$role->id}")
+            ->get("/settings/iam/roles/{$role->id}")
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/role-detail')
+                ->component('settings/iam/role-detail')
                 ->where('role.id', $role->id)
                 ->has('permissions', 1)
                 ->where('permissions.0.id', $permission->id)
@@ -278,10 +278,10 @@ describe('role show', function () {
         $actingUser = User::factory()->standalone()->create();
 
         $this->actingAs($actingUser)
-            ->get("/admin/iam/roles/{$role->id}")
+            ->get("/settings/iam/roles/{$role->id}")
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/role-detail')
+                ->component('settings/iam/role-detail')
                 ->has('assignments', 1)
                 ->where('assignments.0.user.id', $assignedUser->id)
                 ->where('assignments.0.scope_type', 'global')
@@ -292,13 +292,13 @@ describe('role show', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get('/admin/iam/roles/non-existent-uuid')
+            ->get('/settings/iam/roles/non-existent-uuid')
             ->assertNotFound();
     });
 });
 
 // =============================================================================
-// Role Create — GET /admin/iam/roles/create
+// Role Create — GET /settings/iam/roles/create
 // =============================================================================
 
 describe('role create', function () {
@@ -310,17 +310,17 @@ describe('role create', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get('/admin/iam/roles/create')
+            ->get('/settings/iam/roles/create')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/role-create')
+                ->component('settings/iam/role-create')
                 ->has('all_permissions', 3)
             );
     });
 });
 
 // =============================================================================
-// Role Store — POST /admin/iam/roles
+// Role Store — POST /settings/iam/roles
 // =============================================================================
 
 describe('role store', function () {
@@ -328,7 +328,7 @@ describe('role store', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->post('/admin/iam/roles', [
+            ->post('/settings/iam/roles', [
                 'name' => 'Editor',
                 'level' => 5,
                 'description' => 'Can edit content',
@@ -348,7 +348,7 @@ describe('role store', function () {
         $p2 = Permission::factory()->create();
 
         $this->actingAs($user)
-            ->post('/admin/iam/roles', [
+            ->post('/settings/iam/roles', [
                 'name' => 'Editor',
                 'level' => 5,
                 'permission_ids' => [$p1->id, $p2->id],
@@ -364,7 +364,7 @@ describe('role store', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->post('/admin/iam/roles', [
+            ->post('/settings/iam/roles', [
                 'level' => 5,
             ])
             ->assertSessionHasErrors(['name']);
@@ -374,14 +374,14 @@ describe('role store', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->post('/admin/iam/roles', [
+            ->post('/settings/iam/roles', [
                 'name' => 'Test Role',
                 'level' => 0,
             ])
             ->assertSessionHasErrors(['level']);
 
         $this->actingAs($user)
-            ->post('/admin/iam/roles', [
+            ->post('/settings/iam/roles', [
                 'name' => 'Test Role 2',
                 'level' => 11,
             ])
@@ -392,7 +392,7 @@ describe('role store', function () {
         $user = User::factory()->standalone()->create();
 
         $response = $this->actingAs($user)
-            ->post('/admin/iam/roles', [
+            ->post('/settings/iam/roles', [
                 'name' => 'Reviewer',
                 'level' => 3,
             ]);
@@ -405,7 +405,7 @@ describe('role store', function () {
 });
 
 // =============================================================================
-// Role Edit — GET /admin/iam/roles/{roleId}/edit
+// Role Edit — GET /settings/iam/roles/{roleId}/edit
 // =============================================================================
 
 describe('role edit', function () {
@@ -420,10 +420,10 @@ describe('role edit', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get("/admin/iam/roles/{$role->id}/edit")
+            ->get("/settings/iam/roles/{$role->id}/edit")
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/role-edit')
+                ->component('settings/iam/role-edit')
                 ->where('role.id', $role->id)
                 ->where('role.name', $role->name)
                 ->has('permissions', 1)
@@ -433,7 +433,7 @@ describe('role edit', function () {
 });
 
 // =============================================================================
-// Role Update — PUT /admin/iam/roles/{roleId}
+// Role Update — PUT /settings/iam/roles/{roleId}
 // =============================================================================
 
 describe('role update', function () {
@@ -448,7 +448,7 @@ describe('role update', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->put("/admin/iam/roles/{$role->id}", [
+            ->put("/settings/iam/roles/{$role->id}", [
                 'name' => 'New Name',
                 'level' => 7,
                 'description' => 'Updated description',
@@ -472,7 +472,7 @@ describe('role update', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->put("/admin/iam/roles/{$role->id}", [
+            ->put("/settings/iam/roles/{$role->id}", [
                 'name' => $role->name,
                 'level' => 5,
                 'permission_ids' => [$newPermission->id],
@@ -491,7 +491,7 @@ describe('role update', function () {
         $user = User::factory()->standalone()->create();
 
         $response = $this->actingAs($user)
-            ->put("/admin/iam/roles/{$role->id}", [
+            ->put("/settings/iam/roles/{$role->id}", [
                 'name' => 'Updated Role',
                 'level' => 5,
             ]);
@@ -501,7 +501,7 @@ describe('role update', function () {
 });
 
 // =============================================================================
-// Assignments — GET /admin/iam/assignments
+// Assignments — GET /settings/iam/assignments
 // =============================================================================
 
 describe('assignments', function () {
@@ -509,10 +509,10 @@ describe('assignments', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get('/admin/iam/assignments')
+            ->get('/settings/iam/assignments')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/assignments')
+                ->component('settings/iam/assignments')
                 ->has('assignments')
             );
     });
@@ -526,10 +526,10 @@ describe('assignments', function () {
         ]);
 
         $this->actingAs($user)
-            ->get('/admin/iam/assignments')
+            ->get('/settings/iam/assignments')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/assignments')
+                ->component('settings/iam/assignments')
                 ->has('assignments', 1)
                 ->where('assignments.0.user.id', $user->id)
                 ->where('assignments.0.role.id', $role->id)
@@ -547,10 +547,10 @@ describe('assignments', function () {
         ]);
 
         $this->actingAs($user)
-            ->get('/admin/iam/assignments')
+            ->get('/settings/iam/assignments')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/assignments')
+                ->component('settings/iam/assignments')
                 ->has('assignments', 1)
                 ->where('assignments.0.scope_type', 'org-wide')
                 ->where('assignments.0.organization_name', $org->name)
@@ -559,7 +559,7 @@ describe('assignments', function () {
 });
 
 // =============================================================================
-// Assignment Create — GET /admin/iam/assignments/create
+// Assignment Create — GET /settings/iam/assignments/create
 // =============================================================================
 
 describe('assignment create', function () {
@@ -572,10 +572,10 @@ describe('assignment create', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get('/admin/iam/assignments/create')
+            ->get('/settings/iam/assignments/create')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/assignment-create')
+                ->component('settings/iam/assignment-create')
                 ->has('users', 3) // 2 + acting user
                 ->has('roles', 2)
                 ->has('organizations') // at least 1 (other tests may create orgs)
@@ -585,7 +585,7 @@ describe('assignment create', function () {
 });
 
 // =============================================================================
-// Assignment Store — POST /admin/iam/assignments
+// Assignment Store — POST /settings/iam/assignments
 // =============================================================================
 
 describe('assignment store', function () {
@@ -596,7 +596,7 @@ describe('assignment store', function () {
         $targetUser = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->post('/admin/iam/assignments', [
+            ->post('/settings/iam/assignments', [
                 'user_id' => $targetUser->id,
                 'role_id' => $role->id,
                 'scope_type' => 'global',
@@ -614,7 +614,7 @@ describe('assignment store', function () {
         $targetUser = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->post('/admin/iam/assignments', [
+            ->post('/settings/iam/assignments', [
                 'user_id' => $targetUser->id,
                 'role_id' => $role->id,
                 'scope_type' => 'org-wide',
@@ -643,7 +643,7 @@ describe('assignment store', function () {
         $targetUser = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->post('/admin/iam/assignments', [
+            ->post('/settings/iam/assignments', [
                 'user_id' => $targetUser->id,
                 'role_id' => $role->id,
                 'scope_type' => 'branch',
@@ -666,7 +666,7 @@ describe('assignment store', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->post('/admin/iam/assignments', [
+            ->post('/settings/iam/assignments', [
                 'role_id' => 'some-role-id',
                 'scope_type' => 'global',
             ])
@@ -678,7 +678,7 @@ describe('assignment store', function () {
         $targetUser = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->post('/admin/iam/assignments', [
+            ->post('/settings/iam/assignments', [
                 'user_id' => $targetUser->id,
                 'scope_type' => 'global',
             ])
@@ -691,7 +691,7 @@ describe('assignment store', function () {
         $role = Role::factory()->create(['console_organization_id' => null]);
 
         $this->actingAs($user)
-            ->post('/admin/iam/assignments', [
+            ->post('/settings/iam/assignments', [
                 'user_id' => $targetUser->id,
                 'role_id' => $role->id,
             ])
@@ -704,7 +704,7 @@ describe('assignment store', function () {
         $role = Role::factory()->create(['console_organization_id' => null]);
 
         $this->actingAs($user)
-            ->post('/admin/iam/assignments', [
+            ->post('/settings/iam/assignments', [
                 'user_id' => $targetUser->id,
                 'role_id' => $role->id,
                 'scope_type' => 'invalid',
@@ -717,7 +717,7 @@ describe('assignment store', function () {
         $role = Role::factory()->create(['console_organization_id' => null]);
 
         $this->actingAs($user)
-            ->post('/admin/iam/assignments', [
+            ->post('/settings/iam/assignments', [
                 'user_id' => 'non-existent-user-id',
                 'role_id' => $role->id,
                 'scope_type' => 'global',
@@ -730,7 +730,7 @@ describe('assignment store', function () {
         $targetUser = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->post('/admin/iam/assignments', [
+            ->post('/settings/iam/assignments', [
                 'user_id' => $targetUser->id,
                 'role_id' => 'non-existent-role-id',
                 'scope_type' => 'global',
@@ -740,7 +740,7 @@ describe('assignment store', function () {
 });
 
 // =============================================================================
-// Assignment Delete — DELETE /admin/iam/assignments/{userId}/{roleId}
+// Assignment Delete — DELETE /settings/iam/assignments/{userId}/{roleId}
 // =============================================================================
 
 describe('assignment delete', function () {
@@ -757,7 +757,7 @@ describe('assignment delete', function () {
         expect($targetUser->roles()->where('roles.id', $role->id)->exists())->toBeTrue();
 
         $this->actingAs($user)
-            ->delete("/admin/iam/assignments/{$targetUser->id}/{$role->id}")
+            ->delete("/settings/iam/assignments/{$targetUser->id}/{$role->id}")
             ->assertRedirect();
 
         expect($targetUser->roles()->where('roles.id', $role->id)->exists())->toBeFalse();
@@ -774,14 +774,14 @@ describe('assignment delete', function () {
         ]);
 
         $this->actingAs($user)
-            ->delete("/admin/iam/assignments/{$targetUser->id}/{$role->id}")
+            ->delete("/settings/iam/assignments/{$targetUser->id}/{$role->id}")
             ->assertRedirect()
             ->assertSessionHas('success');
     });
 });
 
 // =============================================================================
-// Permissions — GET /admin/iam/permissions
+// Permissions — GET /settings/iam/permissions
 // =============================================================================
 
 describe('permissions', function () {
@@ -789,10 +789,10 @@ describe('permissions', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get('/admin/iam/permissions')
+            ->get('/settings/iam/permissions')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/permissions')
+                ->component('settings/iam/permissions')
                 ->has('permissions')
             );
     });
@@ -805,10 +805,10 @@ describe('permissions', function () {
         $user = User::factory()->standalone()->create();
 
         $this->actingAs($user)
-            ->get('/admin/iam/permissions')
+            ->get('/settings/iam/permissions')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('admin/iam/permissions')
+                ->component('settings/iam/permissions')
                 ->has('permissions', 3)
                 ->where('permissions.0.group', 'posts')
                 ->where('permissions.1.group', 'posts')

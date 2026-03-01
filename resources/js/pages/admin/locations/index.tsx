@@ -241,11 +241,20 @@ export default function AdminLocationsIndex({ locations, branches, organizations
             subtitle={t('admin.locations.subtitle', 'Manage locations across branches.')}
             breadcrumbs={breadcrumbs}
         >
-            <Filters routeUrl="/admin/locations" currentFilters={filters}>
+            <Filters
+                routeUrl="/admin/locations"
+                currentFilters={filters}
+                extra={
+                    <Link href="/admin/locations/create">
+                        <Button type="primary" icon={<PlusCircle size={16} />}>
+                            {t('admin.locations.create', 'Create Location')}
+                        </Button>
+                    </Link>
+                }
+            >
                 <FilterSearch
                     filterKey="search"
                     placeholder={t('admin.locations.searchPlaceholder', 'Search by name or code...')}
-                    style={{ maxWidth: 320 }}
                 />
                 <FilterSelect
                     filterKey="branch_id"
@@ -262,13 +271,6 @@ export default function AdminLocationsIndex({ locations, branches, organizations
                     options={LOCATION_TYPES.map((type) => ({ value: type, label: type.charAt(0).toUpperCase() + type.slice(1) }))}
                     allLabel={t('admin.locations.allTypes', 'All types')}
                 />
-                <div style={{ marginLeft: 'auto' }}>
-                    <Link href="/admin/locations/create">
-                        <Button type="primary" icon={<PlusCircle size={16} />}>
-                            {t('admin.locations.create', 'Create Location')}
-                        </Button>
-                    </Link>
-                </div>
             </Filters>
 
             <Table

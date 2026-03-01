@@ -3,8 +3,8 @@ import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { IamRole, IamUser, ScopeType } from '../../types/iam';
-import { getScopeLabel } from '../../utils/scope-utils';
+import type { IamRole, IamUser, ScopeType } from '@omnify-core/types/iam';
+import { getScopeLabel } from '@omnify-core/utils/scope-utils';
 
 type AssignRoleDialogProps = {
     open: boolean;

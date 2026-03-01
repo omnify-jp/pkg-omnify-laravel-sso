@@ -1,14 +1,13 @@
-import { Card, Col, Flex, Row, Typography } from 'antd';
-import { ScopeTree } from '../../../components/access/scope-tree';
-import { Head } from '@inertiajs/react';
+import { Card, Col, Row } from 'antd';
+import { ScopeTree } from '@omnify-core/components/access/scope-tree';
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useIamLayout } from '@omnify-core/contexts/iam-layout-context';
+import { usePage } from '@inertiajs/react';
+import { PageContainer } from '@omnify-core/components/page-container';
 
-import { ScopeDetailPanel } from '../../../components/access/scope-detail-panel';
-import { IamBreadcrumb } from '../../../components/access/iam-breadcrumb';
-import type { IamAssignment, IamBranch, IamOrganization, ScopeType } from '../../../types/iam';
-import { buildScopeTree } from '../../../utils/scope-utils';
+import { ScopeDetailPanel } from '@omnify-core/components/access/scope-detail-panel';
+import type { IamAssignment, IamBranch, IamOrganization, ScopeType } from '@omnify-core/types/iam';
+import { buildScopeTree } from '@omnify-core/utils/scope-utils';
 
 type Props = {
     organizations: IamOrganization[];
@@ -17,8 +16,9 @@ type Props = {
 };
 
 export default function IamScopeExplorer({ organizations, branches, assignments }: Props) {
-    const Layout = useIamLayout();
     const { t } = useTranslation();
+    const { url } = usePage();
+    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
 
     const [selectedScope, setSelectedScope] = useState<{ type: ScopeType; id: string | null }>({
         type: 'global',
@@ -31,33 +31,14 @@ export default function IamScopeExplorer({ organizations, branches, assignments 
     }, [organizations, branches]);
 
     return (
-        <Layout
+        <PageContainer
+            title={t('iam.scopeExplorer', 'Scope Explorer')}
+            subtitle={t('iam.scopeExplorerSubtitle', 'Browse role assignments across your scope hierarchy.')}
             breadcrumbs={[
-                { title: t('iam.title', 'IAM'), href: '/admin/iam' },
-                { title: t('iam.scopeExplorer', 'Scope Explorer'), href: '/admin/iam/scope-explorer' },
+                { title: t('iam.scopeExplorer', 'Scope Explorer'), href: `${iamBase}/scope-explorer` },
             ]}
         >
-            <Head title={t('iam.scopeExplorer', 'Scope Explorer')} />
-
-            <Flex vertical gap={24}>
-                <Flex justify="space-between" align="center">
-                    <Flex vertical>
-                        <Typography.Title level={4}>
-                            {t('iam.scopeExplorer', 'Scope Explorer')}
-                        </Typography.Title>
-                        <Typography.Text type="secondary">
-                            {t(
-                                'iam.scopeExplorerSubtitle',
-                                'Browse role assignments across your scope hierarchy.',
-                            )}
-                        </Typography.Text>
-                    </Flex>
-                    <IamBreadcrumb
-                        segments={[{ label: t('iam.scopeExplorer', 'Scope Explorer') }]}
-                    />
-                </Flex>
-
-                <Row gutter={[24, 24]}>
+            <Row gutter={[24, 24]}>
                     <Col xs={24} lg={8}>
                         <Card title={t('iam.selectScope', 'Select Scope')}>
                             <ScopeTree
@@ -86,7 +67,6 @@ export default function IamScopeExplorer({ organizations, branches, assignments 
                         </Card>
                     </Col>
                 </Row>
-            </Flex>
-        </Layout>
+        </PageContainer>
     );
 }

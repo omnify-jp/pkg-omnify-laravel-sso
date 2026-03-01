@@ -1,5 +1,4 @@
 import { Head } from '@inertiajs/react';
-import { Flex, Typography } from 'antd';
 import type { ReactNode } from 'react';
 import { usePageLayout } from '@omnify-core/contexts/page-layout-context';
 import type { BreadcrumbItem } from '@omnify-core/contexts/page-layout-context';
@@ -26,28 +25,12 @@ export function PageContainer({
     const Layout = usePageLayout();
 
     return (
-        <Layout breadcrumbs={breadcrumbs}>
+        <Layout breadcrumbs={breadcrumbs} title={title} subtitle={subtitle} extra={extra}>
             <Head title={title} />
 
-            <Flex vertical gap={24}>
-                {(title || extra) && (
-                    <Flex justify="space-between" align="start">
-                        <Flex vertical gap={2}>
-                            <Typography.Title level={4} style={{ marginBottom: 0 }}>
-                                {title}
-                            </Typography.Title>
-                            {subtitle && (
-                                <Typography.Text type="secondary">{subtitle}</Typography.Text>
-                            )}
-                        </Flex>
-                        {extra}
-                    </Flex>
-                )}
+            {children}
 
-                {children}
-
-                {footer}
-            </Flex>
+            {footer}
         </Layout>
     );
 }

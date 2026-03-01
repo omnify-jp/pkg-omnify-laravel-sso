@@ -25,11 +25,14 @@ return [
         'redirect_after_logout' => env('OMNIFY_AUTH_REDIRECT_AFTER_LOGOUT', 'login'),
         'route_prefix' => env('OMNIFY_AUTH_ROUTE_PREFIX', ''),
         'admin_enabled' => env('OMNIFY_STANDALONE_ADMIN_ENABLED', true),
+        'admin_redirect_after_login' => env('OMNIFY_ADMIN_REDIRECT_AFTER_LOGIN', 'admin.index'),
+        'admin_redirect_after_logout' => env('OMNIFY_ADMIN_REDIRECT_AFTER_LOGOUT', 'admin.login'),
         'pages' => [
             'login' => env('OMNIFY_AUTH_PAGE_LOGIN', 'auth/login'),
             'register' => env('OMNIFY_AUTH_PAGE_REGISTER', 'auth/register'),
             'forgot_password' => env('OMNIFY_AUTH_PAGE_FORGOT_PASSWORD', 'auth/forgot-password'),
             'reset_password' => env('OMNIFY_AUTH_PAGE_RESET_PASSWORD', 'auth/reset-password'),
+            'admin_login' => env('OMNIFY_AUTH_PAGE_ADMIN_LOGIN', 'admin/auth/login'),
         ],
     ],
 
@@ -99,6 +102,12 @@ return [
     |--------------------------------------------------------------------------
     */
     'routes' => [
+        // URL-based organization prefix for authenticated routes.
+        // When set (e.g. '@{organization}'), routes like /dashboard become /@{slug}/dashboard.
+        // Auth routes (login/register) stay unprefixed. API routes stay unprefixed.
+        // Set to empty string to disable (cookie-only org context).
+        'org_route_prefix' => env('OMNIFY_ORG_ROUTE_PREFIX', ''),
+
         'prefix' => 'api/sso',
         'admin_prefix' => 'api/admin/sso',
         'middleware' => [
@@ -113,18 +122,18 @@ return [
             'core.role:admin',
         ],
         'access_enabled' => env('SSO_ACCESS_ROUTES_ENABLED', true),
-        'access_prefix' => env('SSO_ACCESS_PREFIX', 'admin/iam'),
+        'access_prefix' => env('SSO_ACCESS_PREFIX', 'settings/iam'),
         // null = auto-detect theo mode:
         //   console    → ['web', 'core.auth']  (Console SSO authentication)
         //   standalone → ['web', 'auth']       (standard Laravel session auth)
         'access_middleware' => null,
-        'access_pages_path' => env('SSO_ACCESS_PAGES_PATH', 'admin/iam'),
+        'access_pages_path' => env('SSO_ACCESS_PAGES_PATH', 'settings/iam'),
         'auth_enabled' => env('SSO_AUTH_ROUTES_ENABLED', true),
         'auth_prefix' => env('SSO_AUTH_PREFIX', 'sso'),
         'auth_middleware' => ['web', 'guest'],
         'auth_pages_path' => env('SSO_AUTH_PAGES_PATH', 'sso'),
         'standalone_admin_prefix' => env('SSO_STANDALONE_ADMIN_PREFIX', 'admin'),
-        // null = auto-detect: ['web', 'auth']
+        // null = auto-detect: ['web', 'core.admin']
         'standalone_admin_middleware' => null,
         'standalone_admin_pages_path' => env('SSO_STANDALONE_ADMIN_PAGES_PATH', 'admin'),
     ],
@@ -159,6 +168,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Admin Model
+    |--------------------------------------------------------------------------
+    |
+    | The admin guard and provider are registered automatically by the
+    | CoreServiceProvider when mode = 'standalone'. No need to configure
+    | auth.php in the host app.
+    |
+    */
+    'admin_model' => env('OMNIFY_AUTH_ADMIN_MODEL', \Omnify\Core\Models\Admin::class),
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Middleware
     |--------------------------------------------------------------------------
     */
@@ -177,6 +198,30 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Supported Locales
+    |--------------------------------------------------------------------------
+    |
+    | The list of locale codes accepted via the locale cookie.
+    | Used by the SetLocale middleware.
+    |
+    */
+    'locales' => ['ja', 'en', 'vi'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Organization Settings Hub
+    |--------------------------------------------------------------------------
+    |
+    | Hook point for packages to register sections on the org settings page.
+    | Packages push section configs into extra_sections during boot().
+    |
+    */
+    'org_settings' => [
+        'extra_sections' => [],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Security
     |--------------------------------------------------------------------------
     */
@@ -184,6 +229,24 @@ return [
         'allowed_redirect_hosts' => array_filter(explode(',', env('SSO_ALLOWED_REDIRECT_HOSTS', ''))),
         'require_https_redirects' => env('SSO_REQUIRE_HTTPS_REDIRECTS', true),
         'max_redirect_url_length' => 2048,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Settings Page
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the user settings page (/settings).
+    | Host apps can register additional sections via extra_sections.
+    |
+    | Each extra section: ['key' => 'string', 'label' => 'string', 'icon' => 'string', 'href' => '/path']
+    |
+    */
+    'settings' => [
+        'enabled' => env('OMNIFY_SETTINGS_ENABLED', true),
+        'prefix' => env('OMNIFY_SETTINGS_PREFIX', 'settings'),
+        'page' => env('OMNIFY_SETTINGS_PAGE', 'settings/index'),
+        'extra_sections' => [],
     ],
 
     /*

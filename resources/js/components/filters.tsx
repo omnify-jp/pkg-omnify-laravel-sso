@@ -84,9 +84,11 @@ type FiltersProps = {
     routeUrl: string;
     currentFilters: FilterRecord;
     children: ReactNode;
+    /** Right-aligned actions (e.g. Create button) */
+    extra?: ReactNode;
 };
 
-export function Filters({ routeUrl, currentFilters, children }: FiltersProps) {
+export function Filters({ routeUrl, currentFilters, children, extra }: FiltersProps) {
     const navigate = useCallback(
         (params: FilterRecord) => {
             router.get(routeUrl, params, { preserveState: true, preserveScroll: true });
@@ -115,20 +117,25 @@ export function Filters({ routeUrl, currentFilters, children }: FiltersProps) {
 
     return (
         <FilterCtx.Provider value={ctx}>
-            <Flex wrap gap={8} align="center">{children}</Flex>
+            <Flex wrap gap={8} align="center">
+                {children}
+                {extra && <Flex flex={1} justify="end">{extra}</Flex>}
+            </Flex>
         </FilterCtx.Provider>
     );
 }
 
 /* ── FilterSearch ──────────────────────────────────── */
 
+/** 検索フィールドの標準最大幅 — 全リストページで統一 */
+export const SEARCH_MAX_WIDTH = 320;
+
 type FilterSearchProps = {
     filterKey: string;
     placeholder?: string;
-    style?: React.CSSProperties;
 };
 
-export function FilterSearch({ filterKey, placeholder, style }: FilterSearchProps) {
+export function FilterSearch({ filterKey, placeholder }: FilterSearchProps) {
     const { currentFilters, applyFilter } = useFilterContext();
 
     return (
@@ -138,7 +145,7 @@ export function FilterSearch({ filterKey, placeholder, style }: FilterSearchProp
             onSearch={(value) => applyFilter(filterKey, value || undefined)}
             allowClear
             enterButton
-            style={style}
+            style={{ maxWidth: SEARCH_MAX_WIDTH }}
         />
     );
 }

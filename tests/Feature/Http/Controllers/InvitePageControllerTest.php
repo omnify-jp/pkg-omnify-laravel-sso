@@ -4,8 +4,8 @@
  * InvitePageController Feature Tests
  *
  * Tests for the invite member flow:
- * - GET /admin/iam/invite/create renders the invite form
- * - POST /admin/iam/invite validates input and calls ConsoleApiService
+ * - GET /settings/iam/invite/create renders the invite form
+ * - POST /settings/iam/invite validates input and calls ConsoleApiService
  * - Errors from ConsoleApiService are surfaced to user
  *
  * Invite routes only exist in console mode. Since Pest v4 doesn't allow
@@ -25,7 +25,7 @@ use Omnify\Core\Services\ConsoleTokenService;
 beforeEach(function () {
     config(['omnify-auth.mode' => 'console']);
 
-    $prefix = config('omnify-auth.routes.access_prefix', 'admin/iam');
+    $prefix = config('omnify-auth.routes.access_prefix', 'settings/iam');
 
     $this->app->make('router')
         ->prefix($prefix)
@@ -38,7 +38,7 @@ beforeEach(function () {
 });
 
 // =============================================================================
-// GET /admin/iam/invite/create
+// GET /settings/iam/invite/create
 // =============================================================================
 
 describe('invite create page', function () {
@@ -67,11 +67,11 @@ describe('invite create page', function () {
         $this->app->instance(ConsoleApiService::class, $consoleApi);
         $this->app->instance(ConsoleTokenService::class, $tokenService);
 
-        $response = $this->get('/admin/iam/invite/create?org=acme');
+        $response = $this->get('/settings/iam/invite/create?org=acme');
 
         $response->assertOk()
             ->assertInertia(fn ($page) => $page
-                ->component('admin/iam/invite-create')
+                ->component('settings/iam/invite-create')
                 ->has('branches', 2)
                 ->where('invite_org.slug', 'acme')
                 ->where('org_slug', 'acme')
@@ -106,11 +106,11 @@ describe('invite create page', function () {
         $this->app->instance(ConsoleApiService::class, $consoleApi);
         $this->app->instance(ConsoleTokenService::class, $tokenService);
 
-        $response = $this->get('/admin/iam/invite/create?org=fallback-org');
+        $response = $this->get('/settings/iam/invite/create?org=fallback-org');
 
         $response->assertOk()
             ->assertInertia(fn ($page) => $page
-                ->component('admin/iam/invite-create')
+                ->component('settings/iam/invite-create')
                 ->has('branches', 1)
             );
     });
@@ -126,11 +126,11 @@ describe('invite create page', function () {
 
         $this->app->instance(ConsoleTokenService::class, $tokenService);
 
-        $response = $this->get('/admin/iam/invite/create');
+        $response = $this->get('/settings/iam/invite/create');
 
         $response->assertOk()
             ->assertInertia(fn ($page) => $page
-                ->component('admin/iam/invite-create')
+                ->component('settings/iam/invite-create')
                 ->has('branches', 0)
                 ->where('invite_org', null)
             );
@@ -138,7 +138,7 @@ describe('invite create page', function () {
 });
 
 // =============================================================================
-// POST /admin/iam/invite
+// POST /settings/iam/invite
 // =============================================================================
 
 describe('invite store', function () {
@@ -146,7 +146,7 @@ describe('invite store', function () {
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $response = $this->post('/admin/iam/invite', []);
+        $response = $this->post('/settings/iam/invite', []);
 
         $response->assertSessionHasErrors(['org_slug', 'branch_id', 'emails_raw', 'role']);
     });
@@ -155,7 +155,7 @@ describe('invite store', function () {
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $response = $this->post('/admin/iam/invite', [
+        $response = $this->post('/settings/iam/invite', [
             'org_slug' => 'acme',
             'branch_id' => 'branch-1',
             'emails_raw' => 'test@example.com',
@@ -173,7 +173,7 @@ describe('invite store', function () {
         $tokenService->shouldReceive('getAccessToken')->andReturn('fake-token');
         $this->app->instance(ConsoleTokenService::class, $tokenService);
 
-        $response = $this->post('/admin/iam/invite', [
+        $response = $this->post('/settings/iam/invite', [
             'org_slug' => 'acme',
             'branch_id' => 'branch-1',
             'emails_raw' => 'not-an-email, also-invalid',
@@ -201,7 +201,7 @@ describe('invite store', function () {
         $this->app->instance(ConsoleApiService::class, $consoleApi);
         $this->app->instance(ConsoleTokenService::class, $tokenService);
 
-        $response = $this->post('/admin/iam/invite', [
+        $response = $this->post('/settings/iam/invite', [
             'org_slug' => 'acme',
             'branch_id' => 'branch-1',
             'emails_raw' => "alice@example.com\nbob@example.com",
@@ -227,7 +227,7 @@ describe('invite store', function () {
         $this->app->instance(ConsoleApiService::class, $consoleApi);
         $this->app->instance(ConsoleTokenService::class, $tokenService);
 
-        $response = $this->post('/admin/iam/invite', [
+        $response = $this->post('/settings/iam/invite', [
             'org_slug' => 'acme',
             'branch_id' => 'branch-1',
             'emails_raw' => "alice@example.com\nalice@example.com",
@@ -250,7 +250,7 @@ describe('invite store', function () {
 
         $this->app->instance(ConsoleTokenService::class, $tokenService);
 
-        $response = $this->post('/admin/iam/invite', [
+        $response = $this->post('/settings/iam/invite', [
             'org_slug' => 'acme',
             'branch_id' => 'branch-1',
             'emails_raw' => 'alice@example.com',
@@ -275,7 +275,7 @@ describe('invite store', function () {
         $this->app->instance(ConsoleApiService::class, $consoleApi);
         $this->app->instance(ConsoleTokenService::class, $tokenService);
 
-        $response = $this->post('/admin/iam/invite', [
+        $response = $this->post('/settings/iam/invite', [
             'org_slug' => 'acme',
             'branch_id' => 'branch-1',
             'emails_raw' => 'alice@example.com',
@@ -301,7 +301,7 @@ describe('invite store', function () {
         $this->app->instance(ConsoleApiService::class, $consoleApi);
         $this->app->instance(ConsoleTokenService::class, $tokenService);
 
-        $response = $this->post('/admin/iam/invite', [
+        $response = $this->post('/settings/iam/invite', [
             'org_slug' => 'acme',
             'branch_id' => 'b1',
             'emails_raw' => 'a@x.com, b@x.com; c@x.com',

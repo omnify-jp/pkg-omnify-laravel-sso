@@ -191,24 +191,26 @@ export default function AdminBrandsIndex({ brands, organizations, filters }: Pro
             subtitle={t('admin.brands.subtitle', 'Manage brands across organizations.')}
             breadcrumbs={breadcrumbs}
         >
-            <Filters routeUrl="/admin/brands" currentFilters={filters}>
+            <Filters
+                routeUrl="/admin/brands"
+                currentFilters={filters}
+                extra={
+                    <Link href="/admin/brands/create">
+                        <Button type="primary" icon={<PlusCircle size={16} />}>
+                            {t('admin.brands.create', 'Create Brand')}
+                        </Button>
+                    </Link>
+                }
+            >
                 <FilterSearch
                     filterKey="search"
                     placeholder={t('admin.brands.searchPlaceholder', 'Search by name or slug...')}
-                    style={{ maxWidth: 320 }}
                 />
                 <FilterSelect
                     filterKey="organization_id"
                     options={organizations.map((org) => ({ value: org.id, label: org.name }))}
                     allLabel={t('admin.brands.allOrganizations', 'All organizations')}
                 />
-                <div style={{ marginLeft: 'auto' }}>
-                    <Link href="/admin/brands/create">
-                        <Button type="primary" icon={<PlusCircle size={16} />}>
-                            {t('admin.brands.create', 'Create Brand')}
-                        </Button>
-                    </Link>
-                </div>
             </Filters>
 
             <Table

@@ -1,15 +1,14 @@
-import { Avatar, Button, Card, Col, Descriptions, Divider, Flex, Row, Tag, Typography } from 'antd';
-import { PermissionGrid } from '../../../components/access/permission-grid';
-import { Head, Link } from '@inertiajs/react';
+import { Avatar, Button, Card, Col, Descriptions, Divider, Empty, Flex, Row, Tag, Typography, theme } from 'antd';
+import { PermissionGrid } from '@omnify-core/components/access/permission-grid';
+import { Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, Pencil } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useIamLayout } from '@omnify-core/contexts/iam-layout-context';
+import { PageContainer } from '@omnify-core/components/page-container';
 
-import { IamBreadcrumb } from '../../../components/access/iam-breadcrumb';
-import { ScopeTypeBadge } from '../../../components/access/scope-type-badge';
-import type { IamPermission, IamRole, IamUserAssignment, ScopeType } from '../../../types/iam';
-import { buildPermissionModules, formatScopeLocation, getScopeLabel, toGridIds, toScopeBadgeType } from '../../../utils/scope-utils';
+import { ScopeTypeBadge } from '@omnify-core/components/access/scope-type-badge';
+import type { IamPermission, IamRole, IamUserAssignment, ScopeType } from '@omnify-core/types/iam';
+import { buildPermissionModules, formatScopeLocation, getScopeLabel, toGridIds, toScopeBadgeType } from '@omnify-core/utils/scope-utils';
 
 type Props = {
     role: IamRole;
@@ -21,8 +20,10 @@ type Props = {
 const SCOPE_ORDER: ScopeType[] = ['global', 'org-wide', 'branch'];
 
 export default function IamRoleDetail({ role, permissions, all_permissions, assignments }: Props) {
-    const Layout = useIamLayout();
     const { t } = useTranslation();
+    const { token } = theme.useToken();
+    const { url } = usePage();
+    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
 
     const permissionModules = useMemo(() => buildPermissionModules(all_permissions), [all_permissions]);
     const selectedGridIds = useMemo(
@@ -36,41 +37,31 @@ export default function IamRoleDetail({ role, permissions, all_permissions, assi
     })).filter((g) => g.assignments.length > 0);
 
     return (
-        <Layout
+        <PageContainer
+            title={role.name}
             breadcrumbs={[
-                { title: t('iam.title', 'IAM'), href: '/admin/iam' },
-                { title: t('iam.roles', 'Roles'), href: '/admin/iam/roles' },
-                { title: role.name, href: `/admin/iam/roles/${role.id}` },
+                { title: t('iam.roles', 'Roles'), href: `${iamBase}/roles` },
+                { title: role.name, href: `${iamBase}/roles/${role.id}` },
             ]}
-        >
-            <Head title={role.name} />
-
-            <Flex vertical gap={24}>
-                <Flex justify="space-between" align="center">
-                    <Link href="/admin/iam/roles">
+            extra={
+                <Flex align="center" gap="small">
+                    <Link href={`${iamBase}/roles`}>
                         <Button type="text" size="small" icon={<ArrowLeft size={16} />}>
                             {t('iam.backToRoles', 'Back to Roles')}
                         </Button>
                     </Link>
-                    <Flex align="center" gap={8}>
-                        <Link href={`/admin/iam/roles/${role.id}/edit`}>
-                            <Button size="small" icon={<Pencil size={16} />}>
-                                {t('iam.editRole', 'Edit Role')}
-                            </Button>
-                        </Link>
-                        <IamBreadcrumb
-                            segments={[
-                                { label: t('iam.roles', 'Roles'), href: '/admin/iam/roles' },
-                                { label: role.name },
-                            ]}
-                        />
-                    </Flex>
+                    <Link href={`${iamBase}/roles/${role.id}/edit`}>
+                        <Button size="small" icon={<Pencil size={16} />}>
+                            {t('iam.editRole', 'Edit Role')}
+                        </Button>
+                    </Link>
                 </Flex>
-
-                <Row gutter={[24, 24]}>
+            }
+        >
+            <Row gutter={[24, 24]}>
                     <Col xs={24} lg={8}>
                         <Card>
-                            <Flex align="center" gap={12}>
+                            <Flex align="center" gap="middle">
                                 <Avatar size={40}>
                                     {role.name.slice(0, 2).toUpperCase()}
                                 </Avatar>
@@ -110,12 +101,10 @@ export default function IamRoleDetail({ role, permissions, all_permissions, assi
                     </Col>
 
                     <Col xs={24} lg={16}>
-                        <Flex vertical gap={24}>
+                        <Flex vertical gap="large">
                             <Card title={t('iam.permissionMatrix', 'Permission Matrix')}>
                                 {permissionModules.length === 0 ? (
-                                    <Typography.Text type="secondary">
-                                        {t('iam.noPermissions', 'No permissions configured.')}
-                                    </Typography.Text>
+                                    <Empty description={t('iam.noPermissions', 'No permissions configured.')} />
                                 ) : (
                                     <PermissionGrid
                                         modules={permissionModules}
@@ -131,14 +120,12 @@ export default function IamRoleDetail({ role, permissions, all_permissions, assi
 
                             <Card title={`${t('iam.whereAssigned', 'Where Assigned')} (${assignments.length})`}>
                                 {assignments.length === 0 ? (
-                                    <Typography.Text type="secondary">
-                                        {t('iam.noAssignments', 'Not assigned to anyone yet.')}
-                                    </Typography.Text>
+                                    <Empty description={t('iam.noAssignments', 'Not assigned to anyone yet.')} />
                                 ) : (
-                                    <Flex vertical gap={16}>
+                                    <Flex vertical gap={token.padding}>
                                         {groupedAssignments.map((group) => (
-                                            <Flex vertical key={group.scope} gap={8}>
-                                                <Flex align="center" gap={8}>
+                                            <Flex vertical key={group.scope} gap="small">
+                                                <Flex align="center" gap="small">
                                                     <ScopeTypeBadge
                                                         type={toScopeBadgeType(group.scope)}
                                                         label={getScopeLabel(group.scope)}
@@ -147,14 +134,14 @@ export default function IamRoleDetail({ role, permissions, all_permissions, assi
                                                         ({group.assignments.length})
                                                     </Typography.Text>
                                                 </Flex>
-                                                <Flex vertical gap={8}>
+                                                <Flex vertical gap="small">
                                                     {group.assignments.map((assignment, index) => (
                                                         <Link
                                                             key={index}
-                                                            href={`/admin/iam/users/${assignment.user.id}`}
+                                                            href={`${iamBase}/users/${assignment.user.id}`}
                                                         >
                                                             <Card size="small" hoverable>
-                                                                <Flex align="center" gap={12}>
+                                                                <Flex align="center" gap="middle">
                                                                     <Avatar size={32}>
                                                                         {assignment.user.name.slice(0, 2).toUpperCase()}
                                                                     </Avatar>
@@ -179,7 +166,6 @@ export default function IamRoleDetail({ role, permissions, all_permissions, assi
                         </Flex>
                     </Col>
                 </Row>
-            </Flex>
-        </Layout>
+        </PageContainer>
     );
 }

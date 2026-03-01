@@ -1,6 +1,6 @@
 import { createContext, useCallback, useMemo } from 'react';
 
-import type { SsoLanguageData, SsoLocale } from '../types/sso';
+import type { SsoLanguageData, SsoLocale } from '@omnify-core/types/sso';
 
 export type LanguageContextValue = {
     locale: SsoLocale;

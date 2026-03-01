@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { LanguageContext, type LanguageContextValue } from '../contexts/language-context';
+import { LanguageContext, type LanguageContextValue } from '@omnify-core/contexts/language-context';
 
 export function useLanguage(): LanguageContextValue {
     const context = useContext(LanguageContext);

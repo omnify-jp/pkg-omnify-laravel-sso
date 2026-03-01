@@ -29,7 +29,7 @@ class InvitePageController extends Controller
      */
     protected function getPagePath(string $page): string
     {
-        $basePath = config('omnify-auth.routes.access_pages_path', 'admin/iam');
+        $basePath = config('omnify-auth.routes.access_pages_path', 'settings/iam');
 
         return "{$basePath}/{$page}";
     }

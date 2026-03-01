@@ -372,21 +372,23 @@ export default function AdminOrganizationsIndex({ organizations, filters }: Prop
             subtitle={t('admin.organizations.subtitle', 'Manage organizations in standalone mode.')}
             breadcrumbs={breadcrumbs}
         >
-            <Filters routeUrl="/admin/organizations" currentFilters={filters}>
+            <Filters
+                routeUrl="/admin/organizations"
+                currentFilters={filters}
+                extra={
+                    <Button type="primary" icon={<PlusCircle size={16} />} onClick={handleCreate}>
+                        {t('admin.organizations.create', 'Create Organization')}
+                    </Button>
+                }
+            >
                 <FilterSearch
                     filterKey="q"
                     placeholder={t('admin.organizations.searchPlaceholder', 'Search by name or slug...')}
-                    style={{ maxWidth: 320 }}
                 />
                 <FilterAdvancedButton
                     label={t('common.filters', 'Filters')}
                     onClick={handleOpenFilterDrawer}
                 />
-                <div style={{ marginLeft: 'auto' }}>
-                    <Button type="primary" icon={<PlusCircle size={16} />} onClick={handleCreate}>
-                        {t('admin.organizations.create', 'Create Organization')}
-                    </Button>
-                </div>
             </Filters>
 
             <FilterChips

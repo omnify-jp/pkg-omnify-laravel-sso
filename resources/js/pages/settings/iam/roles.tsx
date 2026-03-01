@@ -1,13 +1,13 @@
-import { Button, Dropdown, Flex, Input, Table, Tag, Typography } from 'antd';
+import { Button, Card, Dropdown, Flex, Input, Table, Tag, Typography } from 'antd';
+import { SEARCH_MAX_WIDTH } from '@omnify-core/components/filters';
 import type { TableColumnsType } from 'antd';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Ellipsis, Eye } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageContainer } from '@omnify-core/components/page-container';
 
-import { IamBreadcrumb } from '../../../components/access/iam-breadcrumb';
-import type { IamRole } from '../../../types/iam';
+import type { IamRole } from '@omnify-core/types/iam';
 
 type Props = {
     roles: IamRole[];
@@ -15,11 +15,12 @@ type Props = {
 
 export default function IamRoles({ roles }: Props) {
     const { t } = useTranslation();
+    const { url } = usePage();
+    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
     const [search, setSearch] = useState('');
 
     const breadcrumbs = [
-        { title: t('iam.title', 'IAM'), href: '/admin/iam' },
-        { title: t('iam.roles', 'Roles'), href: '/admin/iam/roles' },
+        { title: t('iam.roles', 'Roles'), href: `${iamBase}/roles` },
     ];
 
     const filtered = useMemo(
@@ -111,7 +112,7 @@ export default function IamRoles({ roles }: Props) {
                                 key: 'view',
                                 icon: <Eye size={16} />,
                                 label: (
-                                    <Link href={`/admin/iam/roles/${role.id}`}>
+                                    <Link href={`${iamBase}/roles/${role.id}`}>
                                         {t('common.view', 'View')}
                                     </Link>
                                 ),
@@ -131,29 +132,32 @@ export default function IamRoles({ roles }: Props) {
             title={t('iam.roles', 'Roles')}
             subtitle={t('iam.rolesSubtitle', 'Define roles and their permissions.')}
             breadcrumbs={breadcrumbs}
-            extra={<IamBreadcrumb segments={[{ label: t('iam.roles', 'Roles') }]} />}
         >
-            <Input.Search
-                placeholder={t('iam.searchRoles', 'Search roles...')}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                style={{ maxWidth: 320 }}
-            />
+            <Flex vertical gap="large">
+                <Input.Search
+                    placeholder={t('iam.searchRoles', 'Search roles...')}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    style={{ maxWidth: SEARCH_MAX_WIDTH }}
+                />
 
-            <Table
-                columns={columns}
-                dataSource={filtered}
-                rowKey="id"
-                pagination={false}
-                locale={{ emptyText: t('iam.noRolesFound', 'No roles found.') }}
-            />
+                <Card styles={{ body: { padding: 0 } }}>
+                    <Table
+                        columns={columns}
+                        dataSource={filtered}
+                        rowKey="id"
+                        pagination={false}
+                        locale={{ emptyText: t('iam.noRolesFound', 'No roles found.') }}
+                    />
+                </Card>
 
-            <Typography.Text type="secondary">
-                {t('iam.showingRoles', 'Showing {{filtered}} of {{total}} roles', {
-                    filtered: filtered.length,
-                    total: roles.length,
-                })}
-            </Typography.Text>
+                <Typography.Text type="secondary">
+                    {t('iam.showingRoles', 'Showing {{filtered}} of {{total}} roles', {
+                        filtered: filtered.length,
+                        total: roles.length,
+                    })}
+                </Typography.Text>
+            </Flex>
         </PageContainer>
     );
 }

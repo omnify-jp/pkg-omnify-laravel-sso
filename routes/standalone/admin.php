@@ -15,7 +15,7 @@ use Omnify\Core\Http\Controllers\Standalone\Admin\UserAdminController;
 | CRUD routes for managing organizations, branches, and users.
 | Only loaded when mode = 'standalone' and admin_enabled = true.
 |
-| Middleware is resolved based on config (default: ['web', 'auth']).
+| Middleware is resolved based on config (default: ['web', 'core.admin']).
 | Prefix: /admin (configurable via standalone_admin_prefix)
 | Name prefix: admin.
 |
@@ -23,7 +23,7 @@ use Omnify\Core\Http\Controllers\Standalone\Admin\UserAdminController;
 
 $prefix = config('omnify-auth.routes.standalone_admin_prefix', 'admin');
 $middleware = config('omnify-auth.routes.standalone_admin_middleware')
-    ?? ['web', 'auth'];
+    ?? ['web', 'core.admin'];
 
 Route::prefix($prefix)
     ->name('admin.')

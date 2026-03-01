@@ -2,6 +2,9 @@
 
 namespace Omnify\Core\Models;
 
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Omnify\Core\Database\Factories\AdminFactory;
 use Omnify\Core\Models\Base\AdminBaseModel;
 
 /**
@@ -12,6 +15,13 @@ use Omnify\Core\Models\Base\AdminBaseModel;
  */
 class Admin extends AdminBaseModel
 {
+    use HasFactory;
+
+    protected static function newFactory(): Factory
+    {
+        return AdminFactory::new();
+    }
+
     /**
      * @return array<string, string>
      */

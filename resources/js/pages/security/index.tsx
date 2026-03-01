@@ -3,7 +3,7 @@ import { PageContainer } from '@omnify-core/components/page-container';
 import { useFormMutation } from '@omnify-core/hooks';
 import { securityService, type TwoFactorCodeData } from '@omnify-core/services/security';
 import { useMutation } from '@tanstack/react-query';
-import { Alert, Button, Card, Col, Flex, Form, Input, Row, Space, Tag, Typography } from 'antd';
+import { Alert, Button, Card, Col, Flex, Form, Input, Row, Tag, Typography } from 'antd';
 import { Download, RefreshCw, ShieldCheck, ShieldOff } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -55,7 +55,7 @@ function RecoveryCodesSection({ codes }: { codes: string[] }) {
                         </Col>
                     ))}
                 </Row>
-                <Space>
+                <Flex gap="small">
                     <Button
                         icon={<Download size={14} />}
                         onClick={handleDownload}
@@ -69,7 +69,7 @@ function RecoveryCodesSection({ codes }: { codes: string[] }) {
                     >
                         {t('security.recoveryCodes.regenerate', 'Regenerate')}
                     </Button>
-                </Space>
+                </Flex>
             </Flex>
         </Card>
     );
@@ -213,7 +213,7 @@ function DisableConfirmForm() {
                         />
                     </Form.Item>
                     <Form.Item>
-                        <Space>
+                        <Flex gap="small">
                             <Button
                                 danger
                                 type="primary"
@@ -226,7 +226,7 @@ function DisableConfirmForm() {
                             <Button onClick={() => setShowConfirm(false)}>
                                 {t('common.cancel', 'Cancel')}
                             </Button>
-                        </Space>
+                        </Flex>
                     </Form.Item>
                 </Form>
             </Flex>
@@ -289,16 +289,14 @@ export default function SecurityIndex({
                                     <DisableConfirmForm />
                                 ) : (
                                     step === 'idle' && (
-                                        <div>
-                                            <Button
-                                                type="primary"
-                                                icon={<ShieldCheck size={16} />}
-                                                onClick={() => setupMutation.mutate()}
-                                                loading={setupMutation.isPending}
-                                            >
-                                                {t('security.twoFactor.enable', 'Enable Two-Factor Authentication')}
-                                            </Button>
-                                        </div>
+                                        <Button
+                                            type="primary"
+                                            icon={<ShieldCheck size={16} />}
+                                            onClick={() => setupMutation.mutate()}
+                                            loading={setupMutation.isPending}
+                                        >
+                                            {t('security.twoFactor.enable', 'Enable Two-Factor Authentication')}
+                                        </Button>
                                     )
                                 )}
                             </Flex>

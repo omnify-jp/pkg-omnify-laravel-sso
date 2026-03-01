@@ -2,9 +2,9 @@
 
 namespace Omnify\Core\Database\Factories;
 
-use Omnify\Core\Models\Admin;
 use Illuminate\Database\Eloquent\Factories\Factory;
-
+use Illuminate\Support\Facades\Hash;
+use Omnify\Core\Models\Admin;
 
 /**
  * Admin Factory
@@ -25,12 +25,26 @@ class AdminFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->sentence(3),
+            'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'password' => fake()->sentence(),
-            'is_active' => fake()->boolean(),
-            'email_verified_at' => fake()->dateTime(),
+            'password' => Hash::make('password'),
+            'is_active' => true,
+            'email_verified_at' => now(),
             'remember_token' => \Illuminate\Support\Str::random(32),
         ];
+    }
+
+    public function withPassword(string $password): static
+    {
+        return $this->state([
+            'password' => Hash::make($password),
+        ]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state([
+            'is_active' => false,
+        ]);
     }
 }

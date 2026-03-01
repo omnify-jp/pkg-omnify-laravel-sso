@@ -1,9 +1,9 @@
-import { AuthProvider } from '../contexts/auth-context';
-import { LanguageProvider } from '../contexts/language-context';
-import { OrganizationProvider } from '../contexts/organization-context';
-import type { SsoProviderProps } from '../types/sso';
+import { AuthProvider } from '@omnify-core/contexts/auth-context';
+import { LanguageProvider } from '@omnify-core/contexts/language-context';
+import { OrganizationProvider } from '@omnify-core/contexts/organization-context';
+import type { SsoProviderProps } from '@omnify-core/types/sso';
 
-import type { SsoOrganizationData } from '../types/sso';
+import type { SsoOrganizationData } from '@omnify-core/types/sso';
 
 const defaultOrganizationData: SsoOrganizationData = {
     current: null,

@@ -34,5 +34,11 @@ class Organization extends OrganizationBaseModel
         return OrganizationFactory::new();
     }
 
-    // Add your custom methods here
+    /**
+     * Get the route key for the model (slug-based route binding).
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
 }

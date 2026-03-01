@@ -4,14 +4,14 @@ import { Plus } from 'lucide-react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { IamAssignment, IamBranch, IamOrganization, ScopeType } from '../../types/iam';
+import type { IamAssignment, IamBranch, IamOrganization, ScopeType } from '@omnify-core/types/iam';
 import {
     getDirectAssignments,
     getInheritedAssignments,
     getScopeLabel,
     getScopeNodeName,
     toScopeBadgeType,
-} from '../../utils/scope-utils';
+} from '@omnify-core/utils/scope-utils';
 import { ScopeTypeBadge } from './scope-type-badge';
 
 type Props = {
@@ -37,7 +37,7 @@ export function ScopeDetailPanel({ scope, scopeId, assignments, organizations, b
         [scope, scopeId, assignments, organizations, branches],
     );
 
-    const createUrl = `/admin/iam/assignments/create?scope=${scope}&scopeId=${scopeId ?? ''}`;
+    const createUrl = `/settings/iam/assignments/create?scope=${scope}&scopeId=${scopeId ?? ''}`;
 
     return (
         <Flex vertical gap={24}>
@@ -65,7 +65,7 @@ export function ScopeDetailPanel({ scope, scopeId, assignments, organizations, b
                     <List
                         dataSource={directAssignments}
                         renderItem={(assignment) => (
-                            <Link href={`/admin/iam/users/${assignment.user.id}`}>
+                            <Link href={`/settings/iam/users/${assignment.user.id}`}>
                                 <List.Item
                                     extra={
                                         <Tag>

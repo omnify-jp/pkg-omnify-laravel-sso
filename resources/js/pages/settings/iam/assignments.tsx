@@ -1,23 +1,24 @@
-import { Button, Card, Flex, Input, Select, Table, Tag, Typography } from 'antd';
+import { Button, Card, Flex, Input, Select, Table, Tag, Typography, theme } from 'antd';
 import type { TableColumnsType } from 'antd';
-import { Head, Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { Eye, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useIamLayout } from '@omnify-core/contexts/iam-layout-context';
+import { PageContainer } from '@omnify-core/components/page-container';
 
-import { IamBreadcrumb } from '../../../components/access/iam-breadcrumb';
-import { ScopeTypeBadge } from '../../../components/access/scope-type-badge';
-import type { IamAssignment, ScopeType } from '../../../types/iam';
-import { formatScopeLocation, getScopeLabel, toScopeBadgeType } from '../../../utils/scope-utils';
+import { ScopeTypeBadge } from '@omnify-core/components/access/scope-type-badge';
+import type { IamAssignment, ScopeType } from '@omnify-core/types/iam';
+import { formatScopeLocation, getScopeLabel, toScopeBadgeType } from '@omnify-core/utils/scope-utils';
 
 type Props = {
     assignments: IamAssignment[];
 };
 
 export default function IamAssignments({ assignments }: Props) {
-    const Layout = useIamLayout();
     const { t } = useTranslation();
+    const { token } = theme.useToken();
+    const { url } = usePage();
+    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
     const [search, setSearch] = useState('');
     const [scopeFilter, setScopeFilter] = useState<string>('all');
 
@@ -36,7 +37,7 @@ export default function IamAssignments({ assignments }: Props) {
             return;
         }
         router.delete(
-            `/admin/iam/assignments/${assignment.user.id}/${assignment.role.id}`,
+            `${iamBase}/assignments/${assignment.user.id}/${assignment.role.id}`,
         );
     };
 
@@ -95,8 +96,8 @@ export default function IamAssignments({ assignments }: Props) {
             key: 'actions',
             width: 96,
             render: (_: unknown, assignment: IamAssignment) => (
-                <Flex align="center" gap={4}>
-                    <Link href={`/admin/iam/users/${assignment.user.id}`}>
+                <Flex align="center" gap={token.paddingXXS}>
+                    <Link href={`${iamBase}/users/${assignment.user.id}`}>
                         <Button type="text" size="small" icon={<Eye size={16} />} />
                     </Link>
                     <Button
@@ -112,34 +113,16 @@ export default function IamAssignments({ assignments }: Props) {
     ];
 
     return (
-        <Layout
+        <PageContainer
+            title={t('iam.assignments', 'Assignments')}
+            subtitle={t('iam.assignmentsSubtitle', 'All scoped role assignments across users.')}
             breadcrumbs={[
-                { title: t('iam.title', 'IAM'), href: '/admin/iam' },
-                { title: t('iam.assignments', 'Assignments'), href: '/admin/iam/assignments' },
+                { title: t('iam.assignments', 'Assignments'), href: `${iamBase}/assignments` },
             ]}
         >
-            <Head title={t('iam.assignments', 'Assignments')} />
-
-            <Flex vertical gap={24}>
-                <Flex justify="space-between" align="center">
-                    <Flex vertical>
-                        <Typography.Title level={4}>
-                            {t('iam.assignments', 'Assignments')}
-                        </Typography.Title>
-                        <Typography.Text type="secondary">
-                            {t(
-                                'iam.assignmentsSubtitle',
-                                'All scoped role assignments across users.',
-                            )}
-                        </Typography.Text>
-                    </Flex>
-                    <IamBreadcrumb
-                        segments={[{ label: t('iam.assignments', 'Assignments') }]}
-                    />
-                </Flex>
-
-                <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
-                    <Flex gap={12} wrap="wrap">
+            <Flex vertical gap="large">
+                <Flex justify="space-between" align="center" wrap="wrap" gap="middle">
+                    <Flex gap="middle" wrap="wrap">
                         <Input
                             placeholder={t('iam.searchAssignments', 'Search by user or role\u2026')}
                             value={search}
@@ -157,7 +140,7 @@ export default function IamAssignments({ assignments }: Props) {
                             ]}
                         />
                     </Flex>
-                    <Link href="/admin/iam/assignments/create">
+                    <Link href={`${iamBase}/assignments/create`}>
                         <Button type="primary" icon={<Plus size={16} />}>
                             {t('iam.createAssignment', 'Create Assignment')}
                         </Button>
@@ -181,6 +164,6 @@ export default function IamAssignments({ assignments }: Props) {
                     })}
                 </Typography.Text>
             </Flex>
-        </Layout>
+        </PageContainer>
     );
 }

@@ -154,7 +154,7 @@ export function OrganizationSwitcher({
     return (
         <>
             {/* Trigger */}
-            <Button type="text" onClick={handleOpen} style={{ height: 'auto', padding: '4px 8px', justifyContent: 'flex-start' }}>
+            <Button type="text" onClick={handleOpen}>
                 <Flex align="center" gap={8}>
                     <Avatar size={26} shape="square">
                         {current ? getOrgInitials(current.name) : <Building2 size={14} />}
@@ -164,7 +164,7 @@ export function OrganizationSwitcher({
                             {current?.name ?? t('sso.org.noOrgSelected', 'Select organization')}
                         </Typography.Text>
                         {requireBranch && currentBranch && (
-                            <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                            <Typography.Text type="secondary">
                                 {currentBranch.name}
                             </Typography.Text>
                         )}

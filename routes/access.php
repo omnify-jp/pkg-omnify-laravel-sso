@@ -18,9 +18,14 @@ use Omnify\Core\Http\Controllers\AccessPageController;
 */
 
 $mode = config('omnify-auth.mode', 'standalone');
-$accessPrefix = config('omnify-auth.routes.access_prefix', 'admin/iam');
+$accessPrefix = config('omnify-auth.routes.access_prefix', 'settings/iam');
 $accessMiddleware = config('omnify-auth.routes.access_middleware')
     ?? ($mode === 'console' ? ['web', 'core.auth'] : ['web', 'auth']);
+
+// Org Settings Index — hub page (/@{org}/settings)
+Route::get('settings', [AccessPageController::class, 'orgSettingsIndex'])
+    ->name('org-settings.index')
+    ->middleware($accessMiddleware);
 
 Route::prefix($accessPrefix)
     ->name('access.')

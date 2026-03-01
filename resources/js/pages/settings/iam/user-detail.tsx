@@ -1,21 +1,20 @@
-import { Avatar, Button, Card, Col, Descriptions, Divider, Flex, Row, Select, Tag, Typography } from 'antd';
-import { PermissionGrid } from '../../../components/access/permission-grid';
-import { Head, Link } from '@inertiajs/react';
+import { Avatar, Button, Card, Col, Descriptions, Divider, Empty, Flex, Row, Select, Tag, Typography, theme } from 'antd';
+import { PermissionGrid } from '@omnify-core/components/access/permission-grid';
+import { Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useIamLayout } from '@omnify-core/contexts/iam-layout-context';
+import { PageContainer } from '@omnify-core/components/page-container';
 
-import { IamBreadcrumb } from '../../../components/access/iam-breadcrumb';
-import { ScopeTypeBadge } from '../../../components/access/scope-type-badge';
-import type { IamPermission, IamRoleAssignment, IamUser, ScopeType } from '../../../types/iam';
+import { ScopeTypeBadge } from '@omnify-core/components/access/scope-type-badge';
+import type { IamPermission, IamRoleAssignment, IamUser, ScopeType } from '@omnify-core/types/iam';
 import {
     buildPermissionModules,
     formatScopeLocation,
     getScopeLabel,
     toGridIds,
     toScopeBadgeType,
-} from '../../../utils/scope-utils';
+} from '@omnify-core/utils/scope-utils';
 
 type Props = {
     user: IamUser;
@@ -28,8 +27,10 @@ type Props = {
 const SCOPE_ORDER: ScopeType[] = ['global', 'org-wide', 'branch'];
 
 export default function IamUserDetail({ user, assignments, all_permissions, role_permissions }: Props) {
-    const Layout = useIamLayout();
     const { t } = useTranslation();
+    const { token } = theme.useToken();
+    const { url } = usePage();
+    const iamBase = url.match(/^(.*\/settings\/iam)/)?.[1] ?? '/settings/iam';
     const [selectedPermScope, setSelectedPermScope] = useState<string>('');
 
     const permissionModules = useMemo(
@@ -102,39 +103,29 @@ export default function IamUserDetail({ user, assignments, all_permissions, role
     }, [selectedPermScope, assignments, scopeOptions, role_permissions]);
 
     return (
-        <Layout
+        <PageContainer
+            title={user.name}
             breadcrumbs={[
-                { title: t('iam.title', 'IAM'), href: '/admin/iam' },
-                { title: t('iam.users', 'Users'), href: '/admin/iam/users' },
-                { title: user.name, href: `/admin/iam/users/${user.id}` },
+                { title: t('iam.users', 'Users'), href: `${iamBase}/users` },
+                { title: user.name, href: `${iamBase}/users/${user.id}` },
             ]}
+            extra={
+                <Link href={`${iamBase}/users`}>
+                    <Button type="text" size="small" icon={<ArrowLeft size={16} />}>
+                        {t('iam.backToUsers', 'Back to Users')}
+                    </Button>
+                </Link>
+            }
         >
-            <Head title={user.name} />
-
-            <Flex vertical gap={24}>
-                <Flex justify="space-between" align="center">
-                    <Link href="/admin/iam/users">
-                        <Button type="text" size="small" icon={<ArrowLeft size={16} />}>
-                            {t('iam.backToUsers', 'Back to Users')}
-                        </Button>
-                    </Link>
-                    <IamBreadcrumb
-                        segments={[
-                            { label: t('iam.users', 'Users'), href: '/admin/iam/users' },
-                            { label: user.name },
-                        ]}
-                    />
-                </Flex>
-
-                <Row gutter={[24, 24]}>
+            <Row gutter={[24, 24]}>
                     <Col xs={24} lg={8}>
                         <Card>
-                            <Flex vertical align="center" gap={8}>
+                            <Flex vertical align="center" gap="small">
                                 <Avatar size={64}>
                                     {user.name.slice(0, 2).toUpperCase()}
                                 </Avatar>
                                 <Typography.Title level={5}>{user.name}</Typography.Title>
-                                <Flex align="center" gap={4}>
+                                <Flex align="center" gap={token.paddingXXS}>
                                     <Mail size={12} />
                                     <Typography.Text type="secondary">{user.email}</Typography.Text>
                                 </Flex>
@@ -154,27 +145,25 @@ export default function IamUserDetail({ user, assignments, all_permissions, role
                     </Col>
 
                     <Col xs={24} lg={16}>
-                        <Flex vertical gap={24}>
+                        <Flex vertical gap="large">
                             <Card title={t('iam.roleAssignments', 'Role Assignments')}>
                                 {assignments.length === 0 ? (
-                                    <Typography.Text type="secondary">
-                                        {t('iam.noAssignments', 'No role assignments.')}
-                                    </Typography.Text>
+                                    <Empty description={t('iam.noAssignments', 'No role assignments.')} />
                                 ) : (
-                                    <Flex vertical gap={24}>
+                                    <Flex vertical gap="large">
                                         {groupedAssignments.map((group) => (
-                                            <Flex vertical key={group.scope} gap={8}>
-                                                <Flex align="center" gap={8}>
+                                            <Flex vertical key={group.scope} gap="small">
+                                                <Flex align="center" gap="small">
                                                     <ScopeTypeBadge
                                                         type={toScopeBadgeType(group.scope)}
                                                         label={getScopeLabel(group.scope)}
                                                     />
                                                 </Flex>
-                                                <Flex vertical gap={8}>
+                                                <Flex vertical gap="small">
                                                     {group.assignments.map((assignment, index) => (
                                                         <Card key={index} size="small">
-                                                            <Flex vertical gap={4}>
-                                                                <Flex align="center" gap={8}>
+                                                            <Flex vertical gap={token.paddingXXS}>
+                                                                <Flex align="center" gap="small">
                                                                     <Tag>
                                                                         <Typography.Text type="secondary">
                                                                             Lv.
@@ -190,7 +179,7 @@ export default function IamUserDetail({ user, assignments, all_permissions, role
                                                                     </Typography.Text>
                                                                 </Flex>
                                                                 {assignment.created_at && (
-                                                                    <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                                                                    <Typography.Text type="secondary">
                                                                         {new Date(
                                                                             assignment.created_at,
                                                                         ).toLocaleDateString()}
@@ -255,23 +244,15 @@ export default function IamUserDetail({ user, assignments, all_permissions, role
                                             }}
                                         />
                                     ) : (
-                                        <Typography.Text type="secondary">
-                                            {t('iam.noPermissions', 'No permissions configured.')}
-                                        </Typography.Text>
+                                        <Empty description={t('iam.noPermissions', 'No permissions configured.')} />
                                     )
                                 ) : (
-                                    <Typography.Text type="secondary">
-                                        {t(
-                                            'iam.selectScopeToView',
-                                            'Select a scope above to view effective permissions.',
-                                        )}
-                                    </Typography.Text>
+                                    <Empty description={t('iam.selectScopeToView', 'Select a scope above to view effective permissions.')} />
                                 )}
                             </Card>
                         </Flex>
                     </Col>
                 </Row>
-            </Flex>
-        </Layout>
+        </PageContainer>
     );
 }

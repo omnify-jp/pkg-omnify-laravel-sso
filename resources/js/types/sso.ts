@@ -64,6 +64,7 @@ export type SsoOrganizationData = {
     current: SsoOrganization | null;
     branch: SsoBranch | null;
     organizations?: SsoOrganization[];
+    branches?: SsoBranch[];
 };
 
 // ─── Language ────────────────────────────────────────────────────────────────

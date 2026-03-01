@@ -6,12 +6,17 @@ export type BreadcrumbItem = {
     href: string;
 };
 
-export type PageLayoutComponent = ComponentType<{
+export type PageLayoutProps = {
     children: ReactNode;
     breadcrumbs?: BreadcrumbItem[];
-}>;
+    title?: string;
+    subtitle?: string;
+    extra?: ReactNode;
+};
 
-function PassthroughLayout({ children }: { children: ReactNode; breadcrumbs?: BreadcrumbItem[] }) {
+export type PageLayoutComponent = ComponentType<PageLayoutProps>;
+
+function PassthroughLayout({ children }: PageLayoutProps) {
     return <>{children}</>;
 }
 

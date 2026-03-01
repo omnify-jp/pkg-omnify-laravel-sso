@@ -16,7 +16,7 @@ use Omnify\Core\Http\Controllers\Console\InvitePageController;
 |
 */
 
-$accessPrefix = config('omnify-auth.routes.access_prefix', 'admin/iam');
+$accessPrefix = config('omnify-auth.routes.access_prefix', 'settings/iam');
 
 Route::prefix($accessPrefix)
     ->name('access.')

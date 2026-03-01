@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { AuthContext, type AuthContextValue } from '../contexts/auth-context';
+import { AuthContext, type AuthContextValue } from '@omnify-core/contexts/auth-context';
 
 export function useAuth(): AuthContextValue {
     const context = useContext(AuthContext);

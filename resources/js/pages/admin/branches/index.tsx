@@ -198,24 +198,26 @@ export default function AdminBranchesIndex({ branches, organizations, filters }:
             subtitle={t('admin.branches.subtitle', 'Manage branches across organizations.')}
             breadcrumbs={breadcrumbs}
         >
-            <Filters routeUrl="/admin/branches" currentFilters={filters}>
+            <Filters
+                routeUrl="/admin/branches"
+                currentFilters={filters}
+                extra={
+                    <Link href="/admin/branches/create">
+                        <Button type="primary" icon={<PlusCircle size={16} />}>
+                            {t('admin.branches.create', 'Create Branch')}
+                        </Button>
+                    </Link>
+                }
+            >
                 <FilterSearch
                     filterKey="search"
                     placeholder={t('admin.branches.searchPlaceholder', 'Search by name or slug...')}
-                    style={{ maxWidth: 320 }}
                 />
                 <FilterSelect
                     filterKey="organization_id"
                     options={organizations.map((org) => ({ value: org.id, label: org.name }))}
                     allLabel={t('admin.branches.allOrganizations', 'All organizations')}
                 />
-                <div style={{ marginLeft: 'auto' }}>
-                    <Link href="/admin/branches/create">
-                        <Button type="primary" icon={<PlusCircle size={16} />}>
-                            {t('admin.branches.create', 'Create Branch')}
-                        </Button>
-                    </Link>
-                </div>
             </Filters>
 
             <Table

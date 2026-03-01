@@ -1,6 +1,6 @@
 import { createContext, useMemo } from 'react';
 
-import type { SsoAuthData, SsoPermission, SsoRole, SsoUser } from '../types/sso';
+import type { SsoAuthData, SsoPermission, SsoRole, SsoUser } from '@omnify-core/types/sso';
 
 export type AuthContextValue = {
     user: SsoUser | null;
