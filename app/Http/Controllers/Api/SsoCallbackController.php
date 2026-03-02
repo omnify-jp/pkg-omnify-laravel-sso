@@ -105,9 +105,11 @@ class SsoCallbackController extends Controller
 
         $this->logger->jwtVerification(true);
 
-        // Find or create user
+        // Find or create user (bypass standalone scope to handle mode switches)
         $userModel = config('omnify-auth.user_model');
-        $user = $userModel::where('console_user_id', $claims['sub'])->first();
+        $user = $userModel::withoutGlobalScope('standalone_mode')
+            ->where('console_user_id', $claims['sub'])
+            ->first();
 
         if (! $user) {
             // Create new user (SSO user - no password, authentication via Console tokens)
@@ -117,16 +119,18 @@ class SsoCallbackController extends Controller
             $user->name = $claims['name'];
             $user->is_standalone = false;
         } else {
-            // Update existing user
+            // Update existing user (mark as console-managed)
             $user->email = $claims['email'];
             $user->name = $claims['name'];
+            $user->is_standalone = false;
         }
 
         // Store Console tokens
         $this->tokenService->storeTokens($user, $tokens);
 
-        // Get organizations
+        // Get organizations and sync branches
         $organizations = $this->organizationAccessService->getOrganizations($user);
+        $this->organizationAccessService->syncBranches($user, $organizations);
 
         // Save primary organization to user (first org or existing)
         if (! $user->console_organization_id && ! empty($organizations)) {

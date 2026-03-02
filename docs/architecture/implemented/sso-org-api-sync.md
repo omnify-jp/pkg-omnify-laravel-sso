@@ -1,402 +1,471 @@
-# SSO Organization Sync - Full Implementation Guide
+# SSO Data Sync Architecture
 
-> **Status: ✅ IMPLEMENTED**
-> 
-> This feature is implemented in `@famgia/omnify-react-sso` package.
-> - `getOrgIdForApi()`, `setOrgIdForApi()`, `clearOrgIdForApi()` are exported
-> - `apiClient.ts` uses these functions to add `X-Organization-Id` header
+> **Status: ✅ IMPLEMENTED** (2026-03-01)
+>
+> Data flow: Console (source of truth) → local DB (cache) → Inertia shared props (delivery) → React UI
 
 ## Overview
 
-This document describes the complete solution for syncing organization data between SSO (auth-omnify) and local application, ensuring API calls work correctly with `X-Organization-Id` header.
-
-## The Problem
-
-### Issue 1: Frontend Race Condition
-When using `@famgia/omnify-react-sso` package, the organization ID may not be available when API calls are made during initial render.
-
-**Root Cause:**
-1. `useOrganization()` hook provides `currentOrganization` in React state
-2. API client needs the org ID to add `X-Organization-Id` header
-3. React's `useEffect` runs AFTER render, so org ID isn't synced in time
-4. API calls made during initial render fail with `MISSING_ORGANIZATION` error
-
-### Issue 2: Backend ID Mismatch
-The SSO package stores organization data with two IDs:
-- `id`: Auto-generated local UUID (primary key)
-- `console_organization_id`: SSO's organization ID
-
-Frontend sends `currentOrganization.id` (SSO org ID) as `X-Organization-Id`, but backend lookup uses local `id` field, causing `ORGANIZATION_NOT_FOUND` error.
-
----
-
-## Solution Architecture
+Khi host app (boilerplate/dxs-task/...) chạy ở **console mode** (`OMNIFY_AUTH_MODE=console`), toàn bộ dữ liệu tổ chức (organizations, branches, locations) được quản lý bởi **Omnify Console** — host app chỉ giữ bản cache trong local DB.
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         FRONTEND                                 │
-├─────────────────────────────────────────────────────────────────┤
-│  OrganizationGate                                                │
-│  - Sync org ID IMMEDIATELY (not in useEffect)                   │
-│  - Block render until org selected                               │
-│                           │                                      │
-│                           ▼                                      │
-│  orgApiSync Module                                               │
-│  - setOrgIdForApi() → memory + localStorage                      │
-│  - getOrgIdForApi() → for API requests                          │
-│                           │                                      │
-│                           ▼                                      │
-│  apiClient                                                       │
-│  - Adds X-Organization-Id header from getOrgIdForApi()          │
-└─────────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                         BACKEND                                  │
-├─────────────────────────────────────────────────────────────────┤
-│  SsoOrganizationAccess Middleware                                │
-│  - Validates X-Organization-Id header                           │
-│  - Lookup by organizations.id                             │
-│                           │                                      │
-│                           ▼                                      │
-│  organizations Table                                       │
-│  - id = console_organization_id (synced by listener)                     │
-│  - Ensures header matches local DB                              │
-└─────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│                    Omnify Console (IDP)                           │
+│                                                                  │
+│   organizations ─┐                                               │
+│   branches ──────┤  Source of truth                               │
+│   locations ─────┘                                               │
+│                                                                  │
+│   API: /api/sso/organizations                                    │
+│   API: /api/sso/branches?organization_slug=...                   │
+│   API: /api/sso/locations?organization_slug=...                  │
+└──────────────────────────┬───────────────────────────────────────┘
+                           │ OAuth JWT + API calls
+                           ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                    Host App (e.g. dxs-task)                       │
+│                                                                  │
+│   ┌─────────────────────────────────────────────────────────┐    │
+│   │ SsoCallbackController                                    │    │
+│   │  → getOrganizations()  →  cache orgs to local DB         │    │
+│   │  → syncBranches()      →  cache branches to local DB     │    │
+│   └──────────────────────────────┬──────────────────────────┘    │
+│                                  │                               │
+│   ┌──────────────────────────────▼──────────────────────────┐    │
+│   │ Local Database (SQLite/MySQL)                            │    │
+│   │                                                          │    │
+│   │  organizations  ← is_standalone=false (console-synced)   │    │
+│   │  branches       ← is_standalone=false (console-synced)   │    │
+│   │  locations      ← is_standalone=false (console-synced)   │    │
+│   └──────────────────────────────┬──────────────────────────┘    │
+│                                  │                               │
+│   ┌──────────────────────────────▼──────────────────────────┐    │
+│   │ CoreHandleInertiaRequests (middleware)                    │    │
+│   │  → Query local DB                                        │    │
+│   │  → Share via Inertia props: { organization: {...} }      │    │
+│   └──────────────────────────────┬──────────────────────────┘    │
+│                                  │                               │
+│   ┌──────────────────────────────▼──────────────────────────┐    │
+│   │ React UI (Org Selector Modal)                            │    │
+│   │  → Reads Inertia props (NO separate API call)            │    │
+│   │  → Shows org list + branch counts                        │    │
+│   │  → User selects org + branch → cookies saved             │    │
+│   └─────────────────────────────────────────────────────────┘    │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Frontend Implementation
+## 1. SSO Login — Data Sync Trigger
 
-### 1. orgApiSync Module
+Branch/org data sync xảy ra **1 lần duy nhất khi user login qua SSO**. Không có background sync hay polling.
 
-**File:** `resources/js/lib/orgApiSync.ts`
+### Sequence
 
-```typescript
-/**
- * Organization API Sync Module
- * Ensures org ID is always available for API calls.
- */
+```
+Browser                    Host App                         Console
+  │                          │                                 │
+  │  click "SSO Login"       │                                 │
+  │ ────────────────────────>│                                 │
+  │                          │  redirect to Console /sso/auth  │
+  │ <────────────────────────│────────────────────────────────>│
+  │                          │                                 │
+  │  (user logs in on Console, gets authorization code)        │
+  │ ────────────────────────>│                                 │
+  │  POST /api/sso/callback  │                                 │
+  │  { code: "..." }         │                                 │
+  │                          │                                 │
+  │                          │  1. POST /api/sso/token         │
+  │                          │     { code, service_slug }      │
+  │                          │────────────────────────────────>│
+  │                          │  ← { access_token, refresh }    │
+  │                          │<────────────────────────────────│
+  │                          │                                 │
+  │                          │  2. Verify JWT claims            │
+  │                          │  3. Find/create User             │
+  │                          │  4. Store tokens on User model   │
+  │                          │                                 │
+  │                          │  5. GET /api/sso/organizations   │
+  │                          │     Authorization: Bearer {jwt}  │
+  │                          │────────────────────────────────>│
+  │                          │  ← [{ org_id, slug, name }]     │
+  │                          │<────────────────────────────────│
+  │                          │  → cache orgs to local DB        │
+  │                          │                                 │
+  │                          │  6. GET /api/sso/branches (×N)   │
+  │                          │     ?organization_slug={slug}    │
+  │                          │────────────────────────────────>│
+  │                          │  ← { branches: [...] }          │
+  │                          │<────────────────────────────────│
+  │                          │  → cache branches to local DB    │
+  │                          │                                 │
+  │  ← { user, organizations }                                 │
+  │<─────────────────────────│                                 │
+  │  Auth::login() + session │                                 │
+```
 
-let _currentOrganizationId: string | null = null;
-const ORG_ID_STORAGE_KEY = 'api_current_org_id';
+### Files involved
 
-export function setOrgIdForApi(orgId: string | null): void {
-    _currentOrganizationId = orgId;
-    
-    if (typeof window === 'undefined') return;
-    
-    if (orgId) {
-        localStorage.setItem(ORG_ID_STORAGE_KEY, orgId);
-    } else {
-        localStorage.removeItem(ORG_ID_STORAGE_KEY);
-    }
-}
+| Step | File | Method |
+|------|------|--------|
+| 1-4 | `core/Http/Controllers/Api/SsoCallbackController.php` | `callback()` |
+| 5 | `core/Services/OrganizationAccessService.php` | `getOrganizations()` → `cacheOrganizations()` |
+| 6 | `core/Services/OrganizationAccessService.php` | `syncBranches()` → `cacheBranches()` |
 
-export function getOrgIdForApi(): string | null {
-    if (_currentOrganizationId) return _currentOrganizationId;
-    
-    if (typeof window === 'undefined') return null;
-    
-    const stored = localStorage.getItem(ORG_ID_STORAGE_KEY);
-    if (stored) {
-        _currentOrganizationId = stored;
-        return stored;
-    }
-    
-    return null;
-}
+---
 
-export function clearOrgIdForApi(): void {
-    _currentOrganizationId = null;
-    if (typeof window !== 'undefined') {
-        localStorage.removeItem(ORG_ID_STORAGE_KEY);
-    }
-}
+## 2. ID Mapping — Console vs Host App
 
-export function hasOrgIdForApi(): boolean {
-    return getOrgIdForApi() !== null;
+Mỗi model có **2 ID**: local primary key (`id`, auto-generated UUID) và Console reference (`console_*_id`).
+
+```
+Console DB                              Host App DB
+──────────                              ───────────
+
+organizations                           organizations
+  id: 019caa4a-...  ──────────────────>  console_organization_id: 019caa4a-...
+  slug: "abc-tech"                       id: 019cab59-... (auto-generated)
+  name: "ABC Corp"                       slug: "abc-tech"
+
+branches                                branches
+  id: 01e8f1c0-...  ──────────────────>  console_branch_id: 01e8f1c0-...
+  console_organization_id: 019e8a3b-...  console_organization_id: 019caa4a-... ← Console org.id
+  slug: "ha-noi"                         id: 019cab60-... (auto-generated)
+  name: "Hà Nội"                         slug: "ha-noi"
+```
+
+### Quan trọng: `console_organization_id` có nghĩa khác nhau
+
+| Vị trí | `console_organization_id` chứa gì |
+|--------|-----------------------------------|
+| **Console** org | Seeder constant UUID (e.g. `019e8a3b-...`) — dùng nội bộ |
+| **Console** branch | Cùng seeder constant UUID — link branch ↔ org trong Console |
+| **Host app** org | Console org's `id` (auto UUID, e.g. `019caa4a-...`) — từ API response |
+| **Host app** branch | Console org's `id` (auto UUID) — từ API response `organization.id` |
+
+**Rule**: Host app branches link tới host app orgs qua `console_organization_id` — cả hai lưu cùng giá trị (Console org's primary key `id`).
+
+---
+
+## 3. Inertia Shared Props — Page Load Delivery
+
+Mỗi page load, middleware share org/branch data từ local DB qua Inertia props.
+
+### Backend: `CoreHandleInertiaRequests`
+
+```php
+// core/Http/Middleware/CoreHandleInertiaRequests.php
+
+protected function buildOrganizationData(Request $request): array
+{
+    // 1. Get ALL active organizations from local DB
+    $organizations = Organization::where('is_active', true)
+        ->select(['id', 'console_organization_id', 'name', 'slug'])
+        ->get();
+
+    // 2. Get ALL active branches matching those orgs
+    $branches = Branch::whereIn(
+            'console_organization_id',
+            $organizations->pluck('console_organization_id')
+        )
+        ->where('is_active', true)
+        ->select([...])
+        ->get();
+
+    // 3. Resolve current org/branch from cookies
+    $currentOrg = /* from cookie current_organization_id */;
+    $currentBranch = /* from cookie current_branch_id */;
+
+    return [
+        'current' => $currentOrg,
+        'slug' => $currentOrg?->slug,
+        'list' => $organizations,
+        'currentBranch' => $currentBranch,
+        'branches' => $branches,     // ALL branches across ALL orgs
+    ];
 }
 ```
 
-### 2. OrganizationGate Component
-
-**File:** `resources/js/components/OrganizationGate.tsx`
+### Frontend: `app-layout.tsx`
 
 ```tsx
-import { useOrganization, useSso } from '@famgia/omnify-react-sso';
-import { setOrgIdForApi } from '@/lib/orgApiSync';
+// boilerplate/resources/js/layouts/app-layout.tsx
 
-export function OrganizationGate({ children }: { children: React.ReactNode }) {
-    const { isLoading, isAuthenticated } = useSso();
-    const { organizations, currentOrganization, switchOrganization } = useOrganization();
+// Inertia props → OrganizationProvider
+const orgData = useMemo(() => ({
+    current: organization.current,
+    branch: organization.currentBranch,
+    organizations: organization.list,
+    branches: (organization.branches ?? []).map((b) => ({
+        ...b,
+        // Map console_organization_id → org local id (cho filtering)
+        organization_id: orgLookup.get(b.console_organization_id)
+            ?? b.console_organization_id,
+    })),
+}), [organization, orgLookup]);
 
-    // CRITICAL: Sync org ID IMMEDIATELY (not in useEffect!)
-    // This ensures the org ID is set BEFORE child components render
-    if (currentOrganization?.id) {
-        setOrgIdForApi(currentOrganization.id);
-    }
-
-    // Show loading while checking auth
-    if (isLoading) {
-        return <LoadingSpinner />;
-    }
-
-    // If no org selected, show org selector
-    if (!currentOrganization) {
-        return <OrganizationSelectorModal organizations={organizations} onSelect={switchOrganization} />;
-    }
-
-    // Org is selected, render children
-    return <>{children}</>;
-}
-```
-
-### 3. API Client Integration
-
-**File:** `resources/js/lib/apiClient.ts`
-
-```typescript
-import { getOrgIdForApi } from './orgApiSync';
-
-export async function apiRequest<T>(
-    url: string,
-    options: RequestInit = {}
-): Promise<T> {
-    const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        ...options.headers,
-    };
-
-    // Add organization header
-    const orgId = getOrgIdForApi();
-    if (orgId) {
-        headers['X-Organization-Id'] = orgId;
-    }
-
-    const response = await fetch(url, { ...options, headers });
-    return response.json();
-}
-```
-
-### 4. TanStack Query Integration
-
-```tsx
-// In components using ProTable or useQuery
-<ProTable
-    queryKey={['employees', currentOrganization?.id]}
-    queryFn={fetchEmployees}
-    queryEnabled={!!currentOrganization?.id}  // Don't query until org is ready
+<OrganizationProvider
+    data={orgData}
+    requireBranch
+    onOrganizationChange={handleOrganizationChange}
+    onBranchChange={handleBranchChange}
 />
 ```
 
+### Org Selector Modal Logic
+
+```
+organization-selection-modal.tsx
+
+Step 1: Org List
+  → organizations.map(org => ({
+      ...org,
+      branchCount: branches.filter(b => b.organization_id === org.id).length
+    }))
+  → User chọn org → tempOrgId = org.id
+
+Step 2: Branch List
+  → availableBranches = branches.filter(b => b.organization_id === tempOrgId)
+  → User chọn branch → onBranchChange(branch)
+
+Selection Saved:
+  → Cookie: current_organization_id = org.console_organization_id
+  → Cookie: current_organization_slug = org.slug
+  → Cookie: current_branch_id = branch.id
+  → router.reload() (cookie-only mode) hoặc router.visit('/@{slug}/dashboard') (URL mode)
+```
+
 ---
 
-## Backend Implementation
+## 4. Standalone Mode vs Console Mode
 
-### 1. Organization Cache Seeder
+`HasStandaloneScope` trait tự động filter data theo mode.
 
-**File:** `database/seeders/OrganizationSeeder.php`
+| | Standalone Mode | Console Mode |
+|---|---|---|
+| `OMNIFY_AUTH_MODE` | `standalone` | `console` |
+| Global scope | Không filter | Auto-filter `is_standalone=false` |
+| Tạo record mới | `is_standalone=true` | `is_standalone=false` |
+| Data source | Local (seeders, admin CRUD) | Console API → local cache |
+| Branch sync | Không (managed locally) | SSO callback → Console API |
+
+### Global Scope Implementation
 
 ```php
-<?php
+// core/Models/Traits/HasStandaloneScope.php
 
-namespace Database\Seeders;
-
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-
-class OrganizationSeeder extends Seeder
+public static function bootHasStandaloneScope(): void
 {
-    /**
-     * Development/test organization data.
-     *
-     * IMPORTANT: The 'id' field MUST match the SSO org ID from auth-omnify.
-     * This ensures the X-Organization-Id header sent from frontend matches the local DB.
-     *
-     * To get SSO org IDs:
-     * 1. Login to the app
-     * 2. Open browser console
-     * 3. Run: localStorage.getItem('api_current_org_id')
-     */
-    private array $organizations = [
-        [
-            'id' => '019bdb7a-7413-7072-a53f-76d5cac58be1',
-            'console_organization_id' => '019bdb7a-7413-7072-a53f-76d5cac58be1',
-            'code' => 'company-abc',
-            'name' => 'Company ABC',
-            'is_active' => true,
-        ],
-        [
-            'id' => '019bdb7a-7417-7195-b96b-4962c7ebcd0d',
-            'console_organization_id' => '019bdb7a-7417-7195-b96b-4962c7ebcd0d',
-            'code' => 'company-xyz',
-            'name' => 'Company XYZ',
-            'is_active' => true,
-        ],
-    ];
+    // Console mode: chỉ show data synced từ Console
+    if (config('omnify-auth.mode') === 'console') {
+        static::addGlobalScope('standalone_mode', function (Builder $builder) {
+            $table = (new static)->getTable();
+            $builder->where("{$table}.is_standalone", false);
+        });
+    }
 
-    public function run(): void
-    {
-        foreach ($this->organizations as $org) {
-            DB::table('organizations')->updateOrInsert(
-                ['code' => $org['code']],
-                [
-                    'id' => $org['id'],
-                    'console_organization_id' => $org['console_organization_id'],
-                    'name' => $org['name'],
-                    'is_active' => $org['is_active'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]
-            );
+    // Auto-set is_standalone on creation
+    static::creating(function ($model) {
+        if (! isset($model->is_standalone)) {
+            $model->is_standalone = config('omnify-auth.mode') === 'standalone';
         }
-
-        $this->command->info('Organization caches seeded with SSO org IDs.');
-    }
+    });
 }
 ```
 
-### 2. Organization Sync Listener
+### Bypass scope khi sync
 
-**File:** `app/Listeners/SetupOrganizationDefaults.php`
+Khi cache data từ Console, PHẢI bypass global scope để tìm existing records:
 
 ```php
-<?php
+// ✅ Đúng — bypass scope + set is_standalone=false
+Organization::withoutGlobalScope('standalone_mode')
+    ->withTrashed()
+    ->updateOrCreate(
+        ['console_organization_id' => $consoleOrgId],
+        ['is_standalone' => false, ...]
+    );
 
-namespace App\Listeners;
-
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Omnify\Core\Events\OrganizationCreated;
-
-class SetupOrganizationDefaults
-{
-    public function handle(OrganizationCreated $event): void
-    {
-        $org = $event->organization;
-
-        Log::info('Organization cached', [
-            'organization_id' => $org->console_organization_id,
-            'name' => $org->name,
-        ]);
-
-        // Sync the local ID with SSO org ID
-        $this->syncOrganizationId($org);
-
-        // Create org-specific roles if needed
-        $this->createOrgSpecificRoles($org->console_organization_id);
-    }
-
-    /**
-     * Sync organizations.id with console_organization_id.
-     *
-     * The frontend sends SSO's org ID as X-Organization-Id header.
-     * We need the local DB's `id` to match for proper lookup.
-     */
-    protected function syncOrganizationId(mixed $org): void
-    {
-        if ($org->id !== $org->console_organization_id) {
-            DB::table('organizations')
-                ->where('id', $org->id)
-                ->update(['id' => $org->console_organization_id]);
-
-            Log::info('Synced organization ID with SSO', [
-                'old_id' => $org->id,
-                'new_id' => $org->console_organization_id,
-            ]);
-        }
-    }
-
-    // ... other methods
-}
+// ❌ Sai — global scope filter ẩn existing records → tạo duplicate
+Organization::updateOrCreate(
+    ['console_organization_id' => $consoleOrgId],
+    [...]
+);
 ```
 
-### 3. Register Listener
+---
 
-**File:** `app/Providers/AppServiceProvider.php`
+## 5. On-Demand Branch API (Backup Path)
 
-```php
-use Illuminate\Support\Facades\Event;
-use Omnify\Core\Events\OrganizationCreated;
-use App\Listeners\SetupOrganizationDefaults;
+Ngoài SSO callback sync, có API endpoint để fetch branches on-demand:
 
-class AppServiceProvider extends ServiceProvider
+```
+GET /api/sso/branches
+Headers: X-Organization-Id: {org_id} (hoặc query param)
+Auth: Sanctum session
+
+Flow:
+1. Resolve org từ header/query/cookie
+2. Get user's Console access token (auto-refresh nếu sắp hết hạn)
+3. Gọi Console API: GET /api/sso/branches?organization_slug={slug}
+4. Cache kết quả vào local DB
+5. Return branches to client
+
+Fallback: Nếu Console không available → trả về data từ local DB cache
+```
+
+### File: `core/Http/Controllers/Api/SsoBranchController.php`
+
+Endpoint này **KHÔNG được gọi bởi org selector modal**. Nó tồn tại cho:
+- Mobile apps (API token auth)
+- Manual refresh triggers
+- Future: periodic sync jobs
+
+---
+
+## 6. Console API Endpoints (Server-side)
+
+Console expose các endpoint sau cho host apps:
+
+| Endpoint | Auth | Purpose |
+|----------|------|---------|
+| `POST /api/sso/token` | Service slug + code | Exchange auth code → JWT + refresh token |
+| `POST /api/sso/refresh` | Refresh token | Refresh access token |
+| `GET /api/sso/organizations` | Bearer JWT | List user's orgs for this service |
+| `GET /api/sso/branches` | Bearer JWT | List branches in org |
+| `GET /api/sso/locations` | Bearer JWT | List locations in org/branch |
+| `GET /api/sso/access` | Bearer JWT | Get user's role/permissions in org |
+| `GET /api/sso/teams` | Bearer JWT | Get user's teams in org |
+| `GET /api/sso/.well-known/jwks.json` | Public | JWKS for JWT verification |
+
+### Branch Response Format
+
+```json
 {
-    public function boot(): void
+  "all_branches_access": true,
+  "branches": [
     {
-        Event::listen(
-            OrganizationCreated::class,
-            SetupOrganizationDefaults::class
-        );
+      "id": "019caa4a-...",
+      "slug": "ha-noi",
+      "code": "HAN",
+      "name": "Hà Nội (Trụ sở chính)",
+      "is_headquarters": true,
+      "is_primary": false,
+      "is_assigned": true,
+      "access_type": "explicit",
+      "timezone": "Asia/Ho_Chi_Minh",
+      "currency": null,
+      "locale": null
     }
+  ],
+  "primary_branch_id": "019caa4a-...",
+  "organization": {
+    "id": "019caa4a-...",
+    "slug": "abc-tech",
+    "name": "Công ty CP Giải Pháp Công Nghệ ABC"
+  }
 }
 ```
 
 ---
 
-## Database Schema
+## 7. Token Management
 
-**Table:** `organizations`
+Console tokens được lưu encrypted trên User model:
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key - **MUST match SSO org ID** |
-| console_organization_id | uuid | SSO org ID (same as id after sync) |
-| code | string | Organization slug |
-| name | string | Organization name |
-| is_active | boolean | Active status |
+| Column | Type | Purpose |
+|--------|------|---------|
+| `console_access_token` | encrypted string | JWT access token (15 min TTL) |
+| `console_refresh_token` | encrypted string | Refresh token (30 day TTL) |
+| `console_token_expires_at` | datetime | Access token expiry |
+
+### Auto-refresh
+
+```php
+// core/Services/ConsoleTokenService.php
+
+public function getAccessToken(Model $user): ?string
+{
+    // Nếu token còn hạn > 5 min → return ngay
+    if ($this->isTokenValid($user)) {
+        return decrypt($user->console_access_token);
+    }
+
+    // Nếu sắp hết hạn hoặc đã hết → refresh
+    return $this->refreshIfNeeded($user);
+}
+```
 
 ---
 
-## Key Points
+## 8. File Reference
+
+### Console (IDP)
+
+| File | Purpose |
+|------|---------|
+| `console/app/Http/Controllers/Api/External/Sso/AccessController.php` | branches/orgs/access API |
+| `console/app/Http/Controllers/Api/External/Sso/TokenController.php` | Token exchange/refresh |
+| `console/app/Services/Sso/AccessService.php` | Resolve user authorization |
+| `console/app/Services/Sso/JwtService.php` | JWT creation/verification |
+
+### Core Package (Host App side)
+
+| File | Purpose |
+|------|---------|
+| `core/Http/Controllers/Api/SsoCallbackController.php` | SSO login callback — sync orgs + branches |
+| `core/Http/Controllers/Api/SsoBranchController.php` | On-demand branch API (backup) |
+| `core/Services/OrganizationAccessService.php` | Org fetch + cache + branch sync |
+| `core/Services/ConsoleApiService.php` | HTTP client for Console API |
+| `core/Services/ConsoleTokenService.php` | Token storage + auto-refresh |
+| `core/Http/Middleware/CoreHandleInertiaRequests.php` | Share org/branch data via Inertia props |
+| `core/Models/Traits/HasStandaloneScope.php` | Global scope: console mode filter |
+| `core/Models/Traits/HasConsoleSso.php` | User model: token storage columns |
 
 ### Frontend
-1. **NEVER use useEffect for org sync** - It runs after render, causing race conditions
-2. **Sync during render phase** - Set org ID before children render
-3. **Persist to localStorage** - For page reload persistence
-4. **Gate queries with org ID** - Use `queryEnabled={!!currentOrganization?.id}`
 
-### Backend
-1. **Seeder uses SSO org IDs** - Not auto-generated UUIDs
-2. **Listener syncs new orgs** - When user logs in with new org
-3. **ID = console_organization_id** - Frontend header matches DB lookup
+| File | Purpose |
+|------|---------|
+| `core/resources/js/contexts/organization-context.tsx` | React context provider |
+| `core/resources/js/components/organization-selection-modal.tsx` | 2-step org+branch selector |
+| `boilerplate/resources/js/layouts/app-layout.tsx` | Inertia props → OrganizationProvider |
 
 ---
 
-## Troubleshooting
+## 9. Troubleshooting
 
-### Error: MISSING_ORGANIZATION
-**Cause:** Org ID not synced to localStorage before API call
-**Fix:** Ensure `setOrgIdForApi()` is called in render phase (not useEffect)
+### Org selector shows "0拠点" (0 branches)
 
-### Error: ORGANIZATION_NOT_FOUND
-**Cause:** DB `id` doesn't match SSO org ID
-**Fix:** 
-1. Run seeder: `php artisan db:seed --class=OrganizationSeeder`
-2. Or manually sync: 
-```php
-DB::table('organizations')
-    ->where('code', 'company-abc')
-    ->update(['id' => 'sso-org-id-here']);
+**Nguyên nhân phổ biến:**
+1. SSO callback chưa sync branches (check `OrganizationAccessService::syncBranches()`)
+2. Stale data từ Console cũ (sau `migrate:fresh`) — branches có `console_organization_id` cũ
+3. Global scope ẩn data — branches có `is_standalone=true` nhưng đang ở console mode
+
+**Debug:**
+```bash
+# Check local branches
+php artisan tinker --execute="
+\$orgs = \Omnify\Core\Models\Organization::all();
+foreach (\$orgs as \$o) {
+    \$count = \Omnify\Core\Models\Branch
+        ::where('console_organization_id', \$o->console_organization_id)
+        ->count();
+    echo \$o->name . ': ' . \$count . ' branches' . PHP_EOL;
+}
+"
 ```
 
-### How to Get SSO Org ID
-1. Login to the app
-2. Open browser DevTools > Console
-3. Run: `localStorage.getItem('api_current_org_id')`
+### SSO login tạo duplicate user
 
----
+**Nguyên nhân:** Console `migrate:fresh` đổi user UUID → `console_user_id` không match → tạo user mới.
 
-## Future: Integration into @famgia/omnify-react-sso
+**Fix:** Xóa user cũ hoặc reset host app DB:
+```bash
+php artisan migrate:fresh --seed
+```
 
-To prevent this issue in all applications, the `orgApiSync` module should be integrated into the SSO package:
+### Token expired, refresh fails
 
-1. Copy `orgApiSync.ts` → `src/lib/orgApiSync.ts`
-2. Update `SsoProvider` to call `setOrgIdForApi(currentOrganization.id)` during render
-3. Export functions from package index
-4. Update documentation
+**Nguyên nhân:** Console `migrate:fresh` invalidate tất cả refresh tokens.
 
-See the `orgApiSync.ts` section above for the full implementation.
+**Fix:** Re-login via SSO để nhận tokens mới.

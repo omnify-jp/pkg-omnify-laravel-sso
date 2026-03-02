@@ -164,7 +164,7 @@ class SsoBranchController extends Controller
             ], 404);
         }
 
-        $branches = Branch::where('console_organization_id', $organizationId)
+        $branches = Branch::where('console_organization_id', $org->console_organization_id)
             ->where('is_active', true)
             ->get();
 
@@ -204,15 +204,18 @@ class SsoBranchController extends Controller
             $consoleOrgId = (string) ($org['id'] ?? '');
 
             if ($consoleOrgId) {
-                Organization::withTrashed()->updateOrCreate(
-                    ['console_organization_id' => $consoleOrgId],
-                    [
-                        'name' => $org['name'] ?? 'Unknown',
-                        'slug' => $org['slug'] ?? $consoleOrgId,
-                        'is_active' => true,
-                        'deleted_at' => null,
-                    ]
-                );
+                Organization::withoutGlobalScope('standalone_mode')
+                    ->withTrashed()
+                    ->updateOrCreate(
+                        ['console_organization_id' => $consoleOrgId],
+                        [
+                            'name' => $org['name'] ?? 'Unknown',
+                            'slug' => $org['slug'] ?? $consoleOrgId,
+                            'is_active' => true,
+                            'is_standalone' => false,
+                            'deleted_at' => null,
+                        ]
+                    );
             }
         }
 
@@ -224,17 +227,20 @@ class SsoBranchController extends Controller
                 $consoleBranchId = (string) ($branch['id'] ?? '');
 
                 if ($consoleBranchId && $consoleOrgId) {
-                    Branch::withTrashed()->updateOrCreate(
-                        ['console_branch_id' => $consoleBranchId],
-                        [
-                            'console_organization_id' => $consoleOrgId,
-                            'slug' => $branch['slug'] ?? 'DEFAULT',
-                            'name' => $branch['name'] ?? 'Unknown',
-                            'is_headquarters' => $branch['is_headquarters'] ?? false,
-                            'is_active' => true,
-                            'deleted_at' => null,
-                        ]
-                    );
+                    Branch::withoutGlobalScope('standalone_mode')
+                        ->withTrashed()
+                        ->updateOrCreate(
+                            ['console_branch_id' => $consoleBranchId],
+                            [
+                                'console_organization_id' => $consoleOrgId,
+                                'slug' => $branch['slug'] ?? 'DEFAULT',
+                                'name' => $branch['name'] ?? 'Unknown',
+                                'is_headquarters' => $branch['is_headquarters'] ?? false,
+                                'is_active' => true,
+                                'is_standalone' => false,
+                                'deleted_at' => null,
+                            ]
+                        );
                 }
             }
         }

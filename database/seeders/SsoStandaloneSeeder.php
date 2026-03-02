@@ -16,7 +16,7 @@ use Omnify\Core\Models\User;
  * Tạo dữ liệu mẫu cho môi trường standalone (đăng nhập email/password).
  * Không cần kết nối Omnify Console.
  *
- * Bối cảnh: Công ty CP Giải Pháp Công Nghệ ABC — 3 chi nhánh, 8 nhân viên.
+ * Bối cảnh: Famgia — 1 chi nhánh (Trụ sở chính).
  *
  * Usage:
  *   php artisan db:seed --class=\\Omnify\\Core\\Database\\Seeders\\SsoStandaloneSeeder
@@ -27,21 +27,17 @@ use Omnify\Core\Models\User;
 class SsoStandaloneSeeder extends Seeder
 {
     /**
-     * Fake console organization UUID — đại diện cho công ty ABC trong standalone mode.
+     * Fake console organization UUID — đại diện cho Famgia trong standalone mode.
      * Dùng nhất quán cho branches/locations/roles.
      */
     private const ORG_ID = '019e8a3b-4f2c-7a1d-b5e8-c3d7f4a09b6e';
 
-    /** Fake branch UUIDs — nhất quán cho các lần seed. */
-    private const BRANCH_HAN = '02b9f3c1-a8d4-7e2f-9c6b-d1e4f7a03c8d';
-
-    private const BRANCH_HCM = '03c8e2d0-b7f5-7c3e-ad5a-e2f5a6b02d9e';
-
-    private const BRANCH_DAD = '04d7f1e9-c6a4-7b4d-be49-f3a6b5c01eaf';
+    /** Fake branch UUID. */
+    private const BRANCH_HQ = '02b9f3c1-a8d4-7e2f-9c6b-d1e4f7a03c8d';
 
     public function run(): void
     {
-        $this->command?->info('Seeding standalone demo data — Công ty CP Giải Pháp Công Nghệ ABC...');
+        $this->command?->info('Seeding standalone demo data — Famgia...');
 
         $this->seedPermissions();
         $roles = $this->seedRoles();
@@ -147,29 +143,11 @@ class SsoStandaloneSeeder extends Seeder
     {
         $branches = [
             [
-                'console_branch_id' => self::BRANCH_HAN,
+                'console_branch_id' => self::BRANCH_HQ,
                 'console_organization_id' => self::ORG_ID,
-                'slug' => 'ha-noi',
-                'name' => 'Hà Nội (Trụ sở chính)',
+                'slug' => 'tru-so-chinh',
+                'name' => 'Trụ sở chính',
                 'is_headquarters' => true,
-                'is_active' => true,
-                'is_standalone' => true,
-            ],
-            [
-                'console_branch_id' => self::BRANCH_HCM,
-                'console_organization_id' => self::ORG_ID,
-                'slug' => 'ho-chi-minh',
-                'name' => 'Hồ Chí Minh',
-                'is_headquarters' => false,
-                'is_active' => true,
-                'is_standalone' => true,
-            ],
-            [
-                'console_branch_id' => self::BRANCH_DAD,
-                'console_organization_id' => self::ORG_ID,
-                'slug' => 'da-nang',
-                'name' => 'Đà Nẵng',
-                'is_headquarters' => false,
                 'is_active' => true,
                 'is_standalone' => true,
             ],
@@ -182,7 +160,7 @@ class SsoStandaloneSeeder extends Seeder
             );
         }
 
-        $this->command?->info('  [branches] '.count($branches).' branches seeded (Hà Nội HQ, TP.HCM, Đà Nẵng).');
+        $this->command?->info('  [branches] '.count($branches).' branch seeded (Trụ sở chính).');
     }
 
     // =========================================================================
@@ -192,13 +170,12 @@ class SsoStandaloneSeeder extends Seeder
     private function seedLocations(): void
     {
         $locations = [
-            // ── Hà Nội ────────────────────────────────────────────────────
             [
                 'console_location_id' => '10000001-0000-7000-8000-000000000001',
-                'console_branch_id' => self::BRANCH_HAN,
+                'console_branch_id' => self::BRANCH_HQ,
                 'console_organization_id' => self::ORG_ID,
-                'code' => 'HAN-VP',
-                'name' => 'Văn phòng Hà Nội',
+                'code' => 'FG-VP',
+                'name' => 'Văn phòng Famgia',
                 'type' => 'office',
                 'is_active' => true,
                 'is_standalone' => true,
@@ -207,83 +184,9 @@ class SsoStandaloneSeeder extends Seeder
                 'state_province' => 'Hà Nội',
                 'country_code' => 'VN',
                 'timezone' => 'Asia/Ho_Chi_Minh',
-                'capacity' => 120,
+                'capacity' => 50,
                 'sort_order' => 1,
-                'description' => 'Văn phòng trụ sở chính — tầng 5–7 tòa nhà ABC Tower',
-            ],
-            [
-                'console_location_id' => '10000001-0000-7000-8000-000000000002',
-                'console_branch_id' => self::BRANCH_HAN,
-                'console_organization_id' => self::ORG_ID,
-                'code' => 'HAN-KHO',
-                'name' => 'Kho Hà Nội',
-                'type' => 'warehouse',
-                'is_active' => true,
-                'is_standalone' => true,
-                'address' => 'Lô B-12, KCN Bắc Thăng Long, Đông Anh',
-                'city' => 'Hà Nội',
-                'state_province' => 'Hà Nội',
-                'country_code' => 'VN',
-                'timezone' => 'Asia/Ho_Chi_Minh',
-                'capacity' => 5000,
-                'sort_order' => 2,
-                'description' => 'Kho hàng miền Bắc — diện tích 5,000 m²',
-            ],
-            // ── TP. Hồ Chí Minh ───────────────────────────────────────────
-            [
-                'console_location_id' => '10000002-0000-7000-8000-000000000001',
-                'console_branch_id' => self::BRANCH_HCM,
-                'console_organization_id' => self::ORG_ID,
-                'code' => 'HCM-VP',
-                'name' => 'Văn phòng TP.HCM',
-                'type' => 'office',
-                'is_active' => true,
-                'is_standalone' => true,
-                'address' => '136 Nguyễn Văn Trỗi, Phường 8, Quận Phú Nhuận',
-                'city' => 'Hồ Chí Minh',
-                'state_province' => 'TP. Hồ Chí Minh',
-                'country_code' => 'VN',
-                'timezone' => 'Asia/Ho_Chi_Minh',
-                'capacity' => 80,
-                'sort_order' => 1,
-                'description' => 'Văn phòng chi nhánh miền Nam — tầng 12 tòa Phu Nhuan Tower',
-            ],
-            [
-                'console_location_id' => '10000002-0000-7000-8000-000000000002',
-                'console_branch_id' => self::BRANCH_HCM,
-                'console_organization_id' => self::ORG_ID,
-                'code' => 'HCM-KHO',
-                'name' => 'Kho TP.HCM',
-                'type' => 'warehouse',
-                'is_active' => true,
-                'is_standalone' => true,
-                'address' => 'Lô C-07, KCN Tân Bình, Quận Tân Phú',
-                'city' => 'Hồ Chí Minh',
-                'state_province' => 'TP. Hồ Chí Minh',
-                'country_code' => 'VN',
-                'timezone' => 'Asia/Ho_Chi_Minh',
-                'capacity' => 3000,
-                'sort_order' => 2,
-                'description' => 'Kho hàng miền Nam — diện tích 3,000 m²',
-            ],
-            // ── Đà Nẵng ────────────────────────────────────────────────────
-            [
-                'console_location_id' => '10000003-0000-7000-8000-000000000001',
-                'console_branch_id' => self::BRANCH_DAD,
-                'console_organization_id' => self::ORG_ID,
-                'code' => 'DAD-VP',
-                'name' => 'Văn phòng Đà Nẵng',
-                'type' => 'office',
-                'is_active' => true,
-                'is_standalone' => true,
-                'address' => '112 Trần Phú, Quận Hải Châu',
-                'city' => 'Đà Nẵng',
-                'state_province' => 'Đà Nẵng',
-                'country_code' => 'VN',
-                'timezone' => 'Asia/Ho_Chi_Minh',
-                'capacity' => 40,
-                'sort_order' => 1,
-                'description' => 'Văn phòng chi nhánh miền Trung',
+                'description' => 'Văn phòng trụ sở chính Famgia',
             ],
         ];
 
@@ -294,7 +197,7 @@ class SsoStandaloneSeeder extends Seeder
             );
         }
 
-        $this->command?->info('  [locations] '.count($locations).' locations seeded (2×HN, 2×HCM, 1×ĐN).');
+        $this->command?->info('  [locations] '.count($locations).' location seeded.');
     }
 
     // =========================================================================
@@ -306,57 +209,10 @@ class SsoStandaloneSeeder extends Seeder
      */
     private function seedUsers(array $roles): void
     {
-        // Tài khoản standalone: không có console_user_id, không có SSO tokens.
-        // console_organization_id = null → không bị unique constraint chồng chéo với SSO users.
         $users = [
-            [
-                'name' => 'User',
-                'email' => 'user@dx-s.com',
-                'password' => 'password',
-                'role' => 'admin',
-            ],
-            [
-                'name' => 'User 01',
-                'email' => 'user01@dx-s.com',
-                'password' => 'password',
-                'role' => 'manager',
-            ],
-            [
-                'name' => 'User 02',
-                'email' => 'user02@dx-s.com',
-                'password' => 'password',
-                'role' => 'manager',
-            ],
-            [
-                'name' => 'User 03',
-                'email' => 'user03@dx-s.com',
-                'password' => 'password',
-                'role' => 'staff',
-            ],
-            [
-                'name' => 'User 04',
-                'email' => 'user04@dx-s.com',
-                'password' => 'password',
-                'role' => 'staff',
-            ],
-            [
-                'name' => 'User 05',
-                'email' => 'user05@dx-s.com',
-                'password' => 'password',
-                'role' => 'staff',
-            ],
-            [
-                'name' => 'User 06',
-                'email' => 'user06@dx-s.com',
-                'password' => 'password',
-                'role' => 'staff',
-            ],
-            [
-                'name' => 'User 07',
-                'email' => 'user07@dx-s.com',
-                'password' => 'password',
-                'role' => 'staff',
-            ],
+            ['name' => 'Famgia Admin',   'email' => 'admin@famgia.com',   'password' => 'password', 'role' => 'admin'],
+            ['name' => 'Famgia User',    'email' => 'user@famgia.com',    'password' => 'password', 'role' => 'manager'],
+            ['name' => 'Famgia Staff',   'email' => 'staff@famgia.com',   'password' => 'password', 'role' => 'staff'],
         ];
 
         foreach ($users as $userData) {
@@ -368,12 +224,11 @@ class SsoStandaloneSeeder extends Seeder
 
             /** @var User $user */
             $user = User::withTrashed()->updateOrCreate(
-                ['email' => $userData['email'], 'console_organization_id' => null],
+                ['email' => $userData['email']],
                 $userData
             );
 
-            // Gán role toàn cục (không scope theo org/branch — phù hợp standalone mode)
-            $user->assignRole($roles[$roleKey], null, null);
+            $user->assignRole($roles[$roleKey], self::ORG_ID, null);
         }
 
         $this->command?->info('  [users] '.count($users).' users seeded.');

@@ -51,7 +51,7 @@ class StandaloneOrganizationContext
                     ->first();
             }
 
-            // Priority 2: User's default org
+            // Priority 2: User's default org (from column)
             if (! $organization && $user->console_organization_id) {
                 $organization = Organization::where('is_active', true)
                     ->currentMode()
@@ -59,7 +59,14 @@ class StandaloneOrganizationContext
                     ->first();
             }
 
-            // Priority 3: First active org
+            // Priority 3: First org the user has a role in (via role_user_pivot)
+            if (! $organization && method_exists($user, 'organizations')) {
+                $organization = $user->organizations()
+                    ->where('organizations.is_active', true)
+                    ->first();
+            }
+
+            // Priority 4: First active org (fallback for admin/god mode)
             $organization ??= Organization::where('is_active', true)->currentMode()->first();
 
             if ($organization) {

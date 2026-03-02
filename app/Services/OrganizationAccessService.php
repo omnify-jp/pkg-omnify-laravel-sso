@@ -6,6 +6,7 @@ namespace Omnify\Core\Services;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Omnify\Core\Models\Branch;
 use Omnify\Core\Models\Organization;
 
 class OrganizationAccessService
@@ -164,20 +165,22 @@ class OrganizationAccessService
             }
 
             try {
-                // First, try to find existing record by console_organization_id OR slug
-                // This handles cases where the same org exists with different console_organization_id
-                $existingOrg = Organization::withTrashed()
+                // Find existing record regardless of mode (bypass global scope)
+                // to handle mode switches (standalone → console) or re-syncs.
+                $existingOrg = Organization::withoutGlobalScope('standalone_mode')
+                    ->withTrashed()
                     ->where('console_organization_id', $consoleOrganizationId)
                     ->orWhere('slug', $slug)
                     ->first();
 
                 if ($existingOrg) {
-                    // Update existing record (sync with Console)
+                    // Update existing record (sync with Console — mark as non-standalone)
                     $existingOrg->update([
                         'console_organization_id' => $consoleOrganizationId,
                         'name' => $organization['organization_name'] ?? 'Unknown',
                         'slug' => $slug,
                         'is_active' => true,
+                        'is_standalone' => false,
                         'deleted_at' => null,
                     ]);
                 } else {
@@ -205,6 +208,77 @@ class OrganizationAccessService
                     0,
                     $e
                 );
+            }
+        }
+    }
+
+    /**
+     * Sync branches from Console for each organization.
+     * Called during SSO callback to pre-populate branch data.
+     *
+     * @param  array<array{organization_id?: string, organization_slug?: string}>  $organizations
+     */
+    public function syncBranches(Model $user, array $organizations): void
+    {
+        $accessToken = $this->tokenService->getAccessToken($user);
+
+        if (! $accessToken) {
+            return;
+        }
+
+        foreach ($organizations as $org) {
+            $slug = $org['organization_slug'] ?? null;
+
+            if (! $slug) {
+                continue;
+            }
+
+            try {
+                $result = $this->consoleApi->getUserBranches($accessToken, $slug);
+
+                if ($result) {
+                    $this->cacheBranches($result);
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('SSO: Failed to sync branches for organization', [
+                    'organization_slug' => $slug,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Cache branches from Console API response.
+     *
+     * @param  array{organization?: array{id: int|string, slug: string, name: string}, branches?: array<array{id: int|string, slug?: string, name: string, is_headquarters: bool}>}  $result
+     */
+    private function cacheBranches(array $result): void
+    {
+        if (! isset($result['branches']) || ! is_array($result['branches'])) {
+            return;
+        }
+
+        $consoleOrgId = (string) ($result['organization']['id'] ?? '');
+
+        foreach ($result['branches'] as $branch) {
+            $consoleBranchId = (string) ($branch['id'] ?? '');
+
+            if ($consoleBranchId && $consoleOrgId) {
+                Branch::withoutGlobalScope('standalone_mode')
+                    ->withTrashed()
+                    ->updateOrCreate(
+                        ['console_branch_id' => $consoleBranchId],
+                        [
+                            'console_organization_id' => $consoleOrgId,
+                            'slug' => $branch['slug'] ?? 'DEFAULT',
+                            'name' => $branch['name'] ?? 'Unknown',
+                            'is_headquarters' => $branch['is_headquarters'] ?? false,
+                            'is_active' => true,
+                            'is_standalone' => false,
+                            'deleted_at' => null,
+                        ]
+                    );
             }
         }
     }
