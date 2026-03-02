@@ -42,7 +42,20 @@ type UserRow = {
     id: string;
     name: string;
     email: string;
-    role_name: string | null;
+    is_active: boolean;
+    role_id: string;
+    role_name: string;
+    role_slug: string;
+    console_branch_id: string | null;
+    branch_name: string | null;
+    scope_type: 'org-wide' | 'branch';
+};
+
+type RoleOption = {
+    id: string;
+    name: string;
+    slug: string;
+    level: number;
 };
 
 type PaginatedResponse<T> = {
@@ -60,6 +73,7 @@ type Props = {
     branches: PaginatedResponse<Branch>;
     locations: PaginatedResponse<Location>;
     users: PaginatedResponse<UserRow>;
+    roles: RoleOption[];
     tab: string;
     filters: {
         branches_q?: string;
@@ -855,15 +869,330 @@ function LocationsTab({ locations, branches, organizationId, organizationSlug, f
     );
 }
 
+/* ── User Form Drawer ──────────────────────────────── */
+
+type UserSearchResult = {
+    id: string;
+    name: string;
+    email: string;
+    already_in_org: boolean;
+} | null;
+
+type UserFormData = {
+    email: string;
+    name?: string;
+    role_id: string;
+    console_branch_id: string | null;
+};
+
+type UserFormDrawerProps = {
+    open: boolean;
+    onClose: () => void;
+    organizationSlug: string;
+    editingUser: UserRow | null;
+    roles: RoleOption[];
+    branches: Branch[];
+};
+
+function UserFormDrawer({ open, onClose, organizationSlug, editingUser, roles, branches }: UserFormDrawerProps) {
+    const { t } = useTranslation();
+    const { message } = App.useApp();
+    const [form] = Form.useForm<UserFormData>();
+    const isEdit = !!editingUser;
+
+    const [searchEmail, setSearchEmail] = useState('');
+    const [searchResult, setSearchResult] = useState<UserSearchResult>(null);
+    const [hasSearched, setHasSearched] = useState(false);
+
+    useEffect(() => {
+        if (!open) return;
+        form.resetFields();
+        setSearchEmail('');
+        setSearchResult(null);
+        setHasSearched(false);
+
+        if (isEdit && editingUser) {
+            form.setFieldsValue({
+                role_id: editingUser.role_id,
+                console_branch_id: editingUser.console_branch_id ?? null,
+            });
+        }
+    }, [open, editingUser, isEdit, form]);
+
+    const searchMutation = useMutation({
+        mutationFn: (email: string) =>
+            api.post<{ user: UserSearchResult }>(`/admin/organizations/${organizationSlug}/users/search`, { email }),
+        onSuccess: (response) => {
+            setSearchResult(response.data.user);
+            setHasSearched(true);
+        },
+        onError: () => {
+            message.error(t('admin.users.searchFailed', 'Failed to search user.'));
+        },
+    });
+
+    const storeMutation = useMutation({
+        mutationFn: (data: UserFormData) =>
+            api.post(`/admin/organizations/${organizationSlug}/users`, data),
+        onSuccess: () => {
+            message.success(t('admin.users.added', 'User added to organization.'));
+            onClose();
+            router.reload();
+        },
+        onError: (error) => {
+            if (isAxiosError(error) && error.response?.status === 422) {
+                const serverErrors = error.response.data.errors as Record<string, string[]>;
+                form.setFields(
+                    Object.entries(serverErrors).map(([key, messages]) => ({
+                        name: key as keyof UserFormData,
+                        errors: messages,
+                    })),
+                );
+            } else {
+                message.error(t('admin.users.addFailed', 'Failed to add user.'));
+            }
+        },
+    });
+
+    const updateMutation = useMutation({
+        mutationFn: (data: Omit<UserFormData, 'email' | 'name'>) =>
+            api.put(`/admin/organizations/${organizationSlug}/users/${editingUser!.id}`, data),
+        onSuccess: () => {
+            message.success(t('admin.users.updated', 'Role assignment updated.'));
+            onClose();
+            router.reload();
+        },
+        onError: (error) => {
+            if (isAxiosError(error) && error.response?.status === 422) {
+                const serverErrors = error.response.data.errors as Record<string, string[]>;
+                form.setFields(
+                    Object.entries(serverErrors).map(([key, messages]) => ({
+                        name: key as keyof UserFormData,
+                        errors: messages,
+                    })),
+                );
+            } else {
+                message.error(t('admin.users.updateFailed', 'Failed to update role assignment.'));
+            }
+        },
+    });
+
+    const handleSearch = (value: string) => {
+        const email = value.trim();
+        if (!email) return;
+        setSearchEmail(email);
+        searchMutation.mutate(email);
+    };
+
+    const handleSubmit = () => {
+        form.validateFields().then((data) => {
+            if (isEdit) {
+                updateMutation.mutate({
+                    role_id: data.role_id,
+                    console_branch_id: data.console_branch_id,
+                });
+            } else {
+                storeMutation.mutate({
+                    email: searchEmail,
+                    name: data.name,
+                    role_id: data.role_id,
+                    console_branch_id: data.console_branch_id,
+                });
+            }
+        });
+    };
+
+    const isPending = storeMutation.isPending || updateMutation.isPending;
+    const userFoundButAlreadyInOrg = hasSearched && searchResult && searchResult.already_in_org;
+    const userFoundNotInOrg = hasSearched && searchResult && !searchResult.already_in_org;
+    const userNotFound = hasSearched && !searchResult;
+
+    const ORG_WIDE_VALUE = '__org_wide__';
+
+    const branchOptions = [
+        { value: ORG_WIDE_VALUE, label: t('admin.users.allBranches', 'All branches (org-wide)') },
+        ...branches.map((b) => ({ value: b.id, label: b.name })),
+    ];
+
+    return (
+        <Drawer
+            title={
+                isEdit
+                    ? t('admin.users.editRole', 'Edit Role Assignment')
+                    : t('admin.users.addUser', 'Add User to Organization')
+            }
+            placement="right"
+            size={480}
+            open={open}
+            onClose={onClose}
+            footer={
+                <Flex justify="end" gap="small">
+                    <Button onClick={onClose}>{t('common.cancel', 'Cancel')}</Button>
+                    <Button
+                        type="primary"
+                        loading={isPending}
+                        onClick={handleSubmit}
+                        disabled={!isEdit && !hasSearched}
+                    >
+                        {isEdit
+                            ? t('common.save', 'Save Changes')
+                            : t('admin.users.addUser', 'Add User')}
+                    </Button>
+                </Flex>
+            }
+        >
+            <Form form={form} layout="vertical">
+                {!isEdit && (
+                    <Form.Item label={t('admin.users.email', 'Email')}>
+                        <Input.Search
+                            placeholder={t('admin.users.emailPlaceholder', 'Enter email address...')}
+                            enterButton={t('admin.users.search', 'Search')}
+                            loading={searchMutation.isPending}
+                            onSearch={handleSearch}
+                        />
+                    </Form.Item>
+                )}
+
+                {isEdit && editingUser && (
+                    <Descriptions column={1} size="small" bordered>
+                        <Descriptions.Item label={t('admin.users.name', 'Name')}>
+                            {editingUser.name}
+                        </Descriptions.Item>
+                        <Descriptions.Item label={t('admin.users.email', 'Email')}>
+                            {editingUser.email}
+                        </Descriptions.Item>
+                    </Descriptions>
+                )}
+
+                {!isEdit && hasSearched && (
+                    <>
+                        {(userFoundButAlreadyInOrg || userFoundNotInOrg) && searchResult && (
+                            <Descriptions column={1} size="small" bordered>
+                                <Descriptions.Item label={t('admin.users.name', 'Name')}>
+                                    {searchResult.name}
+                                </Descriptions.Item>
+                                <Descriptions.Item label={t('admin.users.email', 'Email')}>
+                                    {searchResult.email}
+                                </Descriptions.Item>
+                            </Descriptions>
+                        )}
+
+                        {userFoundButAlreadyInOrg && (
+                            <Tag color="warning">
+                                {t('admin.users.alreadyInOrg', 'This user already belongs to this organization.')}
+                            </Tag>
+                        )}
+
+                        {userNotFound && (
+                            <>
+                                <Tag color="processing">
+                                    {t('admin.users.willCreate', 'No existing user found. A new account will be created.')}
+                                </Tag>
+                                <Form.Item
+                                    name="name"
+                                    label={t('admin.users.name', 'Name')}
+                                    rules={[
+                                        { required: true, message: t('validation.required', 'This field is required.') },
+                                        { max: 255 },
+                                    ]}
+                                >
+                                    <Input placeholder={t('admin.users.namePlaceholder', 'e.g. John Doe')} />
+                                </Form.Item>
+                            </>
+                        )}
+                    </>
+                )}
+
+                {(isEdit || (hasSearched && !userFoundButAlreadyInOrg)) && (
+                    <>
+                        <Form.Item
+                            name="role_id"
+                            label={t('admin.users.role', 'Role')}
+                            rules={[{ required: true, message: t('validation.required', 'This field is required.') }]}
+                        >
+                            <Select
+                                placeholder={t('admin.users.selectRole', 'Select a role...')}
+                                options={roles.map((r) => ({
+                                    value: r.id,
+                                    label: `Lv.${r.level} ${r.name}`,
+                                }))}
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="console_branch_id"
+                            label={t('admin.users.branch', 'Branch Scope')}
+                            getValueProps={(value) => ({
+                                value: value === null || value === undefined ? ORG_WIDE_VALUE : value,
+                            })}
+                            getValueFromEvent={(value: string) =>
+                                value === ORG_WIDE_VALUE ? null : value
+                            }
+                        >
+                            <Select
+                                options={branchOptions}
+                                placeholder={t('admin.users.selectBranch', 'Select branch scope...')}
+                            />
+                        </Form.Item>
+                    </>
+                )}
+            </Form>
+        </Drawer>
+    );
+}
+
 /* ── Users Tab ─────────────────────────────────────── */
 
 type UsersTabProps = {
     users: PaginatedResponse<UserRow>;
     organizationSlug: string;
+    roles: RoleOption[];
+    branches: Branch[];
 };
 
-function UsersTab({ users, organizationSlug }: UsersTabProps) {
+function UsersTab({ users, organizationSlug, roles, branches }: UsersTabProps) {
     const { t } = useTranslation();
+    const { message, modal } = App.useApp();
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [editingUser, setEditingUser] = useState<UserRow | null>(null);
+
+    const deleteUserMutation = useMutation({
+        mutationFn: (userId: string) =>
+            api.delete(`/admin/organizations/${organizationSlug}/users/${userId}`),
+        onSuccess: () => {
+            message.success(t('admin.users.removed', 'User removed from organization.'));
+            router.reload();
+        },
+        onError: (error: unknown) => {
+            const axiosError = isAxiosError(error) ? error : null;
+            message.error(
+                axiosError?.response?.data?.message ?? t('admin.users.removeFailed', 'Failed to remove user.'),
+            );
+        },
+    });
+
+    const handleCreate = () => {
+        setEditingUser(null);
+        setDrawerOpen(true);
+    };
+
+    const handleEdit = (user: UserRow) => {
+        setEditingUser(user);
+        setDrawerOpen(true);
+    };
+
+    const handleDelete = (user: UserRow) => {
+        modal.confirm({
+            title: t('admin.users.removeConfirm', 'Remove this user from the organization?'),
+            content: t(
+                'admin.users.removeConfirmContent',
+                'The user account will not be deleted. Only the role assignment in this organization will be removed.',
+            ),
+            okText: t('admin.users.remove', 'Remove'),
+            okButtonProps: { danger: true },
+            onOk: () => deleteUserMutation.mutateAsync(user.id),
+        });
+    };
 
     const columns: TableColumnsType<UserRow> = [
         {
@@ -881,32 +1210,86 @@ function UsersTab({ users, organizationSlug }: UsersTabProps) {
             key: 'role_name',
             render: (_, record) => record.role_name ? <Tag>{record.role_name}</Tag> : '—',
         },
+        {
+            title: t('admin.users.scope', 'Scope'),
+            key: 'scope_type',
+            render: (_, record) =>
+                record.scope_type === 'branch' && record.branch_name
+                    ? <Tag color="purple">{record.branch_name}</Tag>
+                    : <Tag color="blue">{t('admin.users.orgWide', 'Org-wide')}</Tag>,
+        },
+        {
+            key: 'actions',
+            width: 48,
+            align: 'center',
+            render: (_, record) => (
+                <Dropdown
+                    trigger={['click']}
+                    placement="bottomRight"
+                    menu={{
+                        items: [
+                            {
+                                key: 'edit',
+                                label: t('admin.users.editRole', 'Edit Role'),
+                                onClick: () => handleEdit(record),
+                            },
+                            { type: 'divider' },
+                            {
+                                key: 'remove',
+                                label: t('admin.users.removeFromOrg', 'Remove from org'),
+                                danger: true,
+                                onClick: () => handleDelete(record),
+                            },
+                        ],
+                    }}
+                >
+                    <Button type="text" size="small" icon={<Ellipsis size={16} />} />
+                </Dropdown>
+            ),
+        },
     ];
 
     return (
-        <Table
-            dataSource={users.data}
-            columns={columns}
-            rowKey="id"
-            pagination={{
-                current: users.meta.current_page,
-                total: users.meta.total,
-                pageSize: users.meta.per_page,
-                onChange: (page) => {
-                    router.get(
-                        `/admin/organizations/${organizationSlug}`,
-                        { tab: 'users', users_page: page },
-                        { preserveState: true, preserveScroll: true },
-                    );
-                },
-            }}
-        />
+        <>
+            <Flex justify="end">
+                <Button type="primary" icon={<PlusCircle size={16} />} onClick={handleCreate}>
+                    {t('admin.users.addUser', 'Add User')}
+                </Button>
+            </Flex>
+
+            <Table
+                dataSource={users.data}
+                columns={columns}
+                rowKey="id"
+                pagination={{
+                    current: users.meta.current_page,
+                    total: users.meta.total,
+                    pageSize: users.meta.per_page,
+                    onChange: (page) => {
+                        router.get(
+                            `/admin/organizations/${organizationSlug}`,
+                            { tab: 'users', users_page: page },
+                            { preserveState: true, preserveScroll: true },
+                        );
+                    },
+                }}
+            />
+
+            <UserFormDrawer
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                organizationSlug={organizationSlug}
+                editingUser={editingUser}
+                roles={roles}
+                branches={branches}
+            />
+        </>
     );
 }
 
 /* ── Main Page ─────────────────────────────────────── */
 
-export default function AdminOrganizationShow({ organization, branches, locations, users, tab, filters }: Props) {
+export default function AdminOrganizationShow({ organization, branches, locations, users, roles, tab, filters }: Props) {
     const { t } = useTranslation();
     const { message, modal } = App.useApp();
     const [orgEditOpen, setOrgEditOpen] = useState(false);
@@ -985,6 +1368,8 @@ export default function AdminOrganizationShow({ organization, branches, location
                 <UsersTab
                     users={users}
                     organizationSlug={organization.slug}
+                    roles={roles}
+                    branches={branches.data}
                 />
             ),
         },
