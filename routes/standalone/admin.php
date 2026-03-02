@@ -35,7 +35,7 @@ Route::prefix($prefix)
 
         // Organization management
         Route::resource('organizations', OrganizationAdminController::class)
-            ->only(['index', 'store', 'update', 'destroy']);
+            ->only(['index', 'show', 'store', 'update', 'destroy']);
 
         // Branch management
         Route::resource('branches', BranchAdminController::class)

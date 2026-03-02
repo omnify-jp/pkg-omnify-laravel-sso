@@ -10,7 +10,10 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Omnify\Core\Http\Requests\Admin\OrganizationStoreRequest;
 use Omnify\Core\Http\Requests\Admin\OrganizationUpdateRequest;
+use Omnify\Core\Models\Branch;
+use Omnify\Core\Models\Location;
 use Omnify\Core\Models\Organization;
+use Omnify\Core\Models\User;
 
 class OrganizationAdminController
 {
@@ -74,6 +77,122 @@ class OrganizationAdminController
             'filters' => [
                 'q' => $request->input('q'),
                 'sort' => $request->input('sort'),
+                'filter' => $request->input('filter'),
+            ],
+        ]);
+    }
+
+    public function show(Request $request, Organization $organization): Response
+    {
+        $pagesPath = config('omnify-auth.routes.standalone_admin_pages_path', 'admin');
+
+        $tab = $request->input('tab', 'general');
+
+        // Branches — search + sort
+        $branchSortField = $request->input('branches_sort', 'name');
+        $branchSortDirection = 'asc';
+        if (str_starts_with($branchSortField, '-')) {
+            $branchSortField = substr($branchSortField, 1);
+            $branchSortDirection = 'desc';
+        }
+        $allowedBranchSorts = ['name', 'slug', 'is_headquarters', 'is_active', 'created_at'];
+        if (! in_array($branchSortField, $allowedBranchSorts)) {
+            $branchSortField = 'name';
+            $branchSortDirection = 'asc';
+        }
+
+        $branches = Branch::query()
+            ->where('console_organization_id', $organization->console_organization_id)
+            ->when(
+                $request->input('branches_q'),
+                fn ($q, $search) => $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('slug', 'like', "%{$search}%")
+            )
+            ->orderBy($branchSortField, $branchSortDirection)
+            ->paginate(15, ['*'], 'branches_page')
+            ->withQueryString();
+
+        // Locations — search + sort + filter by branch
+        $locationSortField = $request->input('locations_sort', 'name');
+        $locationSortDirection = 'asc';
+        if (str_starts_with($locationSortField, '-')) {
+            $locationSortField = substr($locationSortField, 1);
+            $locationSortDirection = 'desc';
+        }
+        $allowedLocationSorts = ['name', 'code', 'type', 'is_active', 'created_at'];
+        if (! in_array($locationSortField, $allowedLocationSorts)) {
+            $locationSortField = 'name';
+            $locationSortDirection = 'asc';
+        }
+
+        $locations = Location::query()
+            ->where('console_organization_id', $organization->console_organization_id)
+            ->when(
+                $request->input('locations_q'),
+                fn ($q, $search) => $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
+            )
+            ->when(
+                $request->input('filter.branch'),
+                fn ($q, $branchId) => $q->where('console_branch_id', $branchId)
+            )
+            ->orderBy($locationSortField, $locationSortDirection)
+            ->paginate(15, ['*'], 'locations_page')
+            ->withQueryString();
+
+        // Users — users with any role scoped to this organization
+        $userSortField = $request->input('users_sort', 'name');
+        $userSortDirection = 'asc';
+        if (str_starts_with($userSortField, '-')) {
+            $userSortField = substr($userSortField, 1);
+            $userSortDirection = 'desc';
+        }
+        $allowedUserSorts = ['name', 'email', 'is_active', 'created_at'];
+        if (! in_array($userSortField, $allowedUserSorts)) {
+            $userSortField = 'name';
+            $userSortDirection = 'asc';
+        }
+
+        $users = User::query()
+            ->whereHas('roles', fn ($q) => $q->where('role_user_pivot.console_organization_id', $organization->console_organization_id))
+            ->when(
+                $request->input('users_q'),
+                fn ($q, $search) => $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+            )
+            ->orderBy($userSortField, $userSortDirection)
+            ->paginate(15, ['*'], 'users_page')
+            ->withQueryString();
+
+        $paginationMeta = fn ($paginator) => [
+            'current_page' => $paginator->currentPage(),
+            'last_page' => $paginator->lastPage(),
+            'per_page' => $paginator->perPage(),
+            'total' => $paginator->total(),
+        ];
+
+        return Inertia::render("{$pagesPath}/organizations/show", [
+            'organization' => $organization,
+            'branches' => [
+                'data' => $branches->items(),
+                'meta' => $paginationMeta($branches),
+            ],
+            'locations' => [
+                'data' => $locations->items(),
+                'meta' => $paginationMeta($locations),
+            ],
+            'users' => [
+                'data' => $users->items(),
+                'meta' => $paginationMeta($users),
+            ],
+            'tab' => $tab,
+            'filters' => [
+                'branches_q' => $request->input('branches_q'),
+                'branches_sort' => $request->input('branches_sort'),
+                'locations_q' => $request->input('locations_q'),
+                'locations_sort' => $request->input('locations_sort'),
+                'users_q' => $request->input('users_q'),
+                'users_sort' => $request->input('users_sort'),
                 'filter' => $request->input('filter'),
             ],
         ]);
