@@ -39,8 +39,7 @@ class OrganizationAdminController
             ->currentMode()
             ->when(
                 $request->input('q'),
-                fn ($q, $search) => $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('slug', 'like', "%{$search}%")
+                fn ($q, $search) => $q->where(fn ($sub) => $sub->where('name', 'like', "%{$search}%")->orWhere('slug', 'like', "%{$search}%"))
             )
             ->when(
                 $request->input('filter.is_active') !== null,
@@ -105,8 +104,7 @@ class OrganizationAdminController
             ->where('console_organization_id', $organization->console_organization_id)
             ->when(
                 $request->input('branches_q'),
-                fn ($q, $search) => $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('slug', 'like', "%{$search}%")
+                fn ($q, $search) => $q->where(fn ($sub) => $sub->where('name', 'like', "%{$search}%")->orWhere('slug', 'like', "%{$search}%"))
             )
             ->orderBy($branchSortField, $branchSortDirection)
             ->paginate(15, ['*'], 'branches_page')
@@ -126,14 +124,14 @@ class OrganizationAdminController
         }
 
         $locations = Location::query()
+            ->with('branch:id,name')
             ->where('console_organization_id', $organization->console_organization_id)
             ->when(
                 $request->input('locations_q'),
-                fn ($q, $search) => $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('code', 'like', "%{$search}%")
+                fn ($q, $search) => $q->where(fn ($sub) => $sub->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%"))
             )
             ->when(
-                $request->input('filter.branch'),
+                $request->input('branch_id'),
                 fn ($q, $branchId) => $q->where('console_branch_id', $branchId)
             )
             ->orderBy($locationSortField, $locationSortDirection)
@@ -155,10 +153,10 @@ class OrganizationAdminController
 
         $users = User::query()
             ->whereHas('roles', fn ($q) => $q->where('role_user_pivot.console_organization_id', $organization->console_organization_id))
+            ->with(['roles' => fn ($q) => $q->where('role_user_pivot.console_organization_id', $organization->console_organization_id)])
             ->when(
                 $request->input('users_q'),
-                fn ($q, $search) => $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
+                fn ($q, $search) => $q->where(fn ($sub) => $sub->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))
             )
             ->orderBy($userSortField, $userSortDirection)
             ->paginate(15, ['*'], 'users_page')
@@ -182,7 +180,12 @@ class OrganizationAdminController
                 'meta' => $paginationMeta($locations),
             ],
             'users' => [
-                'data' => $users->items(),
+                'data' => collect($users->items())->map(fn ($user) => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role_name' => $user->roles->first()?->name,
+                ]),
                 'meta' => $paginationMeta($users),
             ],
             'tab' => $tab,
@@ -193,7 +196,7 @@ class OrganizationAdminController
                 'locations_sort' => $request->input('locations_sort'),
                 'users_q' => $request->input('users_q'),
                 'users_sort' => $request->input('users_sort'),
-                'filter' => $request->input('filter'),
+                'branch_id' => $request->input('branch_id'),
             ],
         ]);
     }

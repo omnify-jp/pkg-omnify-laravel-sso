@@ -99,7 +99,7 @@ function OrganizationFormDrawer({ open, onClose, organization }: OrgFormDrawerPr
     const mutation = useMutation({
         mutationFn: (data: OrgFormData) => {
             if (isEdit) {
-                return api.put(`/admin/organizations/${organization.id}`, data);
+                return api.put(`/admin/organizations/${organization.slug}`, data);
             }
             return api.post('/admin/organizations', data);
         },
@@ -237,7 +237,7 @@ export default function AdminOrganizationsIndex({ organizations, filters }: Prop
             content: t('admin.organizations.deleteConfirmContent', 'This action cannot be undone.'),
             okText: t('common.delete', 'Delete'),
             okButtonProps: { danger: true },
-            onOk: () => deleteMutation.mutateAsync(org.id),
+            onOk: () => deleteMutation.mutateAsync(org.slug),
         });
     };
 

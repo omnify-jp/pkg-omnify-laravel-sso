@@ -34,7 +34,7 @@ type Location = {
     code: string;
     type: string;
     branch_id: string;
-    branch_name: string | null;
+    branch: { id: string; name: string } | null;
     is_active: boolean;
 };
 
@@ -62,6 +62,12 @@ type Props = {
     users: PaginatedResponse<UserRow>;
     tab: string;
     filters: {
+        branches_q?: string;
+        branches_sort?: string;
+        locations_q?: string;
+        locations_sort?: string;
+        users_q?: string;
+        users_sort?: string;
         branch_id?: string | null;
     };
 };
@@ -118,7 +124,7 @@ function OrgEditDrawer({ open, onClose, organization }: OrgEditDrawerProps) {
     }, [open, organization, form]);
 
     const mutation = useMutation({
-        mutationFn: (data: OrgFormData) => api.put(`/admin/organizations/${organization.id}`, data),
+        mutationFn: (data: OrgFormData) => api.put(`/admin/organizations/${organization.slug}`, data),
         onSuccess: () => {
             message.success(t('admin.organizations.updated', 'Organization updated.'));
             onClose();
@@ -564,6 +570,9 @@ function BranchesTab({ branches, organizationId, organizationSlug }: BranchesTab
             message.success(t('admin.branches.deleted', 'Branch deleted.'));
             router.reload();
         },
+        onError: () => {
+            message.error(t('admin.branches.deleteFailed', 'Failed to delete branch.'));
+        },
     });
 
     const handleCreate = () => {
@@ -666,7 +675,7 @@ function BranchesTab({ branches, organizationId, organizationSlug }: BranchesTab
                     onChange: (page) => {
                         router.get(
                             `/admin/organizations/${organizationSlug}`,
-                            { tab: 'branches', page },
+                            { tab: 'branches', branches_page: page },
                             { preserveState: true, preserveScroll: true },
                         );
                     },
@@ -704,6 +713,9 @@ function LocationsTab({ locations, branches, organizationId, organizationSlug, f
         onSuccess: () => {
             message.success(t('admin.locations.deleted', 'Location deleted.'));
             router.reload();
+        },
+        onError: () => {
+            message.error(t('admin.locations.deleteFailed', 'Failed to delete location.'));
         },
     });
 
@@ -754,7 +766,7 @@ function LocationsTab({ locations, branches, organizationId, organizationSlug, f
         {
             title: t('admin.locations.branch', 'Branch'),
             key: 'branch_name',
-            render: (_, record) => record.branch_name ?? '—',
+            render: (_, record) => record.branch?.name ?? '—',
         },
         {
             title: t('admin.locations.columns.status', 'Status'),
@@ -825,7 +837,7 @@ function LocationsTab({ locations, branches, organizationId, organizationSlug, f
                     onChange: (page) => {
                         router.get(
                             `/admin/organizations/${organizationSlug}`,
-                            { tab: 'locations', branch_id: filters.branch_id ?? undefined, page },
+                            { tab: 'locations', branch_id: filters.branch_id ?? undefined, locations_page: page },
                             { preserveState: true, preserveScroll: true },
                         );
                     },
@@ -883,7 +895,7 @@ function UsersTab({ users, organizationSlug }: UsersTabProps) {
                 onChange: (page) => {
                     router.get(
                         `/admin/organizations/${organizationSlug}`,
-                        { tab: 'users', page },
+                        { tab: 'users', users_page: page },
                         { preserveState: true, preserveScroll: true },
                     );
                 },
@@ -902,11 +914,11 @@ export default function AdminOrganizationShow({ organization, branches, location
     const breadcrumbs = [
         { title: t('nav.dashboard', 'Dashboard'), href: '/dashboard' },
         { title: t('admin.organizations.title', 'Organizations'), href: '/admin/organizations' },
-        { title: organization.name },
+        { title: organization.name, href: `/admin/organizations/${organization.slug}` },
     ];
 
     const deleteMutation = useMutation({
-        mutationFn: () => api.delete(`/admin/organizations/${organization.id}`),
+        mutationFn: () => api.delete(`/admin/organizations/${organization.slug}`),
         onSuccess: () => {
             message.success(t('admin.organizations.deleted', 'Organization deleted.'));
             router.visit('/admin/organizations');
