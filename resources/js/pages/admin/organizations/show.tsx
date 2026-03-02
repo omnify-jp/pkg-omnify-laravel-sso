@@ -1032,7 +1032,7 @@ function UserFormDrawer({ open, onClose, organizationSlug, editingUser, roles, b
                         type="primary"
                         loading={isPending}
                         onClick={handleSubmit}
-                        disabled={!isEdit && !hasSearched}
+                        disabled={!isEdit && (!hasSearched || !!userFoundButAlreadyInOrg)}
                     >
                         {isEdit
                             ? t('common.save', 'Save Changes')

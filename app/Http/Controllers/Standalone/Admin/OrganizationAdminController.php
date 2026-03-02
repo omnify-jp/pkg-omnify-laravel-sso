@@ -181,12 +181,13 @@ class OrganizationAdminController
                 'meta' => $paginationMeta($locations),
             ],
             'users' => [
-                'data' => collect($users->items())->map(function ($user) {
+                'data' => collect($users->items())->map(function ($user) use ($organization) {
+                    static $orgBranches = null;
+                    $orgBranches ??= Branch::where('console_organization_id', $organization->console_organization_id)
+                        ->pluck('name', 'console_branch_id');
+
                     $role = $user->roles->first();
                     $consoleBranchId = $role?->pivot->console_branch_id;
-                    $branch = $consoleBranchId
-                        ? Branch::where('console_branch_id', $consoleBranchId)->first(['name'])
-                        : null;
 
                     return [
                         'id' => $user->id,
@@ -197,7 +198,7 @@ class OrganizationAdminController
                         'role_name' => $role?->name,
                         'role_slug' => $role?->slug,
                         'console_branch_id' => $consoleBranchId,
-                        'branch_name' => $branch?->name,
+                        'branch_name' => $consoleBranchId ? ($orgBranches[$consoleBranchId] ?? null) : null,
                         'scope_type' => $consoleBranchId ? 'branch' : 'org-wide',
                     ];
                 }),

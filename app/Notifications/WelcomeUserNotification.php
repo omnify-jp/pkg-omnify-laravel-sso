@@ -13,7 +13,7 @@ class WelcomeUserNotification extends Notification implements ShouldQueue
 
     public function __construct(
         private readonly string $organizationName,
-        private readonly string $temporaryPassword,
+        private readonly string $resetUrl,
     ) {}
 
     /** @return array<int, string> */
@@ -27,8 +27,8 @@ class WelcomeUserNotification extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject("Welcome to {$this->organizationName}")
             ->line('Your account has been created by an administrator.')
-            ->line("Your temporary password is: **{$this->temporaryPassword}**")
-            ->action('Log In', url('/login'))
-            ->line('Please change your password after your first login.');
+            ->line('Please click the button below to set your password and get started.')
+            ->action('Set Password', $this->resetUrl)
+            ->line('This link will expire in 60 minutes.');
     }
 }

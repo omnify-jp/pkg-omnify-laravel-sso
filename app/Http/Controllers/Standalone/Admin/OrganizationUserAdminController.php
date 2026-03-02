@@ -5,11 +5,11 @@ namespace Omnify\Core\Http\Controllers\Standalone\Admin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Omnify\Core\Http\Requests\Admin\OrganizationUserStoreRequest;
 use Omnify\Core\Http\Requests\Admin\OrganizationUserUpdateRequest;
 use Omnify\Core\Models\Organization;
-use Omnify\Core\Models\Role;
 use Omnify\Core\Models\User;
 use Omnify\Core\Notifications\WelcomeUserNotification;
 use Omnify\Core\Services\UserRoleService;
@@ -26,7 +26,7 @@ class OrganizationUserAdminController
     public function search(Request $request, Organization $organization): JsonResponse
     {
         $request->validate([
-            'email' => ['required', 'string', 'min:2'],
+            'email' => ['required', 'email'],
         ]);
 
         $user = User::where('email', $request->input('email'))->first();
@@ -68,16 +68,20 @@ class OrganizationUserAdminController
             $isNewUser = true;
         }
 
-        $role = Role::find($request->input('role_id'));
-
-        $this->userRoleService->assignRole($user, [
-            'role_id' => $role->id,
+        $result = $this->userRoleService->assignRole($user, [
+            'role_id' => $request->input('role_id'),
             'console_organization_id' => $organization->console_organization_id,
             'console_branch_id' => $request->input('console_branch_id'),
         ]);
 
+        if (! $result['success']) {
+            return response()->json(['message' => $result['message'] ?? __('Failed to assign role.')], 409);
+        }
+
         if ($isNewUser) {
-            $user->notify(new WelcomeUserNotification($organization->name));
+            $token = Password::createToken($user);
+            $resetUrl = url('/password/reset/'.$token.'?email='.urlencode($user->email));
+            $user->notify(new WelcomeUserNotification($organization->name, $resetUrl));
         }
 
         return response()->json(['message' => __('User added to organization.')], 201);
