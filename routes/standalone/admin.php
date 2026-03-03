@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Omnify\Core\Http\Controllers\Standalone\Admin\AdminAdminController;
 use Omnify\Core\Http\Controllers\Standalone\Admin\BranchAdminController;
 use Omnify\Core\Http\Controllers\Standalone\Admin\BrandAdminController;
 use Omnify\Core\Http\Controllers\Standalone\Admin\LocationAdminController;
@@ -30,6 +31,10 @@ Route::prefix($prefix)
     ->name('admin.')
     ->middleware($middleware)
     ->group(function () {
+        // Admin (super-admin) management
+        Route::resource('admins', AdminAdminController::class)
+            ->only(['index', 'store', 'update', 'destroy']);
+
         // User management (standalone)
         Route::get('/users/create', [UserAdminController::class, 'create'])->name('users.create');
         Route::post('/users', [UserAdminController::class, 'store'])->name('users.store');

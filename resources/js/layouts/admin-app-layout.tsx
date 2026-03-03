@@ -11,6 +11,7 @@ import {
     Menu as MenuIcon,
     Settings,
     ShieldAlert,
+    ShieldCheck,
     Users,
 } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
@@ -60,6 +61,11 @@ function SiderContent({ collapsed, toggleSidebar, onNavigate }: {
             key: '/admin/users',
             icon: <Users size={16} />,
             label: <Link href="/admin/users/create">{t('admin.nav.users', 'Users')}</Link>,
+        },
+        {
+            key: '/admin/admins',
+            icon: <ShieldCheck size={16} />,
+            label: <Link href="/admin/admins">{t('admin.nav.admins', 'Admins')}</Link>,
         },
     ], [t]);
 

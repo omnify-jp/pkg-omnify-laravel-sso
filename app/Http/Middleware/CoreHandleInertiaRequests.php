@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Omnify\Core\Http\Middleware;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Omnify\Core\Models\Branch;
 use Omnify\Core\Models\Organization;
+use Omnify\Core\Services\OrganizationAccessService;
 
 /**
  * Base Inertia middleware provided by Core.
@@ -64,19 +66,7 @@ class CoreHandleInertiaRequests extends Middleware
     {
         $user = $request->user();
 
-        // Scope org list to user's role assignments (if relationship exists)
-        if ($user && method_exists($user, 'organizations')) {
-            $organizations = $user->organizations()
-                ->where('organizations.is_active', true)
-                ->select(['organizations.id', 'organizations.console_organization_id', 'organizations.name', 'organizations.slug'])
-                ->orderBy('organizations.name')
-                ->get();
-        } else {
-            $organizations = Organization::where('is_active', true)
-                ->select(['id', 'console_organization_id', 'name', 'slug'])
-                ->orderBy('name')
-                ->get();
-        }
+        $organizations = $this->resolveUserOrganizations($user);
 
         // Resolve current org: route parameter (URL) > cookie > first user org
         $current = null;
@@ -120,6 +110,57 @@ class CoreHandleInertiaRequests extends Middleware
             'currentBranch' => $currentBranch,
             'branches' => $branches->toArray(),
         ];
+    }
+
+    /**
+     * Resolve the list of organizations accessible to the given user.
+     *
+     * Console mode: uses OrganizationAccessService (calls Console API + local cache fallback)
+     * so org list always reflects the user's actual access granted by the Console.
+     *
+     * Standalone mode: uses role_user_pivot (local IAM assignments).
+     *
+     * @return Collection<int, Organization>
+     */
+    protected function resolveUserOrganizations(?object $user): Collection
+    {
+        if (! $user) {
+            return Organization::where('is_active', true)
+                ->select(['id', 'console_organization_id', 'name', 'slug'])
+                ->orderBy('name')
+                ->get();
+        }
+
+        if (config('omnify-auth.mode') === 'console') {
+            // Console mode: OrganizationAccessService calls Console API (with local cache fallback)
+            // to get the list of orgs the user actually has access to, then returns local records.
+            $orgAccessList = app(OrganizationAccessService::class)->getOrganizations($user);
+            $consoleOrgIds = array_column($orgAccessList, 'organization_id');
+
+            if (empty($consoleOrgIds)) {
+                return collect();
+            }
+
+            return Organization::whereIn('console_organization_id', $consoleOrgIds)
+                ->where('is_active', true)
+                ->select(['id', 'console_organization_id', 'name', 'slug'])
+                ->orderBy('name')
+                ->get();
+        }
+
+        // Standalone mode: scope org list to user's local role assignments
+        if (method_exists($user, 'organizations')) {
+            return $user->organizations()
+                ->where('organizations.is_active', true)
+                ->select(['organizations.id', 'organizations.console_organization_id', 'organizations.name', 'organizations.slug'])
+                ->orderBy('organizations.name')
+                ->get();
+        }
+
+        return Organization::where('is_active', true)
+            ->select(['id', 'console_organization_id', 'name', 'slug'])
+            ->orderBy('name')
+            ->get();
     }
 
     /**

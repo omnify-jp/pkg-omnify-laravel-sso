@@ -6,6 +6,7 @@ namespace Omnify\Core\Services;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Omnify\Core\Exceptions\ConsoleAuthException;
 
 class ConsoleTokenService
 {
@@ -57,7 +58,12 @@ class ConsoleTokenService
             return false;
         }
 
-        $tokens = $this->consoleApi->refreshToken($refreshToken);
+        try {
+            $tokens = $this->consoleApi->refreshToken($refreshToken);
+        } catch (ConsoleAuthException) {
+            // Refresh token is invalid, expired, or revoked — cannot renew
+            return false;
+        }
 
         if (! $tokens) {
             return false;
