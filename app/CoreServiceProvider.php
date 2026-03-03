@@ -16,16 +16,16 @@ use Omnify\Core\Http\Middleware\SetBranchFromHeader;
 use Omnify\Core\Http\Middleware\SetLocale;
 use Omnify\Core\Http\Middleware\ShareSsoData;
 use Omnify\Core\Http\Middleware\SsoAuthenticate;
-use Omnify\Core\Http\Middleware\ThrottleByTier;
 use Omnify\Core\Http\Middleware\SsoOrganizationAccess;
 use Omnify\Core\Http\Middleware\SsoPermissionCheck;
 use Omnify\Core\Http\Middleware\SsoRoleCheck;
 use Omnify\Core\Http\Middleware\StandaloneOrganizationContext;
+use Omnify\Core\Http\Middleware\ThrottleByTier;
 use Omnify\Core\Services\ConsoleApiService;
 use Omnify\Core\Services\ConsoleTokenService;
 use Omnify\Core\Services\JwksService;
 use Omnify\Core\Services\JwtVerifier;
-use Omnify\Core\Services\OrgAccessService;
+use Omnify\Core\Services\OrganizationAccessService;
 use Omnify\Core\Services\PermissionService;
 use Omnify\Core\Services\RoleService;
 use Omnify\Core\Services\UserRoleService;
@@ -77,8 +77,8 @@ class CoreServiceProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(OrgAccessService::class, function ($app) {
-            return new OrgAccessService(
+        $this->app->singleton(OrganizationAccessService::class, function ($app) {
+            return new OrganizationAccessService(
                 $app->make(ConsoleApiService::class),
                 $app->make(ConsoleTokenService::class),
                 config('omnify-auth.cache.org_access_ttl')

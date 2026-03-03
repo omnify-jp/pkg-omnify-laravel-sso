@@ -103,19 +103,30 @@ class OrganizationAccessService
      */
     public function getOrganizations(Model $user): array
     {
-        $accessToken = $this->tokenService->getAccessToken($user);
+        try {
+            $accessToken = $this->tokenService->getAccessToken($user);
+        } catch (\Throwable $e) {
+            \Log::warning('ConsoleTokenService::getAccessToken failed, using local org cache', ['error' => $e->getMessage()]);
+
+            return $this->getCachedOrganizations($user);
+        }
 
         if (! $accessToken) {
             // Fallback to cached organizations when no token available (for local development)
             return $this->getCachedOrganizations($user);
         }
 
-        $organizations = $this->consoleApi->getOrganizations($accessToken);
+        try {
+            $organizations = $this->consoleApi->getOrganizations($accessToken);
+            // Auto-cache organizations to database
+            $this->cacheOrganizations($organizations);
 
-        // Auto-cache organizations to database
-        $this->cacheOrganizations($organizations);
+            return $organizations;
+        } catch (\Throwable $e) {
+            \Log::warning('Console API getOrganizations failed, using local org cache', ['error' => $e->getMessage()]);
 
-        return $organizations;
+            return $this->getCachedOrganizations($user);
+        }
     }
 
     /**
@@ -141,7 +152,10 @@ class OrganizationAccessService
         $organizations = $query->get();
 
         return $organizations->map(fn ($organization) => [
-            'organization_id' => $organization->id,
+            // Use console_organization_id to match the Console API response format.
+            // resolveUserOrganizations() queries organizations by console_organization_id,
+            // so this must be the console UUID — not the local primary key.
+            'organization_id' => $organization->console_organization_id ?? $organization->id,
             'organization_slug' => $organization->slug ?: $organization->name,
             'organization_name' => $organization->name,
             'organization_role' => 'admin', // Default for local dev
