@@ -116,33 +116,36 @@ class SsoLocationController extends Controller
                 continue;
             }
 
-            Location::withTrashed()->updateOrCreate(
-                ['console_location_id' => $consoleLocationId],
-                [
-                    'console_branch_id' => $consoleBranchId,
-                    'console_organization_id' => $consoleOrganizationId,
-                    'code' => strtoupper($loc['code'] ?? 'UNKNOWN'),
-                    'name' => $loc['name'] ?? 'Unknown',
-                    'type' => $loc['type'] ?? 'office',
-                    'is_active' => $loc['is_active'] ?? true,
-                    'address' => $loc['address'] ?? null,
-                    'city' => $loc['city'] ?? null,
-                    'state_province' => $loc['state_province'] ?? null,
-                    'postal_code' => $loc['postal_code'] ?? null,
-                    'country_code' => $loc['country_code'] ?? null,
-                    'latitude' => $loc['latitude'] ?? null,
-                    'longitude' => $loc['longitude'] ?? null,
-                    'phone' => $loc['phone'] ?? null,
-                    'email' => $loc['email'] ?? null,
-                    'timezone' => $loc['timezone'] ?? null,
-                    'capacity' => $loc['capacity'] ?? null,
-                    'sort_order' => $loc['sort_order'] ?? 0,
-                    'description' => $loc['description'] ?? null,
-                    'settings' => $loc['settings'] ?? null,
-                    'metadata' => $loc['metadata'] ?? null,
-                    'deleted_at' => null,
-                ]
-            );
+            Location::withoutGlobalScope('standalone_mode')
+                ->withTrashed()
+                ->updateOrCreate(
+                    ['console_location_id' => $consoleLocationId],
+                    [
+                        'console_branch_id' => $consoleBranchId,
+                        'console_organization_id' => $consoleOrganizationId,
+                        'code' => strtoupper($loc['code'] ?? 'UNKNOWN'),
+                        'name' => $loc['name'] ?? 'Unknown',
+                        'type' => $loc['type'] ?? 'office',
+                        'is_active' => $loc['is_active'] ?? true,
+                        'is_standalone' => false,
+                        'address' => $loc['address'] ?? null,
+                        'city' => $loc['city'] ?? null,
+                        'state_province' => $loc['state_province'] ?? null,
+                        'postal_code' => $loc['postal_code'] ?? null,
+                        'country_code' => $loc['country_code'] ?? null,
+                        'latitude' => $loc['latitude'] ?? null,
+                        'longitude' => $loc['longitude'] ?? null,
+                        'phone' => $loc['phone'] ?? null,
+                        'email' => $loc['email'] ?? null,
+                        'timezone' => $loc['timezone'] ?? null,
+                        'capacity' => $loc['capacity'] ?? null,
+                        'sort_order' => $loc['sort_order'] ?? 0,
+                        'description' => $loc['description'] ?? null,
+                        'settings' => $loc['settings'] ?? null,
+                        'metadata' => $loc['metadata'] ?? null,
+                        'deleted_at' => null,
+                    ]
+                );
         }
     }
 

@@ -146,7 +146,7 @@ class SyncFromConsoleCommand extends Command
                 continue;
             }
 
-            $exists = Branch::withTrashed()->where('console_branch_id', $consoleBranchId)->exists();
+            $exists = Branch::withoutGlobalScope('standalone_mode')->withTrashed()->where('console_branch_id', $consoleBranchId)->exists();
 
             $this->line(sprintf(
                 '  [%s] %s (%s)',
@@ -156,7 +156,7 @@ class SyncFromConsoleCommand extends Command
             ));
 
             if (! $dryRun) {
-                Branch::withTrashed()->updateOrCreate(
+                Branch::withoutGlobalScope('standalone_mode')->withTrashed()->updateOrCreate(
                     ['console_branch_id' => $consoleBranchId],
                     [
                         'console_organization_id' => $branch['organization_id'] ?? $organization,
@@ -215,7 +215,7 @@ class SyncFromConsoleCommand extends Command
                     continue;
                 }
 
-                $exists = User::withTrashed()
+                $exists = User::withoutGlobalScope('standalone_mode')->withTrashed()
                     ->where('console_user_id', $consoleUserId)
                     ->exists();
 
@@ -227,7 +227,7 @@ class SyncFromConsoleCommand extends Command
                 ));
 
                 if (! $dryRun) {
-                    User::withTrashed()->updateOrCreate(
+                    User::withoutGlobalScope('standalone_mode')->withTrashed()->updateOrCreate(
                         ['console_user_id' => $consoleUserId],
                         [
                             // console_organization_id — lấy từ response hoặc lookup Organization

@@ -62,12 +62,23 @@ class CoreHandleInertiaRequests extends Middleware
      */
     protected function buildOrganizationData(Request $request): array
     {
-        $organizations = Organization::where('is_active', true)
-            ->select(['id', 'console_organization_id', 'name', 'slug'])
-            ->orderBy('name')
-            ->get();
+        $user = $request->user();
 
-        // Resolve current org: route parameter (URL) > cookie > null
+        // Scope org list to user's role assignments (if relationship exists)
+        if ($user && method_exists($user, 'organizations')) {
+            $organizations = $user->organizations()
+                ->where('organizations.is_active', true)
+                ->select(['organizations.id', 'organizations.console_organization_id', 'organizations.name', 'organizations.slug'])
+                ->orderBy('organizations.name')
+                ->get();
+        } else {
+            $organizations = Organization::where('is_active', true)
+                ->select(['id', 'console_organization_id', 'name', 'slug'])
+                ->orderBy('name')
+                ->get();
+        }
+
+        // Resolve current org: route parameter (URL) > cookie > first user org
         $current = null;
         $routeSlug = $request->route('organization');
 
@@ -81,6 +92,9 @@ class CoreHandleInertiaRequests extends Middleware
                 ? $organizations->firstWhere('console_organization_id', $currentOrgId)
                 : null;
         }
+
+        // Default to first org the user has access to
+        $current ??= $organizations->first();
 
         $branches = Branch::whereIn('console_organization_id', $organizations->pluck('console_organization_id'))
             ->where('is_active', true)

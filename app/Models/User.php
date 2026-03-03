@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -39,6 +40,22 @@ class User extends UserBaseModel implements AuthenticatableContract, Authorizabl
     protected static function newFactory(): Factory
     {
         return UserFactory::new();
+    }
+
+    /**
+     * Get organizations the user has access to (via role assignments in role_user_pivot).
+     */
+    public function organizations(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Organization::class,
+            'role_user_pivot',
+            'user_id',
+            'console_organization_id',
+            'id',
+            'console_organization_id'
+        )->whereNotNull('role_user_pivot.console_organization_id')
+            ->distinct();
     }
 
     /**

@@ -8,12 +8,9 @@ import {
     ChevronRight,
     LayoutDashboard,
     LogOut,
-    MapPin,
     Menu as MenuIcon,
-    Palette,
     Settings,
     ShieldAlert,
-    Store,
     Users,
 } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
@@ -55,15 +52,9 @@ function SiderContent({ collapsed, toggleSidebar, onNavigate }: {
         },
         { type: 'divider' as const },
         {
-            key: 'org',
+            key: '/admin/organizations',
             icon: <Building2 size={16} />,
-            label: t('admin.nav.orgManagement', 'Organizations'),
-            children: [
-                { key: '/admin/organizations', icon: <Building2 size={16} />, label: <Link href="/admin/organizations">{t('admin.nav.organizations', 'Organizations')}</Link> },
-                { key: '/admin/branches', icon: <Store size={16} />, label: <Link href="/admin/branches">{t('admin.nav.branches', 'Branches')}</Link> },
-                { key: '/admin/locations', icon: <MapPin size={16} />, label: <Link href="/admin/locations">{t('admin.nav.locations', 'Locations')}</Link> },
-                { key: '/admin/brands', icon: <Palette size={16} />, label: <Link href="/admin/brands">{t('admin.nav.brands', 'Brands')}</Link> },
-            ],
+            label: <Link href="/admin/organizations">{t('admin.nav.organizations', 'Organizations')}</Link>,
         },
         {
             key: '/admin/users',
